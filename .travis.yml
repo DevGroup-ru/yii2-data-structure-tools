@@ -18,7 +18,6 @@ install:
 
 before_script:
   - mysql -e 'create database yii2_datastructure;'
-  - mysql yii2_datastructure < tests/migrations/mysql.sql
 
 script:
   - vendor/bin/phpunit --coverage-clover=coverage.xml --verbose $PHPUNIT_FLAGS
