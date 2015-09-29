@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <dataset>
-    <product id="1" name="iPhone 6"/>
-    <product id="2" name="Galaxy S6"/>
-    <product id="3" name="Nokia 3310"/>
-    <product id="4" name="Nokia 3110"/>
-    <product id="5" name="Nokia 6110"/>
+    <product id="1" name="iPhone 6" sort_order="1" packed_json_data="[]"/>
+    <product id="2" name="Galaxy S6" sort_order="1" packed_json_data=""/>
+    <product id="3" name="Nokia 3310" sort_order="1" packed_json_data="[]"/>
+    <product id="4" name="Nokia 3110" sort_order="1" packed_json_data="[]"/>
+    <product id="5" name="Nokia 6110" sort_order="1" packed_json_data="[]"/>
 
     <category id="1" name="Cell phones" sort_order="1" />
     <category id="2" name="Smartphones" sort_order="2" />

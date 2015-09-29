@@ -5,8 +5,11 @@ $params = require(__DIR__ . '/params.php');
 return [
     'id' => 'minimal-console',
     'basePath' => dirname(__DIR__),
-    'bootstrap' => ['log'],
+    'bootstrap' => ['log', 'gii'],
     'controllerNamespace' => 'app\commands',
+    'controllerMap' => [
+        'properties' => '\DevGroup\DataStructure\commands\PropertiesController',
+    ],
     'components' => [
         'cache' => [
             'class' => 'yii\caching\FileCache',
@@ -20,6 +23,11 @@ return [
             ],
         ],
         'db' => require(__DIR__ . '/db.php'),
+    ],
+    'modules' => [
+        'gii' => [
+            'class' => 'yii\gii\Module',
+        ],
     ],
     'params' => $params,
 ];

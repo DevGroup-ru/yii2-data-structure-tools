@@ -18,7 +18,9 @@ class m150923_140300_properties extends Migration
             'is_internal' => $this->boolean()->defaultValue(0),
             'allow_multiple_values' => $this->boolean()->defaultValue(0),
             'storage_id' => $this->integer()->notNull(),
+            'packed_json_default_value' => $this->text()->notNull(),
         ], $tableOptions);
+        $this->createIndex('iKey', '{{%property}}', ['key'], true);
 
         $this->createTable('{{%static_value}}', [
             'id' => $this->primaryKey(),
@@ -82,9 +84,12 @@ class m150923_140300_properties extends Migration
     {
         $this->dropTable('{{%property_property_group}}');
         $this->dropTable('{{%property}}');
+        $this->dropTable('{{%property_translation}}');
         $this->dropTable('{{%property_group}}');
+        $this->dropTable('{{%property_group_translation}}');
         $this->dropTable('{{%property_storage}}');
         $this->dropTable('{{%static_value}}');
+        $this->dropTable('{{%static_value_translation}}');
     }
 
     /*

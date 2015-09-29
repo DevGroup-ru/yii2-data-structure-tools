@@ -5,6 +5,9 @@
 
 namespace DevGroup\DataStructure\tests;
 
+use DevGroup\DataStructure\helpers\PropertiesTableGenerator;
+use DevGroup\DataStructure\tests\models\Category;
+use DevGroup\DataStructure\tests\models\Product;
 use Yii;
 use yii\db\Connection;
 
@@ -34,7 +37,7 @@ class DatabaseTest extends \PHPUnit_Extensions_Database_TestCase
      */
     protected function setUp()
     {
-        (new \yii\web\Application([
+        (new \yii\console\Application([
             'id' => 'unit',
             'basePath' => __DIR__,
             'bootstrap' => ['log'],
@@ -47,11 +50,6 @@ class DatabaseTest extends \PHPUnit_Extensions_Database_TestCase
                             'levels' => ['info'],
                         ],
                     ],
-                ],
-                'request' => [
-                    'cookieValidationKey' => 'wefJDF8sfdsfSDefwqdxj9oq',
-                    'scriptFile' => __DIR__ .'/index.php',
-                    'scriptUrl' => '/index.php',
                 ],
                 'cache' => [
                     'class' => '\yii\caching\FileCache',
@@ -70,11 +68,22 @@ class DatabaseTest extends \PHPUnit_Extensions_Database_TestCase
             ]);
 
             Yii::$app->getDb()->open();
-            $this->importDump('properties.sql');
+
+            Yii::$app->runAction('migrate/down', [99999, 'interactive'=>0, 'migrationPath' => __DIR__ . '/../src/migrations/']);
+            Yii::$app->runAction('migrate/up', ['interactive'=>0, 'migrationPath' => __DIR__ . '/../src/migrations/']);
+
             $this->importDump('models.sql');
+
+
+            $generator = PropertiesTableGenerator::getInstance();
+
+            $generator->generate(Product::className());
+            $generator->generate(Category::className());
+
 
         } catch (\Exception $e) {
             Yii::$app->clear('db');
+            throw $e;
         }
 
 
@@ -105,6 +114,10 @@ class DatabaseTest extends \PHPUnit_Extensions_Database_TestCase
     protected function tearDown()
     {
         parent::tearDown();
+        $generator = PropertiesTableGenerator::getInstance();
+
+        $generator->drop(Product::className());
+        $generator->drop(Category::className());
         $this->destroyApplication();
     }
     /**
@@ -120,7 +133,25 @@ class DatabaseTest extends \PHPUnit_Extensions_Database_TestCase
 
     public function testActiveRecord()
     {
-        $this->fail('TBD');
+        $this->markTestSkipped('TBD');
+    }
+
+    public function testPackedJsonFields()
+    {
+        /** @var Product $product */
+        $product = Product::findOne(1);
+        $this->assertEquals([], $product->data);
+        $testArray = ['test'=>1, 2=>'foo', 'bar' => false];
+        $product->data = $testArray;
+        $this->assertEquals($testArray, $product->data);
+        $this->assertTrue($product->save());
+        $this->assertEquals($testArray, $product->data);
+
+        $product = Product::findOne(1);
+        $this->assertEquals($testArray, $product->data);
+
+        $product = Product::findOne(2);
+        $this->assertNull($product->data);
 
 
     }

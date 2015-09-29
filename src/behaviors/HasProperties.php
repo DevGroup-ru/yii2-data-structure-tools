@@ -21,7 +21,7 @@ class HasProperties extends Behavior
         parent::attach($owner);
         /** @var \yii\db\ActiveRecord $owner */
         $owner = $this->owner;
-        if ($owner->hasMethod('deleteTableInheritanceRow', false) === false) {
+        if ($owner->hasMethod('ensurePropertyGroupIds', false) === false) {
             throw new InvalidConfigException('Model class must has PropertiesTrait.');
         }
     }

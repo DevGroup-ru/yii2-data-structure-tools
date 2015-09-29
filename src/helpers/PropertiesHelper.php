@@ -107,7 +107,7 @@ class PropertiesHelper
             return;
         }
 
-        $binding_rows = Yii::$app->cache->lazy(function() use($firstModel) {
+        $binding_rows = Yii::$app->cache->lazy(function() use($firstModel, $models) {
             $query = new \yii\db\Query();
             return $query
                 ->select(['model_id', 'property_group_id'])
@@ -133,6 +133,7 @@ class PropertiesHelper
                     if ($item['model_id'] === $id) {
                         $carry[] = $item['property_group_id'];
                     }
+                    return $carry;
                 },
                 []
             );

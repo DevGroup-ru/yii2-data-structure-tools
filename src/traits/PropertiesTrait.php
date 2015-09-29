@@ -14,11 +14,11 @@ trait PropertiesTrait
      */
     public $property_group_ids = null;
 
-    /** @var null|string[] Array of properties attributes names  */
-    public $propertiesAttributes = null;
-
     /** @var null|integer[] Array of properties ids */
     public $propertiesIds = null;
+
+    /** @var null|string[] Array of properties attributes names indexed by property ids  */
+    public $propertiesAttributes = null;
 
     /**
      * Ensures that $property_group_ids is retrieved
@@ -60,11 +60,15 @@ trait PropertiesTrait
             $this->propertiesAttributes = [];
 
             foreach ($this->propertiesIds as $property_id) {
-                $this->propertiesAttributes[] = Property::propertyKeyForId($property_id);
+                $this->propertiesAttributes[$property_id] = Property::propertyKeyForId($property_id);
             }
         }
     }
 
+    /**
+     * @return \Generator
+     * @throws \Exception
+     */
     public function iteratePropertyGroups()
     {
         foreach ($this->property_group_ids as $id) {
@@ -79,6 +83,12 @@ trait PropertiesTrait
         }
     }
 
+    /**
+     * @param int $property_group_id
+     *
+     * @return \Generator
+     * @throws \Exception
+     */
     public function iterateGroupProperties($property_group_id)
     {
         $property_ids = PropertyGroup::propertyIdsForGroup($property_group_id);

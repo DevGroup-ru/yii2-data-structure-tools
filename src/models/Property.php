@@ -1,6 +1,8 @@
 <?php
 namespace DevGroup\DataStructure\models;
 
+use DevGroup\DataStructure\behaviors\PackedJsonAttributes;
+use DevGroup\DataStructure\helpers\PropertiesHelper;
 use DevGroup\Multilingual\behaviors\MultilingualActiveRecord;
 use DevGroup\Multilingual\traits\MultilingualTrait;
 use DevGroup\TagDependencyHelper\CacheableActiveRecord;
@@ -29,6 +31,9 @@ class Property extends ActiveRecord
             'CacheableActiveRecord' => [
                 'class' => CacheableActiveRecord::className(),
             ],
+            'PackedJsonAttributes' => [
+                'class' => PackedJsonAttributes::className(),
+            ],
         ];
     }
 
@@ -40,6 +45,29 @@ class Property extends ActiveRecord
         return '{{%property}}';
     }
 
+    /**
+     * @inheritdoc
+     */
+    public function rules()
+    {
+        return [
+            ['key', 'unique'],
+            ['key', 'required'],
+            ['key', 'string', 'max'=>80],
+            [['is_numeric', 'is_internal', 'allow_multiple_values'], 'filter', 'filter'=>'boolval'],
+            ['storage_id', function ($attribute, $params) {
+                $handlers = PropertiesHelper::storageHandlers();
+                return isset($handlers[$this->$attribute]);
+            }],
+        ];
+    }
+
+    /**
+     * Perform afterSave events, flush needed caches
+     *
+     * @param bool  $insert
+     * @param array $changedAttributes
+     */
     public function afterSave($insert, $changedAttributes)
     {
         parent::afterSave($insert, $changedAttributes);
@@ -48,12 +76,23 @@ class Property extends ActiveRecord
         }
     }
 
+    /**
+     * Perform afterFind events, fill static variable(per-process memory cache)
+     */
     public function afterFind()
     {
         parent::afterFind();
         static::$propertyIdToKey[$this->id] = $this->key;
     }
 
+    /**
+     * Returns property key by property id.
+     * Uses identityMap, $propertyIdToKey static variable(per-process memory cache), lazy cache for db query
+     *
+     * @param int $property_id
+     *
+     * @return string|null
+     */
     public static function propertyKeyForId($property_id)
     {
 
@@ -73,7 +112,7 @@ class Property extends ActiveRecord
                     ->where(['id' => $property_id])
                     ->scalar(static::getDb());
             },
-            "PropertyKeyForId:{$property_id}",
+            "PropertyKeyForId:$property_id",
             86400
         );
         return static::$propertyIdToKey[$property_id];

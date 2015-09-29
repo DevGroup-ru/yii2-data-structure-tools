@@ -10,11 +10,11 @@ define('YII_ENV', 'test');
 $_SERVER['SCRIPT_NAME'] = '/' . __DIR__;
 $_SERVER['SCRIPT_FILENAME'] = __FILE__;
 $_SERVER['REQUEST_URI'] = '/';
-$_SERVER['SERVER_NAME'] = 'yii2-tag-dependency-helper.test';
+$_SERVER['SERVER_NAME'] = 'yii2-data-structure-tools.test';
 
 require_once(__DIR__ . '/../vendor/autoload.php');
 require_once(__DIR__ . '/../vendor/yiisoft/yii2/Yii.php');
 
-Yii::setAlias('@DevGroup/TagDependencyHelper/tests', __DIR__);
-Yii::setAlias('@DevGroup/TagDependencyHelper', dirname(__DIR__).'/src/');
+Yii::setAlias('@DevGroup/DataStructure/tests', __DIR__);
+Yii::setAlias('@DevGroup/DataStructure', dirname(__DIR__).'/src/');
 
