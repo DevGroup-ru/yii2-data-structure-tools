@@ -11,6 +11,17 @@ use Yii;
 use yii\db\ActiveRecord;
 use yii\db\Query;
 
+/**
+ * Class Property
+ *
+ * @mixin \DevGroup\Multilingual\behaviors\MultilingualActiveRecord
+ * @property string  $key
+ * @property boolean $is_numeric
+ * @property boolean $is_internal
+ * @property integer $storage_id
+ *
+ * @package DevGroup\DataStructure\models
+ */
 class Property extends ActiveRecord
 {
     public static $propertyIdToKey = [];

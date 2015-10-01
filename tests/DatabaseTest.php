@@ -6,6 +6,7 @@
 namespace DevGroup\DataStructure\tests;
 
 use DevGroup\DataStructure\helpers\PropertiesTableGenerator;
+use DevGroup\DataStructure\models\PropertyGroup;
 use DevGroup\DataStructure\tests\models\Category;
 use DevGroup\DataStructure\tests\models\Product;
 use Yii;
@@ -40,7 +41,7 @@ class DatabaseTest extends \PHPUnit_Extensions_Database_TestCase
         (new \yii\console\Application([
             'id' => 'unit',
             'basePath' => __DIR__,
-            'bootstrap' => ['log'],
+            'bootstrap' => ['log', 'multilingual'],
             'components' => [
                 'log' => [
                     'traceLevel' => 10,
@@ -56,6 +57,10 @@ class DatabaseTest extends \PHPUnit_Extensions_Database_TestCase
                     'as lazy' => [
                         'class' => 'DevGroup\TagDependencyHelper\LazyCache',
                     ],
+                ],
+                'multilingual' => [
+                    'class' => 'DevGroup\Multilingual\Multilingual',
+                    'default_language_id' => 1,
                 ],
             ],
         ]));
@@ -79,6 +84,14 @@ class DatabaseTest extends \PHPUnit_Extensions_Database_TestCase
 
             $generator->generate(Product::className());
             $generator->generate(Category::className());
+
+
+            Yii::$app->getDb()
+                ->createCommand()
+                ->batchInsert('{{%property_group_models}}', ['class_name'],[
+                    [Product::className(),],
+                    [Category::className(),],
+                ])->execute();
 
 
         } catch (\Exception $e) {
@@ -133,26 +146,40 @@ class DatabaseTest extends \PHPUnit_Extensions_Database_TestCase
 
     public function testActiveRecord()
     {
-        $this->markTestSkipped('TBD');
+        // property group for all products
+        $package_properties = new PropertyGroup(Product::className());
+        $package_properties->internal_name = 'Package properties';
+        $package_properties->translate()->name = 'Package';
+        $package_properties->is_auto_added = true;
+
+        $this->assertTrue($package_properties->save());
+
+        // property group for smartphones only!
+        $smartphone_general = new PropertyGroup(Product::className());
+        $smartphone_general->internal_name = 'Smartphone - general';
+        $smartphone_general->translate()->name = 'General';
+        $this->assertTrue($smartphone_general->save());
+
+       // $this->markTestSkipped('TBD');
     }
 
-    public function testPackedJsonFields()
-    {
-        /** @var Product $product */
-        $product = Product::findOne(1);
-        $this->assertEquals([], $product->data);
-        $testArray = ['test'=>1, 2=>'foo', 'bar' => false];
-        $product->data = $testArray;
-        $this->assertEquals($testArray, $product->data);
-        $this->assertTrue($product->save());
-        $this->assertEquals($testArray, $product->data);
-
-        $product = Product::findOne(1);
-        $this->assertEquals($testArray, $product->data);
-
-        $product = Product::findOne(2);
-        $this->assertNull($product->data);
-
-
-    }
+//    public function testPackedJsonFields()
+//    {
+//        /** @var Product $product */
+//        $product = Product::findOne(1);
+//        $this->assertEquals([], $product->data);
+//        $testArray = ['test'=>1, 2=>'foo', 'bar' => false];
+//        $product->data = $testArray;
+//        $this->assertEquals($testArray, $product->data);
+//        $this->assertTrue($product->save());
+//        $this->assertEquals($testArray, $product->data);
+//
+//        $product = Product::findOne(1);
+//        $this->assertEquals($testArray, $product->data);
+//
+//        $product = Product::findOne(2);
+//        $this->assertNull($product->data);
+//
+//
+//    }
 }

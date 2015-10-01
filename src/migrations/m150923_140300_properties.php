@@ -32,7 +32,11 @@ class m150923_140300_properties extends Migration
             'id' => $this->primaryKey(),
             'internal_name' => $this->string()->notNull(),
             'sort_order' => $this->integer()->notNull()->defaultValue(0),
+            'property_group_model_id' => $this->integer()->notNull(),
+            'is_auto_added' => $this->boolean()->defaultValue(0),
         ], $tableOptions);
+
+        $this->createIndex('by_models', '{{%property_group}}', ['property_group_model_id']);
 
         $this->createTable('{{%property_property_group}}', [
             'property_id' => $this->integer()->notNull(),
@@ -48,6 +52,11 @@ class m150923_140300_properties extends Migration
             'name' => $this->string()->notNull(),
             'class_name' => $this->string()->notNull(),
             'sort_order' => $this->integer()->notNull()->defaultValue(0),
+        ], $tableOptions);
+
+        $this->createTable('{{%property_group_models}}', [
+            'id' => $this->primaryKey(),
+            'class_name' => $this->string()->notNull(),
         ], $tableOptions);
 
         // translations
@@ -90,6 +99,7 @@ class m150923_140300_properties extends Migration
         $this->dropTable('{{%property_storage}}');
         $this->dropTable('{{%static_value}}');
         $this->dropTable('{{%static_value_translation}}');
+        $this->dropTable('{{%property_group_models}}');
     }
 
     /*

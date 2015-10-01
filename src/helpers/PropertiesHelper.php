@@ -2,9 +2,9 @@
 
 namespace DevGroup\DataStructure\helpers;
 
-
 use DevGroup\DataStructure\models\PropertyStorage;
 use Yii;
+use yii\base\Exception;
 use yii\helpers\ArrayHelper;
 
 class PropertiesHelper
@@ -15,12 +15,17 @@ class PropertiesHelper
     private static $_storageHandlers = null;
 
     /**
+     * @var array Hash map of className to property_group_model.id
+     */
+    private static $_property_group_models = null;
+
+    /**
      * @return \DevGroup\DataStructure\propertyStorage\AbstractPropertyStorage[] PropertyStorage indexed by PropertyStorage.id
      */
     public static function storageHandlers()
     {
         if (static::$_storageHandlers === null) {
-            static::$_storageHandlers = Yii::$app->cache->lazy(function(){
+            static::$_storageHandlers = Yii::$app->cache->lazy(function() {
                 $rows = PropertyStorage::find()
                     ->asArray()
                     ->all();
@@ -28,6 +33,47 @@ class PropertiesHelper
             }, 'StorageHandlers', 86400, PropertyStorage::commonTag());
         }
         return static::$_storageHandlers;
+    }
+
+    /**
+     * Returns id of property_group_models record for requested classname
+     *
+     * @param string     $className
+     * @param bool       $forceRefresh
+     *
+     * @return integer
+     * @throws \yii\base\Exception
+     */
+    public static function propertyGroupModelId($className, $forceRefresh = false)
+    {
+        if (static::$_property_group_models === null || $forceRefresh === true) {
+
+            if ($forceRefresh === true) {
+                Yii::$app->cache->delete('PropertyGroupModelsMap');
+            }
+
+            static::$_property_group_models = Yii::$app->cache->lazy(function() {
+                $query = new \yii\db\Query();
+                $rows = $query
+                    ->select(['id', 'class_name'])
+                    ->from('{{%property_group_models}}')
+                    ->all();
+                array_walk($rows, function(&$item) {
+                    $item['id'] = intval($item['id']);
+                });
+                return ArrayHelper::map(
+                    $rows,
+                    'class_name',
+                    'id'
+                );
+            }, 'PropertyGroupModelsMap', 86400);
+        }
+
+        if (isset(static::$_property_group_models[$className])) {
+            return static::$_property_group_models[$className];
+        } else {
+            throw new Exception('Property group model record not found for class: ' . $className);
+        }
     }
 
     /**

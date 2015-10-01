@@ -1,6 +1,7 @@
 <?php
 namespace DevGroup\DataStructure\models;
 
+use DevGroup\DataStructure\helpers\PropertiesHelper;
 use DevGroup\Multilingual\behaviors\MultilingualActiveRecord;
 use DevGroup\Multilingual\traits\MultilingualTrait;
 use DevGroup\TagDependencyHelper\CacheableActiveRecord;
@@ -9,13 +10,35 @@ use Yii;
 use yii\db\ActiveRecord;
 use yii\db\Query;
 
+/**
+ * Class PropertyGroup
+ *
+ * @property integer $property_group_model_id
+ * @property integer $sort_order
+ * @property boolean $is_auto_added
+ * @property string  $internal_name
+ * @mixin \DevGroup\Multilingual\behaviors\MultilingualActiveRecord
+ * @method PropertyGroupTranslation translate
+ */
 class PropertyGroup extends ActiveRecord
 {
 
-    public static $groupIdToPropertyIds = [];
+    private static $groupIdToPropertyIds = [];
 
     use MultilingualTrait;
     use TagDependencyTrait;
+
+    /**
+     * PropertyGroup constructor.
+     *
+     * @param array $className
+     * @param array $config
+     */
+    public function __construct($className, array $config=[])
+    {
+        parent::__construct($config);
+        $this->property_group_model_id = PropertiesHelper::propertyGroupModelId($className);
+    }
 
     /**
      * @inheritdoc
@@ -39,6 +62,18 @@ class PropertyGroup extends ActiveRecord
     public static function tableName()
     {
         return '{{%property_group}}';
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function rules()
+    {
+        return [
+            [['internal_name'], 'required',],
+            [['sort_order', 'property_group_model_id'], 'integer'],
+            [['is_auto_added'], 'filter', 'filter'=>'boolval'],
+        ];
     }
 
     /**
@@ -77,6 +112,11 @@ class PropertyGroup extends ActiveRecord
             ->via('groupProperties');
     }
 
+    /**
+     * Performs afterSave event and invalidates needed cache
+     * @param bool  $insert
+     * @param array $changedAttributes
+     */
     public function afterSave($insert, $changedAttributes)
     {
         parent::afterSave($insert, $changedAttributes);

@@ -3,6 +3,8 @@
 namespace DevGroup\DataStructure\propertyStorage;
 
 use DevGroup\DataStructure\helpers\PropertiesHelper;
+use DevGroup\DataStructure\models\Property;
+use DevGroup\DataStructure\models\StaticValue;
 use Yii;
 
 class StaticValues extends AbstractPropertyStorage
@@ -25,6 +27,7 @@ class StaticValues extends AbstractPropertyStorage
                     'sort_order',
                 ])
                 ->from($firstModel->static_values_bindings_table())
+                ->innerJoin(StaticValue::tableName(), ['static_value_id'=>'id'])
                 ->where(PropertiesHelper::getInCondition($models))
                 ->orderBy(['model_id' => SORT_ASC, 'sort_order' => SORT_ASC])
                 ->all($firstModel->getDb());
@@ -35,7 +38,7 @@ class StaticValues extends AbstractPropertyStorage
 
         foreach ($static_values_rows as $row) {
             $model = &$models[$modelIdToArrayIndex[$row['model_id']]];
-//            $model->setAttribute();
+
         }
     }
 
