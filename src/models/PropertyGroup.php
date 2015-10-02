@@ -73,6 +73,9 @@ class PropertyGroup extends ActiveRecord
             [['internal_name'], 'required',],
             [['sort_order', 'property_group_model_id'], 'integer'],
             [['is_auto_added'], 'filter', 'filter'=>'boolval'],
+            ['property_group_model_id', function($attribute) {
+                return PropertiesHelper::classNameForPropertyGroupModelId($this->$attribute) !== false;
+            }],
         ];
     }
 
@@ -113,7 +116,10 @@ class PropertyGroup extends ActiveRecord
     }
 
     /**
-     * Performs afterSave event and invalidates needed cache
+     * Performs afterSave event and makes other stuff:
+     * - invalidates needed cache
+     * - automatically adds bindings if this group is_auto_added
+     *
      * @param bool  $insert
      * @param array $changedAttributes
      */
@@ -122,6 +128,10 @@ class PropertyGroup extends ActiveRecord
         parent::afterSave($insert, $changedAttributes);
 
         $this->invalidatePropertyIds();
+
+        if (isset($changedAttributes['is_auto_added']) && $this->is_auto_added === true) {
+            $this->autoAddToObjects();
+        }
     }
 
     /**
@@ -130,6 +140,13 @@ class PropertyGroup extends ActiveRecord
     public function invalidatePropertyIds()
     {
         Yii::$app->cache->delete("PropertyIdsForGroup:{$this->id}");
+    }
+
+    public function autoAddToObjects()
+    {
+        /** @var \yii\db\ActiveRecord $modelClassName */
+        $modelClassName = PropertiesHelper::classNameForPropertyGroupModelId($this->property_group_model_id);
+
     }
 
     /**

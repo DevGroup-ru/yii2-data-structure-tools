@@ -36,15 +36,11 @@ class PropertiesHelper
     }
 
     /**
-     * Returns id of property_group_models record for requested classname
+     * @param bool|false $forceRefresh
      *
-     * @param string     $className
-     * @param bool       $forceRefresh
-     *
-     * @return integer
-     * @throws \yii\base\Exception
+     * @return array
      */
-    public static function propertyGroupModelId($className, $forceRefresh = false)
+    private static function retrievePropertyGroupModels($forceRefresh = false)
     {
         if (static::$_property_group_models === null || $forceRefresh === true) {
 
@@ -68,12 +64,41 @@ class PropertiesHelper
                 );
             }, 'PropertyGroupModelsMap', 86400);
         }
+        return static::$_property_group_models;
+    }
+
+    /**
+     * Returns id of property_group_models record for requested classname
+     *
+     * @param string      $className
+     * @param bool|false  $forceRefresh
+     *
+     * @return integer
+     * @throws \yii\base\Exception
+     */
+    public static function propertyGroupModelId($className, $forceRefresh = false)
+    {
+        static::retrievePropertyGroupModels($forceRefresh);
 
         if (isset(static::$_property_group_models[$className])) {
             return static::$_property_group_models[$className];
         } else {
             throw new Exception('Property group model record not found for class: ' . $className);
         }
+    }
+
+    /**
+     * Returns class name of Model for which property group model record is associated
+     *
+     * @param string      $id
+     * @param bool|false  $forceRefresh
+     *
+     * @return string|false
+     */
+    public static function classNameForPropertyGroupModelId($id, $forceRefresh = false)
+    {
+        static::retrievePropertyGroupModels($forceRefresh);
+        return array_search($id, static::$_property_group_models);
     }
 
     /**
@@ -213,5 +238,13 @@ class PropertiesHelper
     public static function getInCondition(&$models)
     {
         return $condition = 'model_id in (' . implode(',', ArrayHelper::getColumn($models, 'id', false)) . ')';
+    }
+
+    public static function bindGroupToModels(&$models)
+    {
+        /** @var \yii\db\ActiveRecord|\DevGroup\DataStructure\traits\PropertiesTrait|\DevGroup\TagDependencyHelper\TagDependencyTrait $firstModel */
+        $firstModel = reset($models);
+        $tableName = $firstModel->binded_property_groups_table();
+
     }
 }

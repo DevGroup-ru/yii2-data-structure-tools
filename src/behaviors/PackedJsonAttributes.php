@@ -12,7 +12,12 @@ class PackedJsonAttributes extends Behavior
     /** @var string[] name of packed attributes without prefix */
     private $packedAttributes = null;
     public $prefix = 'packed_json_';
-    private $unpackedValues = null;
+    private $unpackedValues = [];
+
+    /**
+     * @var bool Set real value to empty array on null
+     */
+    public $forceEmptyArray = true;
     /**
      * @inheritdoc
      */
@@ -125,7 +130,21 @@ class PackedJsonAttributes extends Behavior
         /** @var ActiveRecord $owner */
         $owner = $this->owner;
 
+
+        if ($this->forceEmptyArray === true) {
+            // set unset attributes to empty array
+            foreach ($this->packedAttributes as $attribute) {
+                if (!isset($this->unpackedValues[$attribute])) {
+                    $this->unpackedValues[$attribute] = [];
+                }
+            }
+        }
+
+        // pack all attributes to JSON string
         foreach ($this->unpackedValues as $attribute => $value) {
+            if (empty($value) && $this->forceEmptyArray === true) {
+                $value = [];
+            }
             $owner->setAttribute($this->addPrefix($attribute), Json::encode($value));
         }
     }

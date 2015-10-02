@@ -5,8 +5,12 @@
 
 namespace DevGroup\DataStructure\tests;
 
+use DevGroup\DataStructure\helpers\PropertiesHelper;
 use DevGroup\DataStructure\helpers\PropertiesTableGenerator;
+use DevGroup\DataStructure\helpers\PropertyHandlerHelper;
+use DevGroup\DataStructure\models\Property;
 use DevGroup\DataStructure\models\PropertyGroup;
+use DevGroup\DataStructure\propertyStorage\StaticValues;
 use DevGroup\DataStructure\tests\models\Category;
 use DevGroup\DataStructure\tests\models\Product;
 use Yii;
@@ -144,6 +148,31 @@ class DatabaseTest extends \PHPUnit_Extensions_Database_TestCase
         \Yii::$app = null;
     }
 
+    public function testHelpers()
+    {
+        $good = false;
+        try {
+            PropertyHandlerHelper::getInstance()->handlerById(PHP_INT_MAX);
+        } catch (\Exception $e) {
+            $good = true;
+        }
+        $this->assertTrue($good);
+
+        $handler = PropertyHandlerHelper::getInstance()->handlerById(1);
+        $this->assertEquals(\DevGroup\DataStructure\propertyHandler\StaticValues::className(), $handler->className());
+
+        $good = false;
+        try {
+            PropertyHandlerHelper::getInstance()->handlerIdByClassName(get_class($this));
+        } catch (\Exception $e) {
+            $good = true;
+        }
+        $this->assertTrue($good);
+
+        $id = PropertyHandlerHelper::getInstance()->handlerIdByClassName(\DevGroup\DataStructure\propertyHandler\StaticValues::className());
+        $this->assertEquals(1, $id);
+    }
+
     public function testActiveRecord()
     {
         // property group for all products
@@ -151,7 +180,6 @@ class DatabaseTest extends \PHPUnit_Extensions_Database_TestCase
         $package_properties->internal_name = 'Package properties';
         $package_properties->translate()->name = 'Package';
         $package_properties->is_auto_added = true;
-
         $this->assertTrue($package_properties->save());
 
         // property group for smartphones only!
@@ -159,6 +187,15 @@ class DatabaseTest extends \PHPUnit_Extensions_Database_TestCase
         $smartphone_general->internal_name = 'Smartphone - general';
         $smartphone_general->translate()->name = 'General';
         $this->assertTrue($smartphone_general->save());
+
+        $weight = new Property();
+        $weight->key = 'weight';
+        $weight->storage_id = array_search(StaticValues::className(), PropertiesHelper::storageHandlers());
+        $weight->property_handler_id = PropertyHandlerHelper::getInstance()->handlerIdByClassName(
+            \DevGroup\DataStructure\propertyHandler\StaticValues::className()
+        );
+        $this->assertTrue($weight->save());
+
 
        // $this->markTestSkipped('TBD');
     }

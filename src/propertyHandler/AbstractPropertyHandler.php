@@ -2,37 +2,41 @@
 
 namespace DevGroup\DataStructure\propertyHandler;
 
+use DevGroup\DataStructure\helpers\PropertyHandlerHelper;
 use DevGroup\DataStructure\models\Property;
 use yii\base\UnknownPropertyException;
 use yii\web\ServerErrorHttpException;
 
 abstract class AbstractPropertyHandler
 {
-
-    /** @var AbstractPropertyHandler Singleton */
-    public static $instance = null;
-
-    /**
-     * @return AbstractPropertyHandler Property handler instance(singleton is used)
-     */
-    public static function getInstance()
+    public function __construct()
     {
-        if (static::$instance === null) {
-            static::$instance = new static();
-        }
-        return static::$instance;
-    }
-
-    public function afterFind($model, $attribute) {
 
     }
 
-    public function afterSave($model, $attribute) {
+    public function afterFind($model, $attribute)
+    {
 
     }
 
-    public function beforeSave($model, $attribute) {
+    public function afterSave($model, $attribute)
+    {
+
+    }
+
+    public function beforeSave($model, $attribute)
+    {
         return true;
+    }
+
+    public function beforePropertyModelSave(Property &$property, $insert)
+    {
+        return true;
+    }
+
+    public function afterPropertyModelSave(Property &$property)
+    {
+
     }
 
     abstract protected function getValidationRules(Property $property);
@@ -41,7 +45,7 @@ abstract class AbstractPropertyHandler
 
     /**
      * @param \yii\db\ActiveRecord|\DevGroup\DataStructure\traits\PropertiesTrait $model
-     * @param $attribute
+     * @param string $attribute
      */
     protected function getPropertyModel($model, $attribute)
     {
@@ -57,5 +61,10 @@ abstract class AbstractPropertyHandler
             new ServerErrorHttpException("Property with id $property_id not found."),
             true
         );
+    }
+
+    public static function className()
+    {
+        return get_called_class();
     }
 }

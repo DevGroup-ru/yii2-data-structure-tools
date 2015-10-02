@@ -19,6 +19,18 @@ class m150923_140300_properties extends Migration
             'allow_multiple_values' => $this->boolean()->defaultValue(0),
             'storage_id' => $this->integer()->notNull(),
             'packed_json_default_value' => $this->text()->notNull(),
+            'property_handler_id' => $this->integer()->notNull(),
+//
+//
+//          This config can not be applied directly as handlers are singleton!
+//          Therefore we need to split configs into several cases???
+//
+//               Or maybe it is useless
+//
+//            'packed_json_handler_config' => $this->text()->notNull(),
+//
+//
+//
         ], $tableOptions);
         $this->createIndex('iKey', '{{%property}}', ['key'], true);
 
@@ -59,6 +71,14 @@ class m150923_140300_properties extends Migration
             'class_name' => $this->string()->notNull(),
         ], $tableOptions);
 
+        $this->createTable('{{%property_handlers}}', [
+            'id' => $this->primaryKey(),
+            'name' => $this->string()->notNull(),
+            'class_name' => $this->string()->notNull(),
+            'sort_order' => $this->integer()->notNull()->defaultValue(0),
+            'packed_json_default_config' => $this->text()->notNull(),
+        ]);
+
         // translations
         $this->createTable('{{%property_translation}}', [
             'model_id' => $this->integer()->notNull(),
@@ -87,6 +107,19 @@ class m150923_140300_properties extends Migration
 
         $this->addPrimaryKey('pk', '{{%property_group_translation}}', ['model_id', 'language_id']);
 
+        // insert default data
+        $this->insert('{{%property_handlers}}', [
+            'name' => 'Static values',
+            'class_name' => 'DevGroup\DataStructure\propertyHandler\StaticValues',
+            'sort_order' => 2,
+            'packed_json_default_config' => '[]',
+        ]);
+
+        $this->insert('{{%property_storage}}', [
+            'name' => 'Static values',
+            'class_name' => 'DevGroup\DataStructure\propertyStorage\StaticValues',
+            'sort_order' => 2,
+        ]);
     }
 
     public function down()
@@ -100,6 +133,7 @@ class m150923_140300_properties extends Migration
         $this->dropTable('{{%static_value}}');
         $this->dropTable('{{%static_value_translation}}');
         $this->dropTable('{{%property_group_models}}');
+        $this->dropTable('{{%property_handlers}}');
     }
 
     /*

@@ -3,6 +3,7 @@ namespace DevGroup\DataStructure\models;
 
 use DevGroup\DataStructure\behaviors\PackedJsonAttributes;
 use DevGroup\DataStructure\helpers\PropertiesHelper;
+use DevGroup\DataStructure\helpers\PropertyHandlerHelper;
 use DevGroup\Multilingual\behaviors\MultilingualActiveRecord;
 use DevGroup\Multilingual\traits\MultilingualTrait;
 use DevGroup\TagDependencyHelper\CacheableActiveRecord;
@@ -18,7 +19,11 @@ use yii\db\Query;
  * @property string  $key
  * @property boolean $is_numeric
  * @property boolean $is_internal
+ * @property boolean $allow_multiple_values
  * @property integer $storage_id
+ * @property integer $property_handler_id
+ * @property array   $default_value
+ * @property array   $handler_config
  *
  * @package DevGroup\DataStructure\models
  */
@@ -74,6 +79,25 @@ class Property extends ActiveRecord
     }
 
     /**
+     * Perform beforeSave events and do other needed stuff:
+     * - send event to property handler(he may want to force is_numeric for example)
+     *
+     * @param bool $insert
+     *
+     * @return bool
+     * @throws \Exception
+     */
+    public function beforeSave($insert)
+    {
+        $result = parent::beforeSave($insert);
+        if ($result === false) {
+            return false;
+        }
+        $handler = PropertyHandlerHelper::getInstance()->handlerById($this->property_handler_id);
+        return $handler->beforePropertyModelSave($this, $insert);
+    }
+
+    /**
      * Perform afterSave events, flush needed caches
      *
      * @param bool  $insert
@@ -85,6 +109,8 @@ class Property extends ActiveRecord
         if (isset($changedAttributes['key'])) {
             Yii::$app->cache->delete("PropertyKeyForId:{$this->id}");
         }
+        $handler = PropertyHandlerHelper::getInstance()->handlerById($this->property_handler_id);
+        $handler->afterPropertyModelSave($this);
     }
 
     /**
@@ -127,5 +153,16 @@ class Property extends ActiveRecord
             86400
         );
         return static::$propertyIdToKey[$property_id];
+    }
+
+    /**
+     * Returns PropertyHandler for current property
+     *
+     * @return \DevGroup\DataStructure\propertyHandler\AbstractPropertyHandler
+     * @throws \Exception
+     */
+    public function handler()
+    {
+        return PropertyHandlerHelper::getInstance()->handlerById($this->property_handler_id);
     }
 }

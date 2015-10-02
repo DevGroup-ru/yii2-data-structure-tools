@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "afb7e76a9e8647b8372b2c779ef57ad8",
-    "content-hash": "c251f30823c36cf497b0634a90ad64bd",
+    "hash": "d644e17c783f1a3e73a7d2231d7907d6",
+    "content-hash": "e5add945678e73145a7256d7722a6238",
     "packages": [
         {
             "name": "bower-asset/bootstrap",
@@ -283,12 +283,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/DevGroup-ru/yii2-multilingual.git",
-                "reference": "d4a937be294bedcb5e11d6742e7d11df1627a9f7"
+                "reference": "1d04662a4604c2dcb798a5e52b5c9b3733c6e724"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/DevGroup-ru/yii2-multilingual/zipball/d4a937be294bedcb5e11d6742e7d11df1627a9f7",
-                "reference": "d4a937be294bedcb5e11d6742e7d11df1627a9f7",
+                "url": "https://api.github.com/repos/DevGroup-ru/yii2-multilingual/zipball/1d04662a4604c2dcb798a5e52b5c9b3733c6e724",
+                "reference": "1d04662a4604c2dcb798a5e52b5c9b3733c6e724",
                 "shasum": ""
             },
             "require": {
@@ -326,20 +326,20 @@
                 "multilingual",
                 "yii2"
             ],
-            "time": "2015-10-01 09:43:43"
+            "time": "2015-10-01 10:16:27"
         },
         {
             "name": "devgroup/yii2-tag-dependency-helper",
-            "version": "1.2.1",
+            "version": "1.3.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/DevGroup-ru/yii2-tag-dependency-helper.git",
-                "reference": "a554756d4f0acea39efa410ee8920f397f2af258"
+                "reference": "5375a9001f95b0fdb4eb46f21881b9408396ddf0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/DevGroup-ru/yii2-tag-dependency-helper/zipball/a554756d4f0acea39efa410ee8920f397f2af258",
-                "reference": "a554756d4f0acea39efa410ee8920f397f2af258",
+                "url": "https://api.github.com/repos/DevGroup-ru/yii2-tag-dependency-helper/zipball/5375a9001f95b0fdb4eb46f21881b9408396ddf0",
+                "reference": "5375a9001f95b0fdb4eb46f21881b9408396ddf0",
                 "shasum": ""
             },
             "require": {
@@ -378,7 +378,7 @@
                 "cache",
                 "yii2"
             ],
-            "time": "2015-09-28 14:10:24"
+            "time": "2015-10-02 13:40:30"
         },
         {
             "name": "ezyang/htmlpurifier",
@@ -524,12 +524,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/yiisoft/yii2-framework.git",
-                "reference": "1cbaeee7bdea8a8af2a2f71b6c3981f6558e39dc"
+                "reference": "c76e0f9840c6ca014eda2f7acffc1c70a053eef9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/yiisoft/yii2-framework/zipball/1cbaeee7bdea8a8af2a2f71b6c3981f6558e39dc",
-                "reference": "1cbaeee7bdea8a8af2a2f71b6c3981f6558e39dc",
+                "url": "https://api.github.com/repos/yiisoft/yii2-framework/zipball/c76e0f9840c6ca014eda2f7acffc1c70a053eef9",
+                "reference": "c76e0f9840c6ca014eda2f7acffc1c70a053eef9",
                 "shasum": ""
             },
             "require": {
@@ -605,7 +605,7 @@
                 "framework",
                 "yii2"
             ],
-            "time": "2015-09-30 10:44:31"
+            "time": "2015-10-01 10:20:19"
         },
         {
             "name": "yiisoft/yii2-bootstrap",
@@ -1223,12 +1223,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/phpunit.git",
-                "reference": "463163747474815c5ccd4ae12b5b355ec12158e8"
+                "reference": "4ecd63c4e88c8eb77d8a93e76e3c5936ec5c3a04"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/463163747474815c5ccd4ae12b5b355ec12158e8",
-                "reference": "463163747474815c5ccd4ae12b5b355ec12158e8",
+                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/4ecd63c4e88c8eb77d8a93e76e3c5936ec5c3a04",
+                "reference": "4ecd63c4e88c8eb77d8a93e76e3c5936ec5c3a04",
                 "shasum": ""
             },
             "require": {
@@ -1287,7 +1287,7 @@
                 "testing",
                 "xunit"
             ],
-            "time": "2015-10-01 09:14:30"
+            "time": "2015-10-02 08:18:49"
         },
         {
             "name": "phpunit/phpunit-mock-objects",
@@ -1295,12 +1295,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/phpunit-mock-objects.git",
-                "reference": "5e2645ad49d196e020b85598d7c97e482725786a"
+                "reference": "ac8e7a3db35738d56ee9a76e78a4e03d97628983"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/phpunit-mock-objects/zipball/5e2645ad49d196e020b85598d7c97e482725786a",
-                "reference": "5e2645ad49d196e020b85598d7c97e482725786a",
+                "url": "https://api.github.com/repos/sebastianbergmann/phpunit-mock-objects/zipball/ac8e7a3db35738d56ee9a76e78a4e03d97628983",
+                "reference": "ac8e7a3db35738d56ee9a76e78a4e03d97628983",
                 "shasum": ""
             },
             "require": {
@@ -1343,7 +1343,7 @@
                 "mock",
                 "xunit"
             ],
-            "time": "2015-08-19 09:14:08"
+            "time": "2015-10-02 06:51:40"
         },
         {
             "name": "sebastian/comparator",
@@ -1723,12 +1723,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/yaml.git",
-                "reference": "28b8b18beadde5ae4684d4adcab87f29ea0ac101"
+                "reference": "e19c911b006df750811f69ad94f61541ef0f9a42"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/yaml/zipball/28b8b18beadde5ae4684d4adcab87f29ea0ac101",
-                "reference": "28b8b18beadde5ae4684d4adcab87f29ea0ac101",
+                "url": "https://api.github.com/repos/symfony/yaml/zipball/e19c911b006df750811f69ad94f61541ef0f9a42",
+                "reference": "e19c911b006df750811f69ad94f61541ef0f9a42",
                 "shasum": ""
             },
             "require": {
@@ -1764,7 +1764,7 @@
             ],
             "description": "Symfony Yaml Component",
             "homepage": "https://symfony.com",
-            "time": "2015-09-30 09:18:13"
+            "time": "2015-10-02 12:38:08"
         }
     ],
     "aliases": [],

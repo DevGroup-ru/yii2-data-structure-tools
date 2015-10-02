@@ -24,7 +24,6 @@ abstract class AbstractPropertyStorage
         return static::$instance;
     }
 
-
     /**
      * Fills $models array models with corresponding binded properties.
      * Models in $models array should be the the same class name.
@@ -44,4 +43,9 @@ abstract class AbstractPropertyStorage
      * @return void
      */
     abstract public function deleteAllProperties(&$models);
+
+    public static function className()
+    {
+        return get_called_class();
+    }
 }
