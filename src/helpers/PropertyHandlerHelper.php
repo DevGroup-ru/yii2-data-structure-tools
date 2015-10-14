@@ -35,7 +35,7 @@ class PropertyHandlerHelper
     /**
      * Retrieves handlers from database.
      * Uses lazy cache.
-     * @return array[]
+     * @return \DevGroup\DataStructure\propertyHandler\AbstractPropertyHandler[]
      */
     public function handlers()
     {

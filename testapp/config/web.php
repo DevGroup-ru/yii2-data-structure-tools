@@ -5,10 +5,13 @@ $params = require(__DIR__ . '/params.php');
 $config = [
     'id' => 'minimal',
     'basePath' => dirname(__DIR__),
-    'bootstrap' => ['log'],
+    'bootstrap' => ['log','multilingual','debug'],
     'modules' => [
         'gii' => [
             'class' => 'yii\gii\Module',
+        ],
+        'debug' => [
+            'class' => 'yii\debug\Module',
         ],
     ],
     'components' => [
@@ -21,10 +24,6 @@ $config = [
             'as lazy' => [
                 'class' => 'DevGroup\TagDependencyHelper\LazyCache',
             ],
-        ],
-        'urlManager' => [
-            'enablePrettyUrl' => true,
-            'showScriptName' => false,
         ],
         'user' => [
             'identityClass' => 'app\models\User',
@@ -43,6 +42,30 @@ $config = [
             ],
         ],
         'db' => require(__DIR__ . '/db.php'),
+        'multilingual' => [
+            'class' => \DevGroup\Multilingual\Multilingual::className(),
+            'default_language_id' => 1,
+            'handlers' => [
+                [
+                    'class' => \DevGroup\Multilingual\DefaultGeoProvider::className(),
+                    'default' => [
+                        'country' => [
+                            'name' => 'England',
+                            'iso' => 'en',
+                        ],
+                    ],
+                ],
+            ],
+        ],
+        'filedb' => [
+            'class' => 'yii2tech\filedb\Connection',
+            'path' => __DIR__ . '/data',
+        ],
+        'urlManager' => [
+            'class' => \DevGroup\Multilingual\components\UrlManager::className(),
+            'excludeRoutes' => false,
+
+        ],
     ],
     'params' => $params,
 ];

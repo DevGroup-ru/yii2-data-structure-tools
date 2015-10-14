@@ -14,7 +14,7 @@ class m150923_140300_properties extends Migration
         $this->createTable('{{%property}}', [
             'id' => $this->primaryKey(),
             'key' => $this->string(80)->notNull(),
-            'is_numeric' => $this->boolean()->defaultValue(0),
+            'data_type' => $this->boolean()->defaultValue(0),
             'is_internal' => $this->boolean()->defaultValue(0),
             'allow_multiple_values' => $this->boolean()->defaultValue(0),
             'storage_id' => $this->integer()->notNull(),
@@ -114,11 +114,22 @@ class m150923_140300_properties extends Migration
             'sort_order' => 2,
             'packed_json_default_config' => '[]',
         ]);
+        $this->insert('{{%property_handlers}}', [
+            'name' => 'Text field',
+            'class_name' => 'DevGroup\DataStructure\propertyHandler\TextField',
+            'sort_order' => 1,
+            'packed_json_default_config' => '[]',
+        ]);
 
         $this->insert('{{%property_storage}}', [
             'name' => 'Static values',
             'class_name' => 'DevGroup\DataStructure\propertyStorage\StaticValues',
             'sort_order' => 2,
+        ]);
+        $this->insert('{{%property_storage}}', [
+            'name' => 'EAV',
+            'class_name' => 'DevGroup\DataStructure\propertyStorage\EAV',
+            'sort_order' => 1,
         ]);
     }
 

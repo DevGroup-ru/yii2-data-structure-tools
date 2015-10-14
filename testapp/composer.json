@@ -11,7 +11,9 @@
     },
     "minimum-stability": "dev",
     "require": {
-        "yiisoft/yii2": "*"
+        "yiisoft/yii2": "*",
+        "devgroup/yii2-multilingual": "dev-master",
+        "yiisoft/yii2-debug": "^2.0@dev"
     },
     "scripts": {
         "post-create-project-cmd": [

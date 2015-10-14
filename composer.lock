@@ -101,17 +101,42 @@
             ]
         },
         {
-            "name": "bower-asset/jquery.inputmask",
-            "version": "3.1.63",
+            "name": "bower-asset/jquery-ui",
+            "version": "1.11.4",
             "source": {
                 "type": "git",
-                "url": "https://github.com/RobinHerbots/jquery.inputmask.git",
-                "reference": "c40c7287eadc31e341ebbf0c02352eb55b9cbc48"
+                "url": "https://github.com/components/jqueryui.git",
+                "reference": "c34f8dbf3ba57b3784b93f26119f436c0e8288e1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/RobinHerbots/jquery.inputmask/zipball/c40c7287eadc31e341ebbf0c02352eb55b9cbc48",
-                "reference": "c40c7287eadc31e341ebbf0c02352eb55b9cbc48",
+                "url": "https://api.github.com/repos/components/jqueryui/zipball/c34f8dbf3ba57b3784b93f26119f436c0e8288e1",
+                "reference": "c34f8dbf3ba57b3784b93f26119f436c0e8288e1",
+                "shasum": ""
+            },
+            "require": {
+                "bower-asset/jquery": ">=1.6"
+            },
+            "type": "bower-asset-library",
+            "extra": {
+                "bower-asset-main": [
+                    "jquery-ui.js"
+                ],
+                "bower-asset-ignore": []
+            }
+        },
+        {
+            "name": "bower-asset/jquery.inputmask",
+            "version": "3.2.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/RobinHerbots/jquery.inputmask.git",
+                "reference": "ebceb88a131e1fbc159733a88a6778ffc02debab"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/RobinHerbots/jquery.inputmask/zipball/ebceb88a131e1fbc159733a88a6778ffc02debab",
+                "reference": "ebceb88a131e1fbc159733a88a6778ffc02debab",
                 "shasum": ""
             },
             "require": {
@@ -120,12 +145,22 @@
             "type": "bower-asset-library",
             "extra": {
                 "bower-asset-main": [
+                    "./dist/inputmask/inputmask.dependencyLib.jquery.js",
+                    "./dist/inputmask/inputmask.js",
+                    "./dist/inputmask/inputmask.extensions.js",
+                    "./dist/inputmask/inputmask.date.extensions.js",
+                    "./dist/inputmask/inputmask.numeric.extensions.js",
+                    "./dist/inputmask/inputmask.phone.extensions.js",
+                    "./dist/inputmask/inputmask.regex.extensions.js",
                     "./dist/inputmask/jquery.inputmask.js",
-                    "./dist/inputmask/jquery.inputmask.extensions.js",
-                    "./dist/inputmask/jquery.inputmask.date.extensions.js",
-                    "./dist/inputmask/jquery.inputmask.numeric.extensions.js",
-                    "./dist/inputmask/jquery.inputmask.phone.extensions.js",
-                    "./dist/inputmask/jquery.inputmask.regex.extensions.js"
+                    "./dist/jquery.inputmask.bundle.js",
+                    "./extra/dependencyLibs/inputmask.dependencyLib.jqlite.js",
+                    "./extra/dependencyLibs/inputmask.dependencyLib.js",
+                    "./extra/phone-codes/phone-be.js",
+                    "./extra/phone-codes/phone-codes.js",
+                    "./extra/phone-codes/phone-nl.js",
+                    "./extra/phone-codes/phone-ru.js",
+                    "./extra/phone-codes/phone-uk.js"
                 ],
                 "bower-asset-ignore": [
                     "**/.*",
@@ -278,21 +313,60 @@
             "time": "2015-03-20 11:07:08"
         },
         {
+            "name": "components/flag-icon-css",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/lipis/flag-icon-css.git",
+                "reference": "35ed9dd3e414dd4044fa83ad692ad3b9c211bdd7"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/lipis/flag-icon-css/zipball/35ed9dd3e414dd4044fa83ad692ad3b9c211bdd7",
+                "reference": "35ed9dd3e414dd4044fa83ad692ad3b9c211bdd7",
+                "shasum": ""
+            },
+            "type": "component",
+            "extra": {
+                "component": {
+                    "name": "flag-icon-css",
+                    "files": [
+                        "less/**",
+                        "css/**",
+                        "flags/**"
+                    ]
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Panayiotis Lipiridis (Lipis)",
+                    "email": "lipiridis@gmail.com"
+                }
+            ],
+            "description": "CSS for vector based country flags",
+            "time": "2015-10-10 09:54:46"
+        },
+        {
             "name": "devgroup/yii2-multilingual",
             "version": "dev-master",
             "source": {
                 "type": "git",
                 "url": "https://github.com/DevGroup-ru/yii2-multilingual.git",
-                "reference": "1d04662a4604c2dcb798a5e52b5c9b3733c6e724"
+                "reference": "02db6bc764da53ec606412cf5667f08d2f1b88ab"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/DevGroup-ru/yii2-multilingual/zipball/1d04662a4604c2dcb798a5e52b5c9b3733c6e724",
-                "reference": "1d04662a4604c2dcb798a5e52b5c9b3733c6e724",
+                "url": "https://api.github.com/repos/DevGroup-ru/yii2-multilingual/zipball/02db6bc764da53ec606412cf5667f08d2f1b88ab",
+                "reference": "02db6bc764da53ec606412cf5667f08d2f1b88ab",
                 "shasum": ""
             },
             "require": {
                 "devgroup/yii2-tag-dependency-helper": "^1.2.0",
+                "kartik-v/yii2-icons": "~1.4.0",
                 "yii2tech/filedb": "^1.0@dev",
                 "yiisoft/yii2": "^2.0.6"
             },
@@ -326,7 +400,7 @@
                 "multilingual",
                 "yii2"
             ],
-            "time": "2015-10-01 10:16:27"
+            "time": "2015-10-12 14:09:01"
         },
         {
             "name": "devgroup/yii2-tag-dependency-helper",
@@ -423,6 +497,148 @@
                 "html"
             ],
             "time": "2013-11-30 08:25:19"
+        },
+        {
+            "name": "fortawesome/font-awesome",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/FortAwesome/Font-Awesome.git",
+                "reference": "153c0e063e59881a375aa310de93551056a03b51"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/FortAwesome/Font-Awesome/zipball/153c0e063e59881a375aa310de93551056a03b51",
+                "reference": "153c0e063e59881a375aa310de93551056a03b51",
+                "shasum": ""
+            },
+            "require-dev": {
+                "jekyll": "1.0.2",
+                "lessc": "1.4.2"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "4.0.x-dev"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "OFL-1.1",
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Dave Gandy",
+                    "email": "dave@fontawesome.io",
+                    "homepage": "http://twitter.com/davegandy",
+                    "role": "Developer"
+                }
+            ],
+            "description": "The iconic font and CSS framework",
+            "homepage": "http://fontawesome.io/",
+            "keywords": [
+                "FontAwesome",
+                "awesome",
+                "bootstrap",
+                "font",
+                "icon"
+            ],
+            "time": "2015-09-14 06:04:03"
+        },
+        {
+            "name": "kartik-v/yii2-icons",
+            "version": "v1.4.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/kartik-v/yii2-icons.git",
+                "reference": "719af14be1bcb3581855ddfd8b389792383a905a"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/kartik-v/yii2-icons/zipball/719af14be1bcb3581855ddfd8b389792383a905a",
+                "reference": "719af14be1bcb3581855ddfd8b389792383a905a",
+                "shasum": ""
+            },
+            "require": {
+                "components/flag-icon-css": "*",
+                "fortawesome/font-awesome": "*",
+                "kartik-v/yii2-krajee-base": "*",
+                "yiisoft/yii2-jui": "*"
+            },
+            "type": "yii2-extension",
+            "autoload": {
+                "psr-4": {
+                    "kartik\\icons\\": ""
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD 3-Clause"
+            ],
+            "authors": [
+                {
+                    "name": "Kartik Visweswaran",
+                    "email": "kartikv2@gmail.com",
+                    "homepage": "http://demos.krajee.com/"
+                }
+            ],
+            "description": "Set of icon frameworks for use in Yii Framework 2.0",
+            "homepage": "https://github.com/kartik-v/yii2-icons",
+            "keywords": [
+                "extension",
+                "font",
+                "icon",
+                "yii",
+                "yii2"
+            ],
+            "time": "2015-04-20 16:17:56"
+        },
+        {
+            "name": "kartik-v/yii2-krajee-base",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/kartik-v/yii2-krajee-base.git",
+                "reference": "c0adff9d9762f4fd3bf0e7cd0000fcab0bf00f19"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/kartik-v/yii2-krajee-base/zipball/c0adff9d9762f4fd3bf0e7cd0000fcab0bf00f19",
+                "reference": "c0adff9d9762f4fd3bf0e7cd0000fcab0bf00f19",
+                "shasum": ""
+            },
+            "require": {
+                "yiisoft/yii2-bootstrap": "@dev"
+            },
+            "type": "yii2-extension",
+            "autoload": {
+                "psr-4": {
+                    "kartik\\base\\": ""
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD-3-Clause"
+            ],
+            "authors": [
+                {
+                    "name": "Kartik Visweswaran",
+                    "email": "kartikv2@gmail.com",
+                    "homepage": "http://www.krajee.com/"
+                }
+            ],
+            "description": "Base library and foundation components for all Yii2 Krajee extensions.",
+            "homepage": "https://github.com/kartik-v/yii2-krajee-base",
+            "keywords": [
+                "base",
+                "extension",
+                "foundation",
+                "krajee",
+                "widget",
+                "yii2"
+            ],
+            "time": "2015-06-16 05:19:57"
         },
         {
             "name": "unclead/yii2-multiple-input",
@@ -524,17 +740,17 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/yiisoft/yii2-framework.git",
-                "reference": "c76e0f9840c6ca014eda2f7acffc1c70a053eef9"
+                "reference": "fa6453b46b5392c06d3afb039896e0a328a8cbdf"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/yiisoft/yii2-framework/zipball/c76e0f9840c6ca014eda2f7acffc1c70a053eef9",
-                "reference": "c76e0f9840c6ca014eda2f7acffc1c70a053eef9",
+                "url": "https://api.github.com/repos/yiisoft/yii2-framework/zipball/fa6453b46b5392c06d3afb039896e0a328a8cbdf",
+                "reference": "fa6453b46b5392c06d3afb039896e0a328a8cbdf",
                 "shasum": ""
             },
             "require": {
                 "bower-asset/jquery": "2.1.*@stable | 1.11.*@stable",
-                "bower-asset/jquery.inputmask": "3.1.*",
+                "bower-asset/jquery.inputmask": "~3.2.2",
                 "bower-asset/punycode": "1.3.*",
                 "bower-asset/yii2-pjax": ">=2.0.1",
                 "cebe/markdown": "~1.0.0 | ~1.1.0",
@@ -605,7 +821,7 @@
                 "framework",
                 "yii2"
             ],
-            "time": "2015-10-01 10:20:19"
+            "time": "2015-10-11 07:58:42"
         },
         {
             "name": "yiisoft/yii2-bootstrap",
@@ -613,12 +829,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/yiisoft/yii2-bootstrap.git",
-                "reference": "49c2d45951dd2e98c6217aa071f655016c706846"
+                "reference": "5ca562bcc759fbb1d9e3fe679529e44c912aaf05"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/yiisoft/yii2-bootstrap/zipball/49c2d45951dd2e98c6217aa071f655016c706846",
-                "reference": "49c2d45951dd2e98c6217aa071f655016c706846",
+                "url": "https://api.github.com/repos/yiisoft/yii2-bootstrap/zipball/5ca562bcc759fbb1d9e3fe679529e44c912aaf05",
+                "reference": "5ca562bcc759fbb1d9e3fe679529e44c912aaf05",
                 "shasum": ""
             },
             "require": {
@@ -655,7 +871,7 @@
                 "bootstrap",
                 "yii2"
             ],
-            "time": "2015-09-29 10:36:47"
+            "time": "2015-10-08 09:33:22"
         },
         {
             "name": "yiisoft/yii2-composer",
@@ -752,6 +968,56 @@
                 "yii2"
             ],
             "time": "2015-09-29 10:35:18"
+        },
+        {
+            "name": "yiisoft/yii2-jui",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/yiisoft/yii2-jui.git",
+                "reference": "022637087b4f8b0d321e697cc0a01b09cd2d7345"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/yiisoft/yii2-jui/zipball/022637087b4f8b0d321e697cc0a01b09cd2d7345",
+                "reference": "022637087b4f8b0d321e697cc0a01b09cd2d7345",
+                "shasum": ""
+            },
+            "require": {
+                "bower-asset/jquery-ui": "1.11.*@stable",
+                "yiisoft/yii2": ">=2.0.4"
+            },
+            "type": "yii2-extension",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "2.0.x-dev"
+                },
+                "asset-installer-paths": {
+                    "npm-asset-library": "vendor/npm",
+                    "bower-asset-library": "vendor/bower"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "yii\\jui\\": ""
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD-3-Clause"
+            ],
+            "authors": [
+                {
+                    "name": "Qiang Xue",
+                    "email": "qiang.xue@gmail.com"
+                }
+            ],
+            "description": "The Jquery UI extension for the Yii framework",
+            "keywords": [
+                "jQuery UI",
+                "yii2"
+            ],
+            "time": "2015-09-29 10:49:11"
         }
     ],
     "packages-dev": [
@@ -983,12 +1249,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/php-code-coverage.git",
-                "reference": "ef1ca6835468857944d5c3b48fa503d5554cff2f"
+                "reference": "eabf68b476ac7d0f73793aada060f1c1a9bf8979"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/php-code-coverage/zipball/ef1ca6835468857944d5c3b48fa503d5554cff2f",
-                "reference": "ef1ca6835468857944d5c3b48fa503d5554cff2f",
+                "url": "https://api.github.com/repos/sebastianbergmann/php-code-coverage/zipball/eabf68b476ac7d0f73793aada060f1c1a9bf8979",
+                "reference": "eabf68b476ac7d0f73793aada060f1c1a9bf8979",
                 "shasum": ""
             },
             "require": {
@@ -1037,7 +1303,7 @@
                 "testing",
                 "xunit"
             ],
-            "time": "2015-09-14 06:51:16"
+            "time": "2015-10-06 15:47:00"
         },
         {
             "name": "phpunit/php-file-iterator",
@@ -1223,12 +1489,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/phpunit.git",
-                "reference": "4ecd63c4e88c8eb77d8a93e76e3c5936ec5c3a04"
+                "reference": "00194eb95989190a73198390ceca081ad3441a7f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/4ecd63c4e88c8eb77d8a93e76e3c5936ec5c3a04",
-                "reference": "4ecd63c4e88c8eb77d8a93e76e3c5936ec5c3a04",
+                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/00194eb95989190a73198390ceca081ad3441a7f",
+                "reference": "00194eb95989190a73198390ceca081ad3441a7f",
                 "shasum": ""
             },
             "require": {
@@ -1287,7 +1553,7 @@
                 "testing",
                 "xunit"
             ],
-            "time": "2015-10-02 08:18:49"
+            "time": "2015-10-12 03:36:47"
         },
         {
             "name": "phpunit/phpunit-mock-objects",
@@ -1580,16 +1846,16 @@
         },
         {
             "name": "sebastian/global-state",
-            "version": "dev-master",
+            "version": "1.1.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/global-state.git",
-                "reference": "23af31f402993cfd94e99cbc4b782e9a78eb0e97"
+                "reference": "bc37d50fea7d017d3d340f230811c9f1d7280af4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/global-state/zipball/23af31f402993cfd94e99cbc4b782e9a78eb0e97",
-                "reference": "23af31f402993cfd94e99cbc4b782e9a78eb0e97",
+                "url": "https://api.github.com/repos/sebastianbergmann/global-state/zipball/bc37d50fea7d017d3d340f230811c9f1d7280af4",
+                "reference": "bc37d50fea7d017d3d340f230811c9f1d7280af4",
                 "shasum": ""
             },
             "require": {
@@ -1627,7 +1893,7 @@
             "keywords": [
                 "global state"
             ],
-            "time": "2015-06-21 15:11:22"
+            "time": "2015-10-12 03:26:01"
         },
         {
             "name": "sebastian/recursion-context",
@@ -1723,19 +1989,16 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/yaml.git",
-                "reference": "e19c911b006df750811f69ad94f61541ef0f9a42"
+                "reference": "242be30271c7daafda80e471a7fcf71303facd93"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/yaml/zipball/e19c911b006df750811f69ad94f61541ef0f9a42",
-                "reference": "e19c911b006df750811f69ad94f61541ef0f9a42",
+                "url": "https://api.github.com/repos/symfony/yaml/zipball/242be30271c7daafda80e471a7fcf71303facd93",
+                "reference": "242be30271c7daafda80e471a7fcf71303facd93",
                 "shasum": ""
             },
             "require": {
                 "php": ">=5.5.9"
-            },
-            "require-dev": {
-                "symfony/phpunit-bridge": "~2.8|~3.0"
             },
             "type": "library",
             "extra": {
@@ -1764,7 +2027,7 @@
             ],
             "description": "Symfony Yaml Component",
             "homepage": "https://symfony.com",
-            "time": "2015-10-02 12:38:08"
+            "time": "2015-10-12 10:22:36"
         }
     ],
     "aliases": [],

@@ -3,8 +3,10 @@
 namespace DevGroup\DataStructure\behaviors;
 
 use DevGroup\DataStructure\helpers\PropertiesHelper;
+use DevGroup\DataStructure\models\Property;
 use Yii;
 use yii\base\Behavior;
+use yii\base\Exception;
 use yii\base\InvalidConfigException;
 use yii\db\ActiveRecord;
 
@@ -34,6 +36,8 @@ class HasProperties extends Behavior
         return [
             ActiveRecord::EVENT_AFTER_FIND => 'afterFind',
             ActiveRecord::EVENT_BEFORE_DELETE => 'beforeDelete',
+            ActiveRecord::EVENT_AFTER_INSERT => 'afterSave',
+            ActiveRecord::EVENT_AFTER_UPDATE => 'afterSave',
         ];
     }
 
@@ -93,5 +97,68 @@ class HasProperties extends Behavior
         return parent::canSetProperty($name, $checkVars);
     }
 
+    public function __set($name, $value)
+    {
+        /** @var \yii\db\ActiveRecord|\DevGroup\DataStructure\traits\PropertiesTrait $owner */
+        $owner = $this->owner;
+        $id = array_search($name, $owner->propertiesAttributes);
+        if ($id === false) {
+            throw new Exception("Property id for key $name not found");
+        }
+        if (is_array($value) === false) {
+            /** @var Property $property */
+            $property = Property::loadModel(
+                $id,
+                false,
+                true,
+                86400,
+                new Exception("Property for id $id not found"),
+                true
+            );
+            if ($property->allow_multiple_values === true) {
+                // convert value to array for multiple property!
+                $value = [$value];
+            }
+        }
 
+        $changed = true;
+        if (isset($owner->propertiesValues[$id])) {
+            if (is_array($value) === true) {
+                $diffCount = count(array_diff_assoc($owner->propertiesValues[$id], $value)) > 0;
+                $changed = $diffCount || count($owner->propertiesValues[$id]) != count($value);
+            } else {
+                $changed = $value !== $owner->propertiesValues[$id];
+            }
+        }
+        if ($changed === true) {
+            $owner->propertiesValuesChanged = true;
+            $owner->changedProperties[] = $id;
+        }
+
+        $owner->propertiesValues[$id] = $value;
+    }
+
+    public function afterSave()
+    {
+        /** @var \yii\db\ActiveRecord|\DevGroup\DataStructure\traits\PropertiesTrait $owner */
+        $owner = $this->owner;
+        $owner->changedProperties = [];
+        $owner->propertiesValuesChanged = false;
+    }
+
+    public function __get($name)
+    {
+        /** @var \yii\db\ActiveRecord|\DevGroup\DataStructure\traits\PropertiesTrait $owner */
+        $owner = $this->owner;
+        $id = array_search($name, $owner->propertiesAttributes);
+        if ($id === false) {
+            throw new Exception("Property id for key $name not found");
+        }
+
+        if (array_key_exists($id, $owner->propertiesValues)) {
+            return $owner->propertiesValues[$id];
+        } else {
+            return null;
+        }
+    }
 }

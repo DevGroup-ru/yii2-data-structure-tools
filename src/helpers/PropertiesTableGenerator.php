@@ -58,10 +58,11 @@ class PropertiesTableGenerator
             ? 'CHARACTER SET utf8 COLLATE utf8_unicode_ci'
             : null;
 
-        $static_values_table = $className::static_values_bindings_table();
+        // Static values
+        $staticValuesTable = $className::staticValuesBindingsTable();
 
         $this->createTable(
-            $static_values_table,
+            $staticValuesTable,
             [
                 'model_id' => $this->integer()->notNull(),
                 'static_value_id' => $this->integer()->notNull(),
@@ -70,7 +71,63 @@ class PropertiesTableGenerator
             $tableOptions
         );
 
-        $this->addPrimaryKey('uniquePair', $static_values_table, ['model_id', 'static_value_id']);
+        $this->addPrimaryKey('uniquePair', $staticValuesTable, ['model_id', 'static_value_id']);
+
+        // eav!
+        $eavTable = $className::eavTable();
+        $this->createTable(
+            $eavTable,
+            [
+                'id' => $this->primaryKey(),
+                'model_id' => $this->integer()->notNull(),
+                'property_id' => $this->integer()->notNull(),
+                'sort_order' => $this->integer()->notNull()->defaultValue(0),
+                'value_integer' => $this->integer()->notNull()->defaultValue(0),
+                'value_float' => $this->float()->notNull()->defaultValue(0),
+                'value_string' => $this->string(),
+                'value_text' => $this->text(),
+            ],
+            $tableOptions
+        );
+        $this->createIndex(
+            'model_properties',
+            $eavTable,
+            [
+                'model_id',
+                'sort_order',
+            ]
+        );
+
+        // table inheritance
+        $tableInheritanceTable = $className::tableInheritanceTable();
+        $this->createTable(
+            $tableInheritanceTable,
+            [
+                'model_id' => $this->primaryKey(),
+            ],
+            $tableOptions
+        );
+
+        // binded property groups
+        $bindedGroupsTable = $className::bindedPropertyGroupsTable();
+        $this->createTable(
+            $bindedGroupsTable,
+            [
+                'model_id' => $this->integer()->notNull(),
+                'property_group_id' => $this->integer()->notNull(),
+                'sort_order' => $this->integer()->notNull()->defaultValue(0),
+            ],
+            $tableOptions
+        );
+        $this->createIndex(
+            'uniquePair',
+            $bindedGroupsTable,
+            [
+                'model_id',
+                'property_group_id',
+            ],
+            true
+        );
     }
 
     /**
@@ -84,8 +141,16 @@ class PropertiesTableGenerator
         /** @var \yii\db\ActiveRecord|\DevGroup\DataStructure\traits\PropertiesTrait $className */
         $this->setDb($db);
 
-        $static_values_table = $className::static_values_bindings_table();
-        $this->dropTable($static_values_table);
+        $tables = [
+            $className::staticValuesBindingsTable(),
+            $className::eavTable(),
+            $className::tableInheritanceTable(),
+            $className::bindedPropertyGroupsTable(),
+        ];
+
+        foreach ($tables as $table) {
+            $this->dropTable($table);
+        }
     }
 
     /**
@@ -114,7 +179,9 @@ class PropertiesTableGenerator
      */
     private function addPrimaryKey($name, $table, $columns)
     {
-        echo "    > add primary key $name on $table (" . (is_array($columns) ? implode(',', $columns) : $columns).") ...";
+        echo "    > add primary key $name on $table (" .
+            (is_array($columns) ? implode(',', $columns) : $columns).
+            ") ...";
         $time = microtime(true);
         $this->db->createCommand()->addPrimaryKey($name, $table, $columns)->execute();
         echo " done (time: " . sprintf('%.3f', microtime(true) - $time) . "s)\n";
@@ -133,7 +200,9 @@ class PropertiesTableGenerator
      */
     private function createIndex($name, $table, $columns, $unique = false)
     {
-        echo "    > create" . ($unique ? ' unique' : '') . " index $name on $table (" . implode(',', (array) $columns) . ") ...";
+        echo "    > create" . ($unique ? ' unique' : '') .
+            " index $name on $table (" . implode(',', (array) $columns) .
+            ") ...";
         $time = microtime(true);
         $this->db->createCommand()->createIndex($name, $table, $columns, $unique)->execute();
         echo " done (time: " . sprintf('%.3f', microtime(true) - $time) . "s)\n";

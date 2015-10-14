@@ -26,7 +26,7 @@ class StaticValues extends AbstractPropertyStorage
                     'static_value_id',
                     'sort_order',
                 ])
-                ->from($firstModel->static_values_bindings_table())
+                ->from($firstModel->staticValuesBindingsTable())
                 ->innerJoin(StaticValue::tableName(), ['static_value_id'=>'id'])
                 ->where(PropertiesHelper::getInCondition($models))
                 ->orderBy(['model_id' => SORT_ASC, 'sort_order' => SORT_ASC])
@@ -56,8 +56,13 @@ class StaticValues extends AbstractPropertyStorage
         $firstModel = reset($models);
 
         $command = $firstModel->getDb()->createCommand()
-            ->delete($firstModel->static_values_bindings_table(), PropertiesHelper::getInCondition($models));
+            ->delete($firstModel->staticValuesBindingsTable(), PropertiesHelper::getInCondition($models));
 
         $command->execute();
+    }
+
+    public function storeValues(&$models)
+    {
+        // TODO: Implement storeValues() method.
     }
 }

@@ -7,12 +7,18 @@ use DevGroup\DataStructure\models\Property;
 use DevGroup\DataStructure\models\PropertyGroup;
 use yii\web\ServerErrorHttpException;
 
+/**
+ * Class PropertiesTrait
+ * @package DevGroup\DataStructure\traits
+ * @mixin \yii\db\ActiveRecord
+ * @property integer $id
+ */
 trait PropertiesTrait
 {
     /**
      * @var null|integer[] Array of property_group_ids
      */
-    public $property_group_ids = null;
+    public $propertyGroupIds = null;
 
     /** @var null|integer[] Array of properties ids */
     public $propertiesIds = null;
@@ -20,12 +26,21 @@ trait PropertiesTrait
     /** @var null|string[] Array of properties attributes names indexed by property ids  */
     public $propertiesAttributes = null;
 
+    /** @var array Array of properties values indexed by property id */
+    public $propertiesValues = [];
+
+    /** @var array Changed properties ids */
+    public $changedProperties = [];
+
+    /** @var bool If properties values were changed */
+    public $propertiesValuesChanged = false;
+
     /**
      * Ensures that $property_group_ids is retrieved
      */
     public function ensurePropertyGroupIds()
     {
-        if ($this->property_group_ids === null) {
+        if ($this->propertyGroupIds === null) {
             $array = [&$this];
             PropertiesHelper::fillPropertyGroups($array);
         }
@@ -33,17 +48,18 @@ trait PropertiesTrait
 
     /**
      * Ensures that $propertiesIds is filled. Also fills $property_group_ids if needed.
+     * @param boolean $force True to force refreshing properties ids even if they are filled.
      */
-    public function ensurePropertiesIds()
+    public function ensurePropertiesIds($force = false)
     {
-        if ($this->propertiesIds === null) {
+        if ($this->propertiesIds === null || $force === true) {
             $this->ensurePropertyGroupIds();
             $this->propertiesIds = [];
 
-            foreach ($this->property_group_ids as $property_group_id) {
-                $property_ids = PropertyGroup::propertyIdsForGroup($property_group_id);
-                foreach ($property_ids as $property_id) {
-                    $this->propertiesIds[] = $property_id;
+            foreach ($this->propertyGroupIds as $propertyGroupId) {
+                $propertyIds = PropertyGroup::propertyIdsForGroup($propertyGroupId);
+                foreach ($propertyIds as $propertyId) {
+                    $this->propertiesIds[] = $propertyId;
                 }
             }
             $this->propertiesIds = array_unique($this->propertiesIds);
@@ -52,15 +68,16 @@ trait PropertiesTrait
 
     /**
      * Ensures that $propertiesAttributes is filled. Also fills $propertiesIds and $property_group_ids if needed.
+     * @param boolean $force True to force refreshing propertiesAttributes even if they are filled.
      */
-    public function ensurePropertiesAttributes()
+    public function ensurePropertiesAttributes($force = false)
     {
-        if ($this->propertiesAttributes === null) {
-            $this->ensurePropertiesIds();
+        if ($this->propertiesAttributes === null || $force === true) {
+            $this->ensurePropertiesIds($force);
             $this->propertiesAttributes = [];
 
-            foreach ($this->propertiesIds as $property_id) {
-                $this->propertiesAttributes[$property_id] = Property::propertyKeyForId($property_id);
+            foreach ($this->propertiesIds as $propertyId) {
+                $this->propertiesAttributes[$propertyId] = Property::propertyKeyForId($propertyId);
             }
         }
     }
@@ -71,7 +88,8 @@ trait PropertiesTrait
      */
     public function iteratePropertyGroups()
     {
-        foreach ($this->property_group_ids as $id) {
+        $this->ensurePropertyGroupIds();
+        foreach ($this->propertyGroupIds as $id) {
             yield PropertyGroup::loadModel(
                 $id,
                 false,
@@ -84,15 +102,16 @@ trait PropertiesTrait
     }
 
     /**
-     * @param int $property_group_id
+     * @param int $propertyGroupId
      *
      * @return \Generator
      * @throws \Exception
      */
-    public function iterateGroupProperties($property_group_id)
+    public function iterateGroupProperties($propertyGroupId)
     {
-        $property_ids = PropertyGroup::propertyIdsForGroup($property_group_id);
-        foreach ($property_ids as $id) {
+        $propertyIds = PropertyGroup::propertyIdsForGroup($propertyGroupId);
+        foreach ($propertyIds as $id) {
+            /** @var Property $property */
             $property = Property::loadModel(
                 $id,
                 false,
@@ -109,7 +128,7 @@ trait PropertiesTrait
     /**
      * @return string Static values bindings table name. Override this in your model class if needed.
      */
-    public static function static_values_bindings_table()
+    public static function staticValuesBindingsTable()
     {
         $baseTableName = trim(static::tableName(), '{}%');
         return $baseTableName . '_static_values';
@@ -118,7 +137,7 @@ trait PropertiesTrait
     /**
      * @return string EAV table name. Override this in your model class if needed.
      */
-    public static function eav_table()
+    public static function eavTable()
     {
         $baseTableName = trim(static::tableName(), '{}%');
         return $baseTableName . '_eav';
@@ -127,7 +146,7 @@ trait PropertiesTrait
     /**
      * @return string Table inheritance table name. Override this in your model class if needed.
      */
-    public static function table_inheritance_table()
+    public static function tableInheritanceTable()
     {
         $baseTableName = trim(static::tableName(), '{}%');
         return $baseTableName . '_properties';
@@ -136,12 +155,23 @@ trait PropertiesTrait
     /**
      * @return string Binded property groups ids. Override this in your model class if needed.
      */
-    public static function binded_property_groups_table()
+    public static function bindedPropertyGroupsTable()
     {
         $baseTableName = trim(static::tableName(), '{}%');
         return $baseTableName . '_property_groups';
     }
 
-
-
+    /**
+     * Adds property group to current model instance.
+     *
+     * @param PropertyGroup $propertyGroup
+     *
+     * @return bool Result of adding
+     * @throws \yii\db\Exception
+     */
+    public function addPropertyGroup(PropertyGroup $propertyGroup)
+    {
+        $array = [ &$this ];
+        return PropertiesHelper::bindGroupToModels($array, $propertyGroup);
+    }
 }

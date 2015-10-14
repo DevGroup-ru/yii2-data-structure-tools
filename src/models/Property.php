@@ -17,7 +17,7 @@ use yii\db\Query;
  *
  * @mixin \DevGroup\Multilingual\behaviors\MultilingualActiveRecord
  * @property string  $key
- * @property boolean $is_numeric
+ * @property integer $data_type
  * @property boolean $is_internal
  * @property boolean $allow_multiple_values
  * @property integer $storage_id
@@ -33,6 +33,13 @@ class Property extends ActiveRecord
 
     use MultilingualTrait;
     use TagDependencyTrait;
+
+    const DATA_TYPE_STRING         = 0;
+    const DATA_TYPE_INTEGER        = 1;
+    const DATA_TYPE_FLOAT          = 2;
+    const DATA_TYPE_TEXT           = 3;
+    const DATA_TYPE_PACKED_JSON    = 4;
+    const DATA_TYPE_BOOLEAN        = 5;
 
     /**
      * @inheritdoc
@@ -70,8 +77,9 @@ class Property extends ActiveRecord
             ['key', 'unique'],
             ['key', 'required'],
             ['key', 'string', 'max'=>80],
-            [['is_numeric', 'is_internal', 'allow_multiple_values'], 'filter', 'filter'=>'boolval'],
-            ['storage_id', function ($attribute, $params) {
+            [['is_internal', 'allow_multiple_values'], 'filter', 'filter'=>'boolval'],
+            [['data_type'], 'integer',],
+            ['storage_id', function ($attribute) {
                 $handlers = PropertiesHelper::storageHandlers();
                 return isset($handlers[$this->$attribute]);
             }],
@@ -98,7 +106,9 @@ class Property extends ActiveRecord
     }
 
     /**
-     * Perform afterSave events, flush needed caches
+     * Perform afterSave events:
+     * - flush needed caches
+     * - trigger afterPropertyModelSave event of corresponding PropertyHandler
      *
      * @param bool  $insert
      * @param array $changedAttributes
@@ -126,33 +136,33 @@ class Property extends ActiveRecord
      * Returns property key by property id.
      * Uses identityMap, $propertyIdToKey static variable(per-process memory cache), lazy cache for db query
      *
-     * @param int $property_id
+     * @param int $propertyId
      *
      * @return string|null
      */
-    public static function propertyKeyForId($property_id)
+    public static function propertyKeyForId($propertyId)
     {
 
-        if (isset(static::$identityMap[$property_id])) {
-            return static::$identityMap[$property_id]->key;
+        if (isset(static::$identityMap[$propertyId])) {
+            return static::$identityMap[$propertyId]->key;
         }
-        if (isset(static::$propertyIdToKey[$property_id])) {
-            return static::$propertyIdToKey[$property_id];
+        if (isset(static::$propertyIdToKey[$propertyId])) {
+            return static::$propertyIdToKey[$propertyId];
         }
 
-        static::$propertyIdToKey[$property_id] = Yii::$app->cache->lazy(
-            function() use ($property_id) {
+        static::$propertyIdToKey[$propertyId] = Yii::$app->cache->lazy(
+            function () use ($propertyId) {
                 $query = new Query();
                 return $query
                     ->select(['key'])
                     ->from(static::tableName())
-                    ->where(['id' => $property_id])
+                    ->where(['id' => $propertyId])
                     ->scalar(static::getDb());
             },
-            "PropertyKeyForId:$property_id",
+            "PropertyKeyForId:$propertyId",
             86400
         );
-        return static::$propertyIdToKey[$property_id];
+        return static::$propertyIdToKey[$propertyId];
     }
 
     /**

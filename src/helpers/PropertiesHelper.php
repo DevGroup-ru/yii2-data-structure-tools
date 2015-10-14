@@ -2,9 +2,11 @@
 
 namespace DevGroup\DataStructure\helpers;
 
+use DevGroup\DataStructure\models\PropertyGroup;
 use DevGroup\DataStructure\models\PropertyStorage;
 use Yii;
 use yii\base\Exception;
+use yii\db\Query;
 use yii\helpers\ArrayHelper;
 
 class PropertiesHelper
@@ -25,7 +27,7 @@ class PropertiesHelper
     public static function storageHandlers()
     {
         if (static::$_storageHandlers === null) {
-            static::$_storageHandlers = Yii::$app->cache->lazy(function() {
+            static::$_storageHandlers = Yii::$app->cache->lazy(function () {
                 $rows = PropertyStorage::find()
                     ->asArray()
                     ->all();
@@ -43,18 +45,17 @@ class PropertiesHelper
     private static function retrievePropertyGroupModels($forceRefresh = false)
     {
         if (static::$_property_group_models === null || $forceRefresh === true) {
-
             if ($forceRefresh === true) {
                 Yii::$app->cache->delete('PropertyGroupModelsMap');
             }
 
-            static::$_property_group_models = Yii::$app->cache->lazy(function() {
+            static::$_property_group_models = Yii::$app->cache->lazy(function () {
                 $query = new \yii\db\Query();
                 $rows = $query
                     ->select(['id', 'class_name'])
                     ->from('{{%property_group_models}}')
                     ->all();
-                array_walk($rows, function(&$item) {
+                array_walk($rows, function (&$item) {
                     $item['id'] = intval($item['id']);
                 });
                 return ArrayHelper::map(
@@ -165,7 +166,7 @@ class PropertiesHelper
     /**
      * Fills all $models with corresponding binded property_group_ids
      *
-     * @param \yii\db\ActiveRecord[] $models
+     * @param \yii\db\ActiveRecord[]|\DevGroup\DataStructure\traits\PropertiesTrait[] $models
      *
      * @return \yii\db\ActiveRecord[]
      */
@@ -173,16 +174,16 @@ class PropertiesHelper
     {
         /** @var \yii\db\ActiveRecord|\DevGroup\DataStructure\traits\PropertiesTrait|\DevGroup\TagDependencyHelper\TagDependencyTrait $firstModel */
         $firstModel = reset($models);
-        if ($firstModel->property_group_ids !== null) {
+        if ($firstModel->propertyGroupIds !== null) {
             // assume that we have already got them
             return;
         }
 
-        $binding_rows = Yii::$app->cache->lazy(function() use($firstModel, $models) {
-            $query = new \yii\db\Query();
+        $binding_rows = Yii::$app->cache->lazy(function () use ($firstModel, $models) {
+            $query = new Query();
             return $query
                 ->select(['model_id', 'property_group_id'])
-                ->from($firstModel->binded_property_groups_table())
+                ->from($firstModel->bindedPropertyGroupsTable())
                 ->where(PropertiesHelper::getInCondition($models))
                 ->orderBy(['sort_order' => SORT_ASC])
                 ->all($firstModel->getDb());
@@ -190,7 +191,7 @@ class PropertiesHelper
 
         array_walk(
             $binding_rows,
-            function(&$item) {
+            function (&$item) {
                 $item['model_id'] = intval($item['model_id']);
                 $item['property_group_id'] = intval($item['property_group_id']);
             }
@@ -198,9 +199,9 @@ class PropertiesHelper
 
         foreach ($models as &$model) {
             $id = $model->id;
-            $model->property_group_ids = array_reduce(
+            $model->propertyGroupIds = array_reduce(
                 $binding_rows,
-                function($carry, $item) use ($id) {
+                function ($carry, $item) use ($id) {
                     if ($item['model_id'] === $id) {
                         $carry[] = $item['property_group_id'];
                     }
@@ -240,11 +241,66 @@ class PropertiesHelper
         return $condition = 'model_id in (' . implode(',', ArrayHelper::getColumn($models, 'id', false)) . ')';
     }
 
-    public static function bindGroupToModels(&$models)
+    /**
+     * @param \yii\db\ActiveRecord[]|\DevGroup\DataStructure\traits\PropertiesTrait[] $models
+     * @param PropertyGroup $propertyGroup
+     * @return bool
+     */
+    public static function bindGroupToModels(&$models, PropertyGroup $propertyGroup)
     {
-        /** @var \yii\db\ActiveRecord|\DevGroup\DataStructure\traits\PropertiesTrait|\DevGroup\TagDependencyHelper\TagDependencyTrait $firstModel */
-        $firstModel = reset($models);
-        $tableName = $firstModel->binded_property_groups_table();
+        foreach ($models as &$model) {
+            $model->ensurePropertyGroupIds();
+            if (in_array($propertyGroup->id, $model->propertyGroupIds) === true) {
+                // maybe it'll be better to throw special exception in such case
+                return false;
+            }
 
+            $model->getDb()->createCommand()
+                ->insert(
+                    $model->bindedPropertyGroupsTable(),
+                    [
+                        'model_id' => $model->id,
+                        'property_group_id' => $propertyGroup->id,
+                        'sort_order' => count($model->propertyGroupIds),
+                    ]
+                )
+                ->execute();
+
+            $model->propertyGroupIds[] = $propertyGroup->id;
+
+            if ($model->propertiesAttributes !== null) {
+                // if there were propertiesIds filled - refresh them
+                $model->ensurePropertiesAttributes(true);
+            }
+        }
+        return true;
+    }
+
+    /**
+     * @param \yii\db\ActiveRecord[] $models
+     *
+     * @return boolean
+     */
+    public static function storeValues($models)
+    {
+        // first filter out models that has no changed properties
+        $changedModels = array_filter(
+            $models,
+            function ($model) {
+                /** @var \yii\db\ActiveRecord|\DevGroup\DataStructure\traits\PropertiesTrait|\DevGroup\TagDependencyHelper\TagDependencyTrait $model */
+                return $model->changedProperties;
+            }
+        );
+
+        $storages = static::storageHandlers();
+
+        $result = true;
+
+        foreach ($storages as $storageId => $storage) {
+            Yii::beginProfile("Saving storage $storageId");
+            $result = $result && static::storeValues($changedModels);
+            Yii::endProfile("Saving storage $storageId");
+        }
+        return $result;
     }
 }

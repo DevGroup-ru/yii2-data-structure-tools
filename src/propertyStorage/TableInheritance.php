@@ -30,7 +30,7 @@ class TableInheritance extends AbstractPropertyStorage
         $firstModel = reset($models);
 
         $command = $firstModel->getDb()->createCommand()
-            ->delete($firstModel->table_inheritance_table(), PropertiesHelper::getInCondition($models));
+            ->delete($firstModel->tableInheritanceTable(), PropertiesHelper::getInCondition($models));
 
         $command->execute();
     }

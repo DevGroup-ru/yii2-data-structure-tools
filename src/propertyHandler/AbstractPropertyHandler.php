@@ -46,6 +46,9 @@ abstract class AbstractPropertyHandler
     /**
      * @param \yii\db\ActiveRecord|\DevGroup\DataStructure\traits\PropertiesTrait $model
      * @param string $attribute
+     * @throws UnknownPropertyException
+     * @throws ServerErrorHttpException
+     * @return Property
      */
     protected function getPropertyModel($model, $attribute)
     {
@@ -67,4 +70,6 @@ abstract class AbstractPropertyHandler
     {
         return get_called_class();
     }
+
+
 }

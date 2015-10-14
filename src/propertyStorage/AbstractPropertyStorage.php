@@ -44,8 +44,18 @@ abstract class AbstractPropertyStorage
      */
     abstract public function deleteAllProperties(&$models);
 
+    /**
+     * @return string Returns class name
+     */
     public static function className()
     {
         return get_called_class();
     }
+
+    /**
+     * @param ActiveRecord[] $models
+     *
+     * @return boolean
+     */
+    abstract public function storeValues(&$models);
 }

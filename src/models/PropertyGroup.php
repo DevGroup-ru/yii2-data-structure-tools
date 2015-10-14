@@ -13,12 +13,12 @@ use yii\db\Query;
 /**
  * Class PropertyGroup
  *
+ * @property integer $id
  * @property integer $property_group_model_id
  * @property integer $sort_order
  * @property boolean $is_auto_added
  * @property string  $internal_name
  * @mixin \DevGroup\Multilingual\behaviors\MultilingualActiveRecord
- * @method PropertyGroupTranslation translate
  */
 class PropertyGroup extends ActiveRecord
 {
@@ -31,14 +31,17 @@ class PropertyGroup extends ActiveRecord
     /**
      * PropertyGroup constructor.
      *
-     * @param array $className
+     * @param string $className
      * @param array $config
      */
-    public function __construct($className, array $config=[])
+    public function __construct($className = null, array $config = [])
     {
         parent::__construct($config);
-        $this->property_group_model_id = PropertiesHelper::propertyGroupModelId($className);
+        if ($className !== null) {
+            $this->property_group_model_id = PropertiesHelper::propertyGroupModelId($className);
+        }
     }
+
 
     /**
      * @inheritdoc
@@ -73,7 +76,7 @@ class PropertyGroup extends ActiveRecord
             [['internal_name'], 'required',],
             [['sort_order', 'property_group_model_id'], 'integer'],
             [['is_auto_added'], 'filter', 'filter'=>'boolval'],
-            ['property_group_model_id', function($attribute) {
+            ['property_group_model_id', function ($attribute) {
                 return PropertiesHelper::classNameForPropertyGroupModelId($this->$attribute) !== false;
             }],
         ];
@@ -152,35 +155,35 @@ class PropertyGroup extends ActiveRecord
     /**
      * Returns property ids sequence array for $property_group_id, uses cache
      *
-     * @param int $property_group_id
+     * @param int $propertyGroupId
      *
      * @return int[] Array of property ids for group
      */
-    public static function propertyIdsForGroup($property_group_id)
+    public static function propertyIdsForGroup($propertyGroupId)
     {
-        if (isset(static::$groupIdToPropertyIds[$property_group_id])) {
-            return static::$groupIdToPropertyIds[$property_group_id];
+        if (isset(static::$groupIdToPropertyIds[$propertyGroupId])) {
+            return static::$groupIdToPropertyIds[$propertyGroupId];
         }
         $ids = Yii::$app->cache->lazy(
-            function() use($property_group_id) {
+            function () use ($propertyGroupId) {
                 $query = new Query();
                 return array_map(
-                    function($item) {
+                    function ($item) {
                         return intval($item);
                     },
                     $query
                         ->select(['property_id'])
                         ->from(PropertyPropertyGroup::tableName())
-                        ->where(['property_group_id' => $property_group_id])
+                        ->where(['property_group_id' => $propertyGroupId])
                         ->orderBy(['sort_order_group_properties' => SORT_ASC])
                         ->column(static::getDb())
                 );
 
             },
-            "PropertyIdsForGroup:$property_group_id",
+            "PropertyIdsForGroup:$propertyGroupId",
             86400
         );
-        static::$groupIdToPropertyIds[$property_group_id] = $ids;
-        return static::$groupIdToPropertyIds[$property_group_id];
+        static::$groupIdToPropertyIds[$propertyGroupId] = $ids;
+        return static::$groupIdToPropertyIds[$propertyGroupId];
     }
 }

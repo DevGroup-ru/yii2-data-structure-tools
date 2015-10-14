@@ -14,6 +14,7 @@ use DevGroup\DataStructure\propertyStorage\StaticValues;
 use DevGroup\DataStructure\tests\models\Category;
 use DevGroup\DataStructure\tests\models\Product;
 use Yii;
+use yii\base\UnknownPropertyException;
 use yii\db\Connection;
 
 /**
@@ -92,7 +93,7 @@ class DatabaseTest extends \PHPUnit_Extensions_Database_TestCase
 
             Yii::$app->getDb()
                 ->createCommand()
-                ->batchInsert('{{%property_group_models}}', ['class_name'],[
+                ->batchInsert('{{%property_group_models}}', ['class_name'], [
                     [Product::className(),],
                     [Category::className(),],
                 ])->execute();
@@ -178,26 +179,81 @@ class DatabaseTest extends \PHPUnit_Extensions_Database_TestCase
         // property group for all products
         $package_properties = new PropertyGroup(Product::className());
         $package_properties->internal_name = 'Package properties';
-        $package_properties->translate()->name = 'Package';
+        $package_properties->translate(1)->name = 'Package';
+        $package_properties->translate(2)->name = 'Упаковка';
         $package_properties->is_auto_added = true;
         $this->assertTrue($package_properties->save());
 
         // property group for smartphones only!
         $smartphone_general = new PropertyGroup(Product::className());
         $smartphone_general->internal_name = 'Smartphone - general';
-        $smartphone_general->translate()->name = 'General';
+        $smartphone_general->translate(1)->name = 'General';
+        $smartphone_general->translate(2)->name = 'Основные';
         $this->assertTrue($smartphone_general->save());
 
         $weight = new Property();
         $weight->key = 'weight';
         $weight->storage_id = array_search(StaticValues::className(), PropertiesHelper::storageHandlers());
         $weight->property_handler_id = PropertyHandlerHelper::getInstance()->handlerIdByClassName(
-            \DevGroup\DataStructure\propertyHandler\StaticValues::className()
+            \DevGroup\DataStructure\propertyHandler\TextField::className()
         );
+        $weight->translate(1)->name = 'Weight';
+        $weight->translate(2)->name = 'Вес';
         $this->assertTrue($weight->save());
 
+        $package_properties->link(
+            'properties',
+            $weight,
+            ['sort_order_group_properties' => 1]
+        );
 
-       // $this->markTestSkipped('TBD');
+        $properties = $package_properties->properties;
+        $this->assertEquals(1, count($properties));
+        /** @var Product $product */
+        $product = Product::findOne(1);
+
+        // product should not has property groups filled as autoFetch is off
+        $this->assertNull($product->propertyGroupIds);
+
+        $product->ensurePropertyGroupIds();
+        // now we fetched and it should be an empty array
+        $this->assertTrue(is_array($product->propertyGroupIds));
+        $this->assertEquals(0, count($product->propertyGroupIds));
+
+        // try to get non existing property
+        $propertyThrowsError = false;
+        try {
+            $product->weight;
+        } catch (UnknownPropertyException $e) {
+            $propertyThrowsError = true;
+        }
+        $this->assertTrue($propertyThrowsError);
+
+
+        // try to SET non existing property
+        $propertyThrowsError = false;
+        try {
+            $product->tralala = true;
+        } catch (UnknownPropertyException $e) {
+            $propertyThrowsError = true;
+        }
+        $this->assertTrue($propertyThrowsError);
+
+        // now add property group
+        $this->assertTrue($product->addPropertyGroup($package_properties));
+
+        $this->assertEquals(1, count($product->propertyGroupIds));
+        $this->assertSame([], $product->changedProperties);
+        $this->assertFalse($product->propertiesValuesChanged);
+        $this->assertNull($product->weight);
+
+        $product->weight = 127.001;
+
+        $this->assertSame(127.001, $product->weight);
+        $this->assertSame([1], $product->changedProperties);
+        $this->assertTrue($product->propertiesValuesChanged);
+//        die("STOP");
+//        $this->markTestSkipped('TBD');
     }
 
 //    public function testPackedJsonFields()

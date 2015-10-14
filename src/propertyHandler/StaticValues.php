@@ -8,7 +8,7 @@ use DevGroup\DataStructure\models\Property;
 class StaticValues extends AbstractPropertyHandler
 {
     /**
-     * Forces property to be numeric
+     * Forces property to be of integer data type
      * @param \DevGroup\DataStructure\models\Property $property
      * @param                                         $insert
      *
@@ -16,8 +16,8 @@ class StaticValues extends AbstractPropertyHandler
      */
     public function beforePropertyModelSave(Property &$property, $insert)
     {
-        // static values are forced to be numeric
-        $property->is_numeric = true;
+        // static values are forced to be of integer data type
+        $property->data_type = Property::DATA_TYPE_INTEGER;
         return parent::beforePropertyModelSave($property, $insert);
     }
 
