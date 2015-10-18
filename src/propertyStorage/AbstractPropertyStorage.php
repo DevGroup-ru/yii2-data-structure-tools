@@ -8,22 +8,12 @@ use yii\helpers\ArrayHelper;
 
 abstract class AbstractPropertyStorage
 {
-    /** @var AbstractPropertyStorage Singleton */
-    public static $instance = null;
+    public $storageId = null;
 
-
-
-    /**
-     * @return AbstractPropertyStorage PropertyStorage handler instance(singleton is used)
-     */
-    public static function getInstance()
+    public function __construct($storageId)
     {
-        if (static::$instance === null) {
-            static::$instance = new static();
-        }
-        return static::$instance;
+        $this->storageId = intval($storageId);
     }
-
     /**
      * Fills $models array models with corresponding binded properties.
      * Models in $models array should be the the same class name.

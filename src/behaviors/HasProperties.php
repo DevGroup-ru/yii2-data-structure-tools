@@ -13,7 +13,10 @@ use yii\db\ActiveRecord;
 class HasProperties extends Behavior
 {
     /** @var bool Should properties be automatically fetched after find */
-    public $autoFetch = false;
+    public $autoFetchProperties = false;
+
+    /** @var bool Should properties be automatically saved when model saves  */
+    public $autoSaveProperties = false;
 
     /**
      * @inheritdoc
@@ -43,7 +46,7 @@ class HasProperties extends Behavior
 
     public function afterFind()
     {
-        if ($this->autoFetch === true) {
+        if ($this->autoFetchProperties === true) {
             //! @todo fetch here
             /** @var \yii\db\ActiveRecord|\DevGroup\DataStructure\traits\PropertiesTrait $owner */
             $owner = $this->owner;
@@ -101,6 +104,8 @@ class HasProperties extends Behavior
     {
         /** @var \yii\db\ActiveRecord|\DevGroup\DataStructure\traits\PropertiesTrait $owner */
         $owner = $this->owner;
+        $owner->ensurePropertiesAttributes();
+
         $id = array_search($name, $owner->propertiesAttributes);
         if ($id === false) {
             throw new Exception("Property id for key $name not found");
@@ -150,6 +155,8 @@ class HasProperties extends Behavior
     {
         /** @var \yii\db\ActiveRecord|\DevGroup\DataStructure\traits\PropertiesTrait $owner */
         $owner = $this->owner;
+        $owner->ensurePropertiesAttributes();
+
         $id = array_search($name, $owner->propertiesAttributes);
         if ($id === false) {
             throw new Exception("Property id for key $name not found");

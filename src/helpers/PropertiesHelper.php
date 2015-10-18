@@ -31,7 +31,9 @@ class PropertiesHelper
                 $rows = PropertyStorage::find()
                     ->asArray()
                     ->all();
-                return ArrayHelper::map($rows, 'id', 'class_name');
+                return ArrayHelper::map($rows, 'id', function ($item) {
+                    return new $item['class_name']($item['id']);
+                });
             }, 'StorageHandlers', 86400, PropertyStorage::commonTag());
         }
         return static::$_storageHandlers;
@@ -103,10 +105,24 @@ class PropertiesHelper
     }
 
     /**
+     * @param \yii\db\ActiveRecord[]|\DevGroup\DataStructure\traits\PropertiesTrait[] $models
+     * @param bool|false $forceRefresh
+     */
+    public static function ensurePropertiesAttributes(&$models, $forceRefresh = false)
+    {
+        foreach ($models as &$model) {
+            $model->ensurePropertiesAttributes($forceRefresh);
+        }
+    }
+
+    /**
      * @param \yii\db\ActiveRecord[] $models
      */
     public static function fillProperties(&$models)
     {
+        static::fillPropertyGroups($models);
+        static::ensurePropertiesAttributes($models);
+
         $storageHandlers = static::storageHandlers();
 
         Yii::beginProfile('Fill properties for models');
@@ -277,28 +293,28 @@ class PropertiesHelper
     }
 
     /**
-     * @param \yii\db\ActiveRecord[] $models
+     * @param \yii\db\ActiveRecord[]|\DevGroup\DataStructure\traits\PropertiesTrait[] $models
      *
      * @return boolean
      */
-    public static function storeValues($models)
+    public static function storeValues(&$models)
     {
         // first filter out models that has no changed properties
         $changedModels = array_filter(
             $models,
             function ($model) {
-                /** @var \yii\db\ActiveRecord|\DevGroup\DataStructure\traits\PropertiesTrait|\DevGroup\TagDependencyHelper\TagDependencyTrait $model */
-                return $model->changedProperties;
+                /** @var \yii\db\ActiveRecord|\DevGroup\DataStructure\traits\PropertiesTrait $model */
+                return $model->propertiesValuesChanged;
             }
         );
 
-        $storages = static::storageHandlers();
+        $storageHandlers = static::storageHandlers();
 
         $result = true;
 
-        foreach ($storages as $storageId => $storage) {
+        foreach ($storageHandlers as $storageId => $storage) {
             Yii::beginProfile("Saving storage $storageId");
-            $result = $result && static::storeValues($changedModels);
+            $result = $storage->storeValues($changedModels) && $result;
             Yii::endProfile("Saving storage $storageId");
         }
         return $result;

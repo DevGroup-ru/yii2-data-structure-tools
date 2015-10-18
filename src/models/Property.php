@@ -16,6 +16,7 @@ use yii\db\Query;
  * Class Property
  *
  * @mixin \DevGroup\Multilingual\behaviors\MultilingualActiveRecord
+ * @property integer $id
  * @property string  $key
  * @property integer $data_type
  * @property boolean $is_internal
@@ -83,6 +84,7 @@ class Property extends ActiveRecord
                 $handlers = PropertiesHelper::storageHandlers();
                 return isset($handlers[$this->$attribute]);
             }],
+            [['storage_id', 'data_type'], 'filter', 'filter'=>'intval'],
         ];
     }
 

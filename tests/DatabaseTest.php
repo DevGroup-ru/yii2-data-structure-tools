@@ -10,6 +10,7 @@ use DevGroup\DataStructure\helpers\PropertiesTableGenerator;
 use DevGroup\DataStructure\helpers\PropertyHandlerHelper;
 use DevGroup\DataStructure\models\Property;
 use DevGroup\DataStructure\models\PropertyGroup;
+use DevGroup\DataStructure\propertyStorage\EAV;
 use DevGroup\DataStructure\propertyStorage\StaticValues;
 use DevGroup\DataStructure\tests\models\Category;
 use DevGroup\DataStructure\tests\models\Product;
@@ -193,13 +194,16 @@ class DatabaseTest extends \PHPUnit_Extensions_Database_TestCase
 
         $weight = new Property();
         $weight->key = 'weight';
-        $weight->storage_id = array_search(StaticValues::className(), PropertiesHelper::storageHandlers());
+        $weight->storage_id = 2;
         $weight->property_handler_id = PropertyHandlerHelper::getInstance()->handlerIdByClassName(
             \DevGroup\DataStructure\propertyHandler\TextField::className()
         );
+
         $weight->translate(1)->name = 'Weight';
         $weight->translate(2)->name = 'Вес';
+        var_dump($weight->getAttributes());
         $this->assertTrue($weight->save());
+        var_dump($weight->getAttributes());
 
         $package_properties->link(
             'properties',
@@ -212,7 +216,7 @@ class DatabaseTest extends \PHPUnit_Extensions_Database_TestCase
         /** @var Product $product */
         $product = Product::findOne(1);
 
-        // product should not has property groups filled as autoFetch is off
+        // product should not has property groups filled as autoFetchProperties is off
         $this->assertNull($product->propertyGroupIds);
 
         $product->ensurePropertyGroupIds();
@@ -252,7 +256,20 @@ class DatabaseTest extends \PHPUnit_Extensions_Database_TestCase
         $this->assertSame(127.001, $product->weight);
         $this->assertSame([1], $product->changedProperties);
         $this->assertTrue($product->propertiesValuesChanged);
-//        die("STOP");
+
+        $models = [&$product];
+        $this->assertTrue(PropertiesHelper::storeValues($models));
+        $product->invalidateTags();
+
+        // test fill
+        /** @var Product $productFromDatabase */
+        $productFromDatabase = Product::findOne(1);
+
+        $models = [&$productFromDatabase];
+        PropertiesHelper::fillProperties($models);
+        $this->assertSame(127.001, $product->weight);
+
+
 //        $this->markTestSkipped('TBD');
     }
 
