@@ -3,6 +3,7 @@
 namespace DevGroup\DataStructure\propertyHandler;
 
 use DevGroup\DataStructure\models\Property;
+use DevGroup\DataStructure\models\StaticValue;
 
 class StaticValues extends AbstractPropertyHandler
 {
@@ -20,18 +21,44 @@ class StaticValues extends AbstractPropertyHandler
         return parent::beforePropertyModelSave($property, $insert);
     }
 
+    /**
+     * @inheritdoc
+     */
     public function getValidationRules(Property $property)
     {
         $key = $property->key;
         if ($property->allow_multiple_values) {
             return [
                 [$key, 'each', 'rule' => ['filter', 'filter'=>'intval']],
+                $this->existenceValidation($property),
             ];
         } else {
             return [
                 [$key, 'filter', 'filter' => 'intval'],
+                $this->existenceValidation($property),
             ];
         }
+    }
+
+    /**
+     * @param Property $property
+     * @return array Validation rule for checking existence of static_value row with specified ID
+     *
+     * @warning If we are updating multiple models properties at once - we get lots of queries to db(1 for each model in array)
+     */
+    private function existenceValidation(Property $property)
+    {
+        $key = $property->key;
+
+        return [
+            $key,
+            'exist',
+            'targetClass' => StaticValue::className(),
+            'targetAttribute' => 'id',
+            'allowArray' => true,
+            'filter' => ['property_id' => $property->id],
+        ];
+
     }
 
     public function render($model, $attribute, $case)

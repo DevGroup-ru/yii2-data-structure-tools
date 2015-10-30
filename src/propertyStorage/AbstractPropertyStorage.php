@@ -6,6 +6,14 @@ use Yii;
 use yii\db\ActiveRecord;
 use yii\helpers\ArrayHelper;
 
+/**
+ * Class AbstractPropertyStorage
+ *
+ * @todo list:
+ * - abstract function that for moving from one storage type to another
+ *
+ * @package DevGroup\DataStructure\propertyStorage
+ */
 abstract class AbstractPropertyStorage
 {
     /**
@@ -20,6 +28,7 @@ abstract class AbstractPropertyStorage
     {
         $this->storageId = intval($storageId);
     }
+
     /**
      * Fills $models array models with corresponding binded properties.
      * Models in $models array should be the the same class name.

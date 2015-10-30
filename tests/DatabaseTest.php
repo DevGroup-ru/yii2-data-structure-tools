@@ -331,6 +331,11 @@ class DatabaseTest extends \PHPUnit_Extensions_Database_TestCase
         $this->assertSame(127.001, $productFromDatabase->weight);
         $this->assertSame(1, $productFromDatabase->os);
 
+        $productFromDatabase->os = 65535;
+        $validationResult = $productFromDatabase->validate();
+        $this->assertFalse($validationResult, "We have added unexisting static value, but there was no validation error");
+
+
 //        $this->markTestSkipped('TBD');
     }
 
