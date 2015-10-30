@@ -4,6 +4,9 @@ TBD
 
 **WARNING:** This extension is under active development. Don't use it in production!
 
+[![Build Status](https://travis-ci.org/DevGroup-ru/yii2-data-structure-tools.svg)](https://travis-ci.org/DevGroup-ru/yii2-data-structure-tools)
+[![codecov.io](https://codecov.io/github/DevGroup-ru/yii2-data-structure-tools/coverage.svg?branch=master)](https://codecov.io/github/DevGroup-ru/yii2-data-structure-tools?branch=master)
+
 Installation
 ------------
 
