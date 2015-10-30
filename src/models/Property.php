@@ -11,6 +11,7 @@ use DevGroup\TagDependencyHelper\TagDependencyTrait;
 use Yii;
 use yii\db\ActiveRecord;
 use yii\db\Query;
+use yii\web\ServerErrorHttpException;
 
 /**
  * Class Property
@@ -132,6 +133,10 @@ class Property extends ActiveRecord
     {
         parent::afterFind();
         static::$propertyIdToKey[$this->id] = $this->key;
+
+        // cast bool values
+        $this->allow_multiple_values = boolval($this->allow_multiple_values);
+        $this->is_internal = boolval($this->is_internal);
     }
 
     /**
@@ -176,5 +181,105 @@ class Property extends ActiveRecord
     public function handler()
     {
         return PropertyHandlerHelper::getInstance()->handlerById($this->property_handler_id);
+    }
+
+    /**
+     * Casts value to data type
+     */
+    public static function castValueToDataType($value, $type)
+    {
+        switch ($type) {
+            case Property::DATA_TYPE_FLOAT:
+                return floatval($value);
+                break;
+
+            case Property::DATA_TYPE_BOOLEAN:
+                return boolval($value);
+                break;
+
+            case Property::DATA_TYPE_INTEGER:
+                return intval($value);
+                break;
+
+            default:
+                return $value;
+                break;
+        }
+    }
+
+    /**
+     * Returns name of function for filtering, data casting
+     * @param $type
+     * @return null|string
+     */
+    public static function validationCastFunction($type)
+    {
+        switch ($type) {
+            case Property::DATA_TYPE_FLOAT:
+                return 'floatval';
+                break;
+
+            case Property::DATA_TYPE_BOOLEAN:
+                return 'boolval';
+                break;
+
+            case Property::DATA_TYPE_INTEGER:
+                return 'intval';
+                break;
+
+            case Property::DATA_TYPE_STRING:
+            case Property::DATA_TYPE_TEXT:
+                return 'strval';
+                break;
+            default:
+                return null;
+        }
+    }
+
+    /**
+     * Returns name of validator used for validation based on data type
+     * @param $type
+     * @return null|string
+     */
+    public static function dataTypeValidator($type)
+    {
+        switch ($type) {
+            case Property::DATA_TYPE_FLOAT:
+                return 'double';
+                break;
+
+            case Property::DATA_TYPE_BOOLEAN:
+                return 'bool';
+                break;
+
+            case Property::DATA_TYPE_INTEGER:
+                return 'integer';
+                break;
+
+            case Property::DATA_TYPE_STRING:
+            case Property::DATA_TYPE_TEXT:
+                return 'string';
+                break;
+            default:
+                return null;
+        }
+    }
+
+    /**
+     * A proxy method for LoadModel
+     * @param $id
+     * @return Property
+     * @throws \Exception
+     */
+    public static function findById($id)
+    {
+        return static::loadModel(
+            $id,
+            false,
+            true,
+            86400,
+            new ServerErrorHttpException("Property with id $id not found"),
+            true
+        );
     }
 }

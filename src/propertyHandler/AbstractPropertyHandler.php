@@ -39,7 +39,7 @@ abstract class AbstractPropertyHandler
 
     }
 
-    abstract protected function getValidationRules(Property $property);
+    abstract public function getValidationRules(Property $property);
 
     abstract public function render($model, $attribute, $case);
 
@@ -52,20 +52,16 @@ abstract class AbstractPropertyHandler
      */
     protected function getPropertyModel($model, $attribute)
     {
-        $property_id = array_search($attribute, $model->propertiesAttributes);
-        if ($property_id === false) {
+        $propertyId = array_search($attribute, $model->propertiesAttributes);
+        if ($propertyId === false) {
             throw new UnknownPropertyException("Attribute $attribute not found in model ".$model->className());
         }
-        return Property::loadModel(
-            $property_id,
-            false,
-            true,
-            86400,
-            new ServerErrorHttpException("Property with id $property_id not found."),
-            true
-        );
+        return Property::findById($propertyId);
     }
 
+    /**
+     * @return string class name with namespace
+     */
     public static function className()
     {
         return get_called_class();

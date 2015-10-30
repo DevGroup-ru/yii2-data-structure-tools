@@ -57,25 +57,17 @@ class EAV extends AbstractPropertyStorage
 
                 foreach ($groupedByProperty as $propertyId => $propertyRows) {
                     /** @var Property $property */
-                    $property = Property::loadModel(
-                        $propertyId,
-                        false,
-                        true,
-                        86400,
-                        false,
-                        true
-                    );
-                    if ($property === null) {
-                        continue;
-                    }
+                    $property = Property::findById($propertyId);
+
                     $key = $property->key;
 
-                    $column = $this->dataTypeToEavColumn($property->data_type);
+                    $column = static::dataTypeToEavColumn($property->data_type);
 
                     $value = array_reduce(
                         $propertyRows,
-                        function ($carry, $item) use ($column) {
-                            $carry[] = $item[$column];
+                        function ($carry, $item) use ($column, $property) {
+                            $value = Property::castValueToDataType($item[$column], $property->data_type);
+                            $carry[] = $value;
                             return $carry;
                         },
                         []
@@ -132,14 +124,7 @@ class EAV extends AbstractPropertyStorage
         foreach ($models as $model) {
             foreach ($model->changedProperties as $propertyId) {
                 /** @var Property $propertyModel */
-                $propertyModel = Property::loadModel(
-                    $propertyId,
-                    false,
-                    true,
-                    86400,
-                    false,
-                    true
-                );
+                $propertyModel = Property::findById($propertyId);
                 if ($propertyModel === null) {
                     continue;
                 }
@@ -259,4 +244,6 @@ class EAV extends AbstractPropertyStorage
                 break;
         }
     }
+
+
 }

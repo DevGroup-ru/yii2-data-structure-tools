@@ -5,6 +5,7 @@ namespace DevGroup\DataStructure\traits;
 use DevGroup\DataStructure\helpers\PropertiesHelper;
 use DevGroup\DataStructure\models\Property;
 use DevGroup\DataStructure\models\PropertyGroup;
+use yii\helpers\ArrayHelper;
 use yii\web\ServerErrorHttpException;
 
 /**
@@ -112,14 +113,7 @@ trait PropertiesTrait
         $propertyIds = PropertyGroup::propertyIdsForGroup($propertyGroupId);
         foreach ($propertyIds as $id) {
             /** @var Property $property */
-            $property = Property::loadModel(
-                $id,
-                false,
-                true,
-                86400,
-                new ServerErrorHttpException("Property with id $id not found"),
-                true
-            );
+            $property = Property::findById($id);
             $key = $property->key;
             yield $key => $this->$key;
         }
@@ -173,5 +167,25 @@ trait PropertiesTrait
     {
         $array = [ &$this ];
         return PropertiesHelper::bindGroupToModels($array, $propertyGroup);
+    }
+
+    /**
+     * @return array Array of validation rules for properties
+     */
+    public function propertiesRules()
+    {
+        $rules = [];
+
+        $this->ensurePropertiesAttributes();
+
+        foreach ($this->propertiesAttributes as $propertyId => $propertyKey) {
+            /** @var Property $property */
+            $property = Property::findById($propertyId);
+            $handler = $property->handler();
+
+            $rules = ArrayHelper::merge($rules, $handler->getValidationRules($property));
+        }
+
+        return $rules;
     }
 }

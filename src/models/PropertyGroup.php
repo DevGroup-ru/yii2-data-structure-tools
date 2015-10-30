@@ -186,4 +186,16 @@ class PropertyGroup extends ActiveRecord
         static::$groupIdToPropertyIds[$propertyGroupId] = $ids;
         return static::$groupIdToPropertyIds[$propertyGroupId];
     }
+
+//    public function link($name, $model, $extraColumns = [])
+//    {
+//        parent::link($name, $model, $extraColumns);
+//        $this->invalidatePropertyIds();
+//    }
+//
+//    public function unlink($name, $model, $delete = false)
+//    {
+//        parent::unlink($name, $model, $delete);
+//        $this->invalidatePropertyIds();
+//    }
 }

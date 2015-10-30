@@ -10,6 +10,7 @@ use DevGroup\DataStructure\helpers\PropertiesTableGenerator;
 use DevGroup\DataStructure\helpers\PropertyHandlerHelper;
 use DevGroup\DataStructure\models\Property;
 use DevGroup\DataStructure\models\PropertyGroup;
+use DevGroup\DataStructure\models\StaticValue;
 use DevGroup\DataStructure\propertyStorage\EAV;
 use DevGroup\DataStructure\propertyStorage\StaticValues;
 use DevGroup\DataStructure\tests\models\Category;
@@ -195,15 +196,16 @@ class DatabaseTest extends \PHPUnit_Extensions_Database_TestCase
         $weight = new Property();
         $weight->key = 'weight';
         $weight->storage_id = 2;
+        $weight->data_type = Property::DATA_TYPE_FLOAT;
         $weight->property_handler_id = PropertyHandlerHelper::getInstance()->handlerIdByClassName(
             \DevGroup\DataStructure\propertyHandler\TextField::className()
         );
 
         $weight->translate(1)->name = 'Weight';
         $weight->translate(2)->name = 'Вес';
-        var_dump($weight->getAttributes());
+
         $this->assertTrue($weight->save());
-        var_dump($weight->getAttributes());
+
 
         $package_properties->link(
             'properties',
@@ -213,6 +215,21 @@ class DatabaseTest extends \PHPUnit_Extensions_Database_TestCase
 
         $properties = $package_properties->properties;
         $this->assertEquals(1, count($properties));
+
+        $os = new Property();
+        $os->key = 'os';
+        $os->storage_id = 1;
+        $os->property_handler_id = PropertyHandlerHelper::getInstance()->handlerIdByClassName(
+            \DevGroup\DataStructure\propertyHandler\StaticValues::className()
+        );
+        $os->translate(1)->name = 'Operating system';
+        $os->translate(2)->name = 'Операционная система';
+        $this->assertTrue($os->save());
+        $smartphone_general->link(
+            'properties',
+            $os
+        );
+
         /** @var Product $product */
         $product = Product::findOne(1);
 
@@ -257,6 +274,49 @@ class DatabaseTest extends \PHPUnit_Extensions_Database_TestCase
         $this->assertSame([1], $product->changedProperties);
         $this->assertTrue($product->propertiesValuesChanged);
 
+        // static values test
+        $this->assertTrue($product->addPropertyGroup($smartphone_general));
+
+        $this->assertSame([], StaticValue::valuesForProperty($os));
+
+        $windows = new StaticValue($os);
+        $windows->name = 'Windows';
+        $windows->slug = 'win';
+        $this->assertTrue($windows->save());
+
+        $this->assertSame([
+            1 => [
+                'name' => 'Windows',
+                'description' => '',
+                'slug' => 'win',
+            ]
+        ], StaticValue::valuesForProperty($os));
+
+
+
+        $linux = new StaticValue($os);
+        $linux->name = 'Linux';
+        $this->assertTrue($linux->save());
+
+        $this->assertSame([
+            1 => [
+                'name' => 'Windows',
+                'description' => '',
+                'slug' => 'win',
+            ],
+            2 => [
+                'name' => 'Linux',
+                'description' => '',
+                'slug' => '',
+            ],
+        ], StaticValue::valuesForProperty($os));
+
+        $product->os = 1;
+
+        $validationResult = $product->validate();
+        $this->assertTrue($validationResult, var_export($product->errors, true));
+
+        // save
         $models = [&$product];
         $this->assertTrue(PropertiesHelper::storeValues($models));
         $product->invalidateTags();
@@ -267,8 +327,9 @@ class DatabaseTest extends \PHPUnit_Extensions_Database_TestCase
 
         $models = [&$productFromDatabase];
         PropertiesHelper::fillProperties($models);
-        $this->assertSame(127.001, $product->weight);
 
+        $this->assertSame(127.001, $productFromDatabase->weight);
+        $this->assertSame(1, $productFromDatabase->os);
 
 //        $this->markTestSkipped('TBD');
     }

@@ -127,12 +127,12 @@ class PropertiesHelper
 
         Yii::beginProfile('Fill properties for models');
 
-        foreach ($storageHandlers as $handler) {
-            Yii::beginProfile($handler);
+        foreach ($storageHandlers as $storage) {
+            Yii::beginProfile('Fill properties: ' . $storage->className());
 
-            $handler->fillProperties($models);
+            $storage->fillProperties($models);
 
-            Yii::endProfile($handler);
+            Yii::endProfile('Fill properties: ' . $storage->className());
         }
         Yii::endProfile('Fill properties for models');
         return $models;
@@ -230,22 +230,6 @@ class PropertiesHelper
     }
 
     /**
-     * Returns mapping from model id to array index
-     *
-     * @param \yii\db\ActiveRecord[] $models
-     *
-     * @return array
-     */
-    public static function idToArrayIndex(&$models)
-    {
-        $map = [];
-        foreach ($models as $index => $model) {
-            $map[$model->id] = $index;
-        }
-        return $map;
-    }
-
-    /**
      * Returns fast IN condition for $models array without PDO param binding which is not necessary for integers
      *
      * @param \yii\db\ActiveRecord[] $models
@@ -316,6 +300,19 @@ class PropertiesHelper
             Yii::beginProfile("Saving storage $storageId");
             $result = $storage->storeValues($changedModels) && $result;
             Yii::endProfile("Saving storage $storageId");
+        }
+        return $result;
+    }
+
+    /**
+     * @param $models
+     * @return array Array where key is model.id and value is model's index in array of $models
+     */
+    public static function idToArrayIndex(&$models)
+    {
+        $result = [];
+        foreach ($models as $index => &$model) {
+            $result[$model->id] = $index;
         }
         return $result;
     }

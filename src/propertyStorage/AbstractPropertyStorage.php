@@ -8,8 +8,14 @@ use yii\helpers\ArrayHelper;
 
 abstract class AbstractPropertyStorage
 {
+    /**
+     * @var int ID of storage in property_storage table
+     */
     public $storageId = null;
 
+    /**
+     * @param int $storageId ID of storage in property_storage table
+     */
     public function __construct($storageId)
     {
         $this->storageId = intval($storageId);
@@ -18,9 +24,9 @@ abstract class AbstractPropertyStorage
      * Fills $models array models with corresponding binded properties.
      * Models in $models array should be the the same class name.
      *
-     * @param ActiveRecord[] $models
+     * @param ActiveRecord[]|\DevGroup\DataStructure\traits\PropertiesTrait[]|\DevGroup\DataStructure\behaviors\HasProperties[] $models
      *
-     * @return ActiveRecord[]
+     * @return ActiveRecord[]|\DevGroup\DataStructure\traits\PropertiesTrait[]|\DevGroup\DataStructure\behaviors\HasProperties[]
      */
     abstract public function fillProperties(&$models);
 
@@ -28,7 +34,7 @@ abstract class AbstractPropertyStorage
      * Removes all properties binded to models.
      * Models in $models array should be the the same class name.
      *
-     * @param ActiveRecord[] $models
+     * @param ActiveRecord[]|\DevGroup\DataStructure\traits\PropertiesTrait[]|\DevGroup\DataStructure\behaviors\HasProperties[] $models
      *
      * @return void
      */
@@ -43,7 +49,7 @@ abstract class AbstractPropertyStorage
     }
 
     /**
-     * @param ActiveRecord[] $models
+     * @param ActiveRecord[]|\DevGroup\DataStructure\traits\PropertiesTrait[]|\DevGroup\DataStructure\behaviors\HasProperties[] $models
      *
      * @return boolean
      */

@@ -7,9 +7,21 @@ use DevGroup\DataStructure\models\Property;
 class TextField extends AbstractPropertyHandler
 {
 
-    protected function getValidationRules(Property $property)
+    public function getValidationRules(Property $property)
     {
-        // TODO: Implement getValidationRules() method.
+        $key = $property->key;
+
+        $rule = Property::dataTypeValidator($property->data_type) ?: 'safe';
+
+        if ($property->allow_multiple_values) {
+            return [
+                [$key, 'each', 'rule' => [$rule]],
+            ];
+        } else {
+            return [
+                [$key, $rule],
+            ];
+        }
     }
 
     public function render($model, $attribute, $case)

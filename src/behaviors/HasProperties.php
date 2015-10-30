@@ -8,6 +8,7 @@ use Yii;
 use yii\base\Behavior;
 use yii\base\Exception;
 use yii\base\InvalidConfigException;
+use yii\base\Model;
 use yii\db\ActiveRecord;
 
 class HasProperties extends Behavior
@@ -44,13 +45,19 @@ class HasProperties extends Behavior
         ];
     }
 
+    /**
+     * Performs auto fetching properties if it is turned on
+     * @return bool
+     */
     public function afterFind()
     {
         if ($this->autoFetchProperties === true) {
-            //! @todo fetch here
             /** @var \yii\db\ActiveRecord|\DevGroup\DataStructure\traits\PropertiesTrait $owner */
             $owner = $this->owner;
             $owner->ensurePropertyGroupIds();
+
+            $models = [&$owner];
+            PropertiesHelper::fillProperties($models);
         }
         return true;
     }
@@ -73,7 +80,12 @@ class HasProperties extends Behavior
         return true;
     }
 
-    private function hasPropertyKey($key)
+    /**
+     * Returns if property is binded to model
+     * @param string $key
+     * @return bool
+     */
+    public function hasPropertyKey($key)
     {
         /** @var \yii\db\ActiveRecord|\DevGroup\DataStructure\traits\PropertiesTrait $owner */
         $owner = $this->owner;
@@ -81,9 +93,14 @@ class HasProperties extends Behavior
         return in_array($key, $owner->propertiesAttributes);
     }
 
+    /**
+     * Checks if property can be read(binded to model)
+     * @param string $name
+     * @param bool|true $checkVars
+     * @return bool
+     */
     public function canGetProperty($name, $checkVars = true)
     {
-
         if ($this->hasPropertyKey($name)) {
             return true;
         }
@@ -91,6 +108,12 @@ class HasProperties extends Behavior
         return parent::canGetProperty($name, $checkVars);
     }
 
+    /**
+     * Checks if property can be written(binded to model)
+     * @param string $name
+     * @param bool|true $checkVars
+     * @return bool
+     */
     public function canSetProperty($name, $checkVars = true)
     {
         if ($this->hasPropertyKey($name)) {
@@ -100,11 +123,19 @@ class HasProperties extends Behavior
         return parent::canSetProperty($name, $checkVars);
     }
 
+    /**
+     * Sets property value
+     *
+     * @param string $name
+     * @param mixed $value
+     * @throws Exception
+     * @throws \Exception
+     * @throws bool
+     */
     public function __set($name, $value)
     {
         /** @var \yii\db\ActiveRecord|\DevGroup\DataStructure\traits\PropertiesTrait $owner */
         $owner = $this->owner;
-        $owner->ensurePropertiesAttributes();
 
         $id = array_search($name, $owner->propertiesAttributes);
         if ($id === false) {
@@ -112,14 +143,7 @@ class HasProperties extends Behavior
         }
         if (is_array($value) === false) {
             /** @var Property $property */
-            $property = Property::loadModel(
-                $id,
-                false,
-                true,
-                86400,
-                new Exception("Property for id $id not found"),
-                true
-            );
+            $property = Property::findById($id);
             if ($property->allow_multiple_values === true) {
                 // convert value to array for multiple property!
                 $value = [$value];
@@ -143,19 +167,33 @@ class HasProperties extends Behavior
         $owner->propertiesValues[$id] = $value;
     }
 
+    /**
+     * Performs after save stuff:
+     * - saves dirty properties
+     * - clears states of dirty properties
+     */
     public function afterSave()
     {
         /** @var \yii\db\ActiveRecord|\DevGroup\DataStructure\traits\PropertiesTrait $owner */
         $owner = $this->owner;
+        if ($this->autoSaveProperties === true) {
+            $models = [&$owner];
+            PropertiesHelper::storeValues($models);
+        }
         $owner->changedProperties = [];
         $owner->propertiesValuesChanged = false;
     }
 
+    /**
+     * Returns property value
+     * @param string $name
+     * @return null
+     * @throws Exception
+     */
     public function __get($name)
     {
         /** @var \yii\db\ActiveRecord|\DevGroup\DataStructure\traits\PropertiesTrait $owner */
         $owner = $this->owner;
-        $owner->ensurePropertiesAttributes();
 
         $id = array_search($name, $owner->propertiesAttributes);
         if ($id === false) {

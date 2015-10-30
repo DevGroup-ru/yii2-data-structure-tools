@@ -2,7 +2,6 @@
 
 namespace DevGroup\DataStructure\propertyHandler;
 
-
 use DevGroup\DataStructure\models\Property;
 
 class StaticValues extends AbstractPropertyHandler
@@ -21,9 +20,18 @@ class StaticValues extends AbstractPropertyHandler
         return parent::beforePropertyModelSave($property, $insert);
     }
 
-    protected function getValidationRules(Property $property)
+    public function getValidationRules(Property $property)
     {
-        // TODO: Implement getValidationRules() method.
+        $key = $property->key;
+        if ($property->allow_multiple_values) {
+            return [
+                [$key, 'each', 'rule' => ['filter', 'filter'=>'intval']],
+            ];
+        } else {
+            return [
+                [$key, 'filter', 'filter' => 'intval'],
+            ];
+        }
     }
 
     public function render($model, $attribute, $case)
