@@ -5,6 +5,12 @@ namespace DevGroup\DataStructure\helpers;
 use Yii;
 use yii\db\SchemaBuilderTrait;
 
+/**
+ * Class PropertiesTableGenerator is a special helper for manipulating(creating/dropping) properties related tables
+ * for exact models.
+ *
+ * @package DevGroup\DataStructure\helpers
+ */
 class PropertiesTableGenerator
 {
     use SchemaBuilderTrait;
