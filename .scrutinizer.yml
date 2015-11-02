@@ -4,7 +4,6 @@ build:
             - sudo composer self-update && composer --version
             - composer global require "fxp/composer-asset-plugin:~1.1.0"
             - mysql -e 'create database yii2_datastructure;'
-            - mysql yii2_datastructure < tests/migrations/mysql.sql
 
     environment:
         php:
