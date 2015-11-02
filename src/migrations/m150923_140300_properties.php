@@ -2,13 +2,19 @@
 
 use yii\db\Migration;
 
+/**
+ * Base migration for properies
+ */
 class m150923_140300_properties extends Migration
 {
+    /**
+     * Applies migrations
+     */
     public function up()
     {
         mb_internal_encoding("UTF-8");
         $tableOptions = $this->db->driverName === 'mysql'
-            ? 'CHARACTER SET utf8 COLLATE utf8_unicode_ci'
+            ? 'CHARACTER SET utf8 COLLATE utf8_unicode_ci ENGINE=InnoDB'
             : null;
 
         $this->createTable('{{%property}}', [
@@ -87,7 +93,15 @@ class m150923_140300_properties extends Migration
             'description' => $this->string()->notNull()->defaultValue(''),
         ], $tableOptions);
 
-        $this->addPrimaryKey('pk', '{{%property_translation}}', ['model_id', 'language_id']);
+        $this->createIndex('pk', '{{%property_translation}}', ['model_id', 'language_id'], true);
+        $this->addForeignKey(
+            'fkPrT',
+            '{{%property_translation}}',
+            ['model_id'],
+            '{{%property}}',
+            ['id'],
+            'CASCADE'
+        );
 
         $this->createTable('{{%static_value_translation}}', [
             'model_id' => $this->integer()->notNull(),
@@ -96,8 +110,16 @@ class m150923_140300_properties extends Migration
             'description' => $this->string()->notNull()->defaultValue(''),
             'slug' => $this->string(80)->notNull(),
         ], $tableOptions);
-        $this->addPrimaryKey('pk', '{{%static_value_translation}}', ['model_id', 'language_id']);
+        $this->createIndex('pk', '{{%static_value_translation}}', ['model_id', 'language_id'], true);
         $this->createIndex('slug', '{{%static_value_translation}}', ['slug']);
+        $this->addForeignKey(
+            'fkSvT',
+            '{{%static_value_translation}}',
+            ['model_id'],
+            '{{%static_value}}',
+            ['id'],
+            'CASCADE'
+        );
 
         $this->createTable('{{%property_group_translation}}', [
             'model_id' => $this->integer()->notNull(),
@@ -105,7 +127,15 @@ class m150923_140300_properties extends Migration
             'name' => $this->string()->notNull(),
         ], $tableOptions);
 
-        $this->addPrimaryKey('pk', '{{%property_group_translation}}', ['model_id', 'language_id']);
+        $this->createIndex('pk', '{{%property_group_translation}}', ['model_id', 'language_id'], true);
+        $this->addForeignKey(
+            'fkPgT',
+            '{{%property_group_translation}}',
+            ['model_id'],
+            '{{%property_group}}',
+            ['id'],
+            'CASCADE'
+        );
 
         // insert default data
         $this->insert('{{%property_handlers}}', [
@@ -133,16 +163,23 @@ class m150923_140300_properties extends Migration
         ]);
     }
 
+    /**
+     * Removes all properties related tables
+     */
     public function down()
     {
         $this->dropTable('{{%property_property_group}}');
-        $this->dropTable('{{%property}}');
+
         $this->dropTable('{{%property_translation}}');
-        $this->dropTable('{{%property_group}}');
+        $this->dropTable('{{%property}}');
         $this->dropTable('{{%property_group_translation}}');
+        $this->dropTable('{{%property_group}}');
+
         $this->dropTable('{{%property_storage}}');
-        $this->dropTable('{{%static_value}}');
+
         $this->dropTable('{{%static_value_translation}}');
+        $this->dropTable('{{%static_value}}');
+
         $this->dropTable('{{%property_group_models}}');
         $this->dropTable('{{%property_handlers}}');
     }

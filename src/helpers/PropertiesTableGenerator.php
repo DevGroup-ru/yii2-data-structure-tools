@@ -46,6 +46,7 @@ class PropertiesTableGenerator
     }
 
     /**
+     * Generates all properties tables for specified $className model
      * @param string                          $className
      * @param \yii\db\Connection|string|null  $db
      */
@@ -55,7 +56,7 @@ class PropertiesTableGenerator
         $this->setDb($db);
 
         $tableOptions = $this->db->driverName === 'mysql'
-            ? 'CHARACTER SET utf8 COLLATE utf8_unicode_ci'
+            ? 'CHARACTER SET utf8 COLLATE utf8_unicode_ci ENGINE=InnoDB'
             : null;
 
         // Static values
@@ -72,6 +73,15 @@ class PropertiesTableGenerator
         );
 
         $this->addPrimaryKey('uniquePair', $staticValuesTable, ['model_id', 'static_value_id']);
+        $this->addForeignKey(
+            'fk'.crc32($className).'SV',
+            $staticValuesTable,
+            ['model_id'],
+            $className::tableName(),
+            ['id'],
+            'CASCADE'
+        );
+
 
         // eav!
         $eavTable = $className::eavTable();
@@ -97,6 +107,14 @@ class PropertiesTableGenerator
                 'sort_order',
             ]
         );
+        $this->addForeignKey(
+            'fk'.crc32($className).'Eav',
+            $eavTable,
+            ['model_id'],
+            $className::tableName(),
+            ['id'],
+            'CASCADE'
+        );
 
         // table inheritance
         $tableInheritanceTable = $className::tableInheritanceTable();
@@ -106,6 +124,14 @@ class PropertiesTableGenerator
                 'model_id' => $this->primaryKey(),
             ],
             $tableOptions
+        );
+        $this->addForeignKey(
+            'fk'.crc32($className).'TI',
+            $tableInheritanceTable,
+            ['model_id'],
+            $className::tableName(),
+            ['id'],
+            'CASCADE'
         );
 
         // binded property groups
@@ -127,6 +153,14 @@ class PropertiesTableGenerator
                 'property_group_id',
             ],
             true
+        );
+        $this->addForeignKey(
+            'fk'.crc32($className).'BPG',
+            $bindedGroupsTable,
+            ['model_id'],
+            $className::tableName(),
+            ['id'],
+            'CASCADE'
         );
     }
 
@@ -221,6 +255,21 @@ class PropertiesTableGenerator
         echo "    > drop table $table ...";
         $time = microtime(true);
         $this->db->createCommand()->dropTable($table)->execute();
+        echo " done (time: " . sprintf('%.3f', microtime(true) - $time) . "s)\n";
+    }
+    /**
+     * Copy-paste from \yii\db\Migration
+     * @codeCoverageIgnore
+     *
+     * @param $table
+     *
+     * @throws \yii\db\Exception
+     */
+    private function addForeignKey($name, $table, $columns, $refTable, $refColumns, $delete = null, $update = null)
+    {
+        echo "    > add foreign key $name: $table (" . implode(',', (array) $columns) . ") references $refTable (" . implode(',', (array) $refColumns) . ") ...";
+        $time = microtime(true);
+        $this->db->createCommand()->addForeignKey($name, $table, $columns, $refTable, $refColumns, $delete, $update)->execute();
         echo " done (time: " . sprintf('%.3f', microtime(true) - $time) . "s)\n";
     }
 
