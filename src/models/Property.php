@@ -4,6 +4,7 @@ namespace DevGroup\DataStructure\models;
 use DevGroup\DataStructure\behaviors\PackedJsonAttributes;
 use DevGroup\DataStructure\helpers\PropertiesHelper;
 use DevGroup\DataStructure\helpers\PropertyHandlerHelper;
+use DevGroup\DataStructure\helpers\PropertyStorageHelper;
 use DevGroup\Multilingual\behaviors\MultilingualActiveRecord;
 use DevGroup\Multilingual\traits\MultilingualTrait;
 use DevGroup\TagDependencyHelper\CacheableActiveRecord;
@@ -26,6 +27,7 @@ use yii\web\ServerErrorHttpException;
  * @property integer $property_handler_id
  * @property array   $default_value
  * @property array   $handler_config
+ * @property integer $applicable_property_model_id
  *
  * @package DevGroup\DataStructure\models
  */
@@ -76,14 +78,16 @@ class Property extends ActiveRecord
     public function rules()
     {
         return [
+            ['applicable_property_model_id', 'integer',],
+            ['applicable_property_model_id', 'required',],
             ['key', 'unique'],
             ['key', 'required'],
             ['key', 'string', 'max'=>80],
             [['is_internal', 'allow_multiple_values'], 'filter', 'filter'=>'boolval'],
             [['data_type'], 'integer',],
+            [['data_type'], 'required',],
             ['storage_id', function ($attribute) {
-                $handlers = PropertiesHelper::storageHandlers();
-                return isset($handlers[$this->$attribute]);
+                return PropertyStorageHelper::storageById($this->$attribute);
             }],
             [['storage_id', 'data_type'], 'filter', 'filter'=>'intval'],
         ];
@@ -104,6 +108,14 @@ class Property extends ActiveRecord
         if ($result === false) {
             return false;
         }
+
+        $storage = PropertyStorageHelper::storageById($this->storage_id);
+
+        $status = $insert ? $storage->beforePropertyAdd($this) : $storage->beforePropertyChange($this);
+        if ($status === false) {
+            return false;
+        }
+
         $handler = PropertyHandlerHelper::getInstance()->handlerById($this->property_handler_id);
         return $handler->beforePropertyModelSave($this, $insert);
     }
@@ -124,6 +136,60 @@ class Property extends ActiveRecord
         }
         $handler = PropertyHandlerHelper::getInstance()->handlerById($this->property_handler_id);
         $handler->afterPropertyModelSave($this);
+
+        $storage = PropertyStorageHelper::storageById($this->storage_id);
+
+        if ($insert) {
+            $storage->afterPropertyAdd($this);
+        } else {
+            $storage->afterPropertyChange($this);
+        }
+    }
+
+    /**
+     * Perform beforeDelete events
+     *
+     * @return bool events status
+     * @throws ServerErrorHttpException
+     */
+    public function beforeDelete()
+    {
+        if (parent::beforeDelete() === false) {
+            return false;
+        }
+        $storage = PropertyStorageHelper::storageById($this->storage_id);
+        return $storage->beforePropertyDelete($this);
+    }
+
+    /**
+     * Perform afterDelete events
+     * @throws ServerErrorHttpException
+     */
+    public function afterDelete()
+    {
+        $storage = PropertyStorageHelper::storageById($this->storage_id);
+        $storage->afterPropertyDelete($this);
+    }
+
+    /**
+     * Perform beforeValidate events
+     * @return bool
+     * @throws ServerErrorHttpException
+     */
+    public function beforeValidate()
+    {
+        $validation = parent::beforeValidate();
+        return $validation && PropertyStorageHelper::storageById($this->storage_id)->beforePropertyValidate($this);
+    }
+
+    /**
+     * Perform afterValidate events
+     * @throws ServerErrorHttpException
+     */
+    public function afterValidate()
+    {
+        parent::afterValidate();
+        PropertyStorageHelper::storageById($this->storage_id)->afterPropertyValidate($this);
     }
 
     /**
@@ -134,9 +200,10 @@ class Property extends ActiveRecord
         parent::afterFind();
         static::$propertyIdToKey[$this->id] = $this->key;
 
-        // cast bool values
+        // cast scalar values
         $this->allow_multiple_values = boolval($this->allow_multiple_values);
         $this->is_internal = boolval($this->is_internal);
+        $this->data_type = intval($this->data_type);
     }
 
     /**
@@ -149,7 +216,6 @@ class Property extends ActiveRecord
      */
     public static function propertyKeyForId($propertyId)
     {
-
         if (isset(static::$identityMap[$propertyId])) {
             return static::$identityMap[$propertyId]->key;
         }

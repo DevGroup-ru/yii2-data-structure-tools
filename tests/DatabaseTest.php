@@ -18,6 +18,7 @@ use DevGroup\DataStructure\tests\models\Product;
 use Yii;
 use yii\base\UnknownPropertyException;
 use yii\db\Connection;
+use yii\web\ServerErrorHttpException;
 
 /**
  * DatabaseTestCase
@@ -95,7 +96,7 @@ class DatabaseTest extends \PHPUnit_Extensions_Database_TestCase
 
             Yii::$app->getDb()
                 ->createCommand()
-                ->batchInsert('{{%property_group_models}}', ['class_name'], [
+                ->batchInsert('{{%applicable_property_models}}', ['class_name'], [
                     [Product::className(),],
                     [Category::className(),],
                 ])->execute();
@@ -194,12 +195,14 @@ class DatabaseTest extends \PHPUnit_Extensions_Database_TestCase
         $this->assertTrue($smartphone_general->save());
 
         $weight = new Property();
+        $weight->applicable_property_model_id = PropertiesHelper::applicablePropertyModelId(Product::className());
         $weight->key = 'weight';
         $weight->storage_id = 2;
         $weight->data_type = Property::DATA_TYPE_FLOAT;
         $weight->property_handler_id = PropertyHandlerHelper::getInstance()->handlerIdByClassName(
             \DevGroup\DataStructure\propertyHandler\TextField::className()
         );
+
 
         $weight->translate(1)->name = 'Weight';
         $weight->translate(2)->name = 'Вес';
@@ -217,6 +220,7 @@ class DatabaseTest extends \PHPUnit_Extensions_Database_TestCase
         $this->assertEquals(1, count($properties));
 
         $os = new Property();
+        $os->applicable_property_model_id = PropertiesHelper::applicablePropertyModelId(Product::className());
         $os->key = 'os';
         $os->storage_id = 1;
         $os->property_handler_id = PropertyHandlerHelper::getInstance()->handlerIdByClassName(
@@ -224,7 +228,7 @@ class DatabaseTest extends \PHPUnit_Extensions_Database_TestCase
         );
         $os->translate(1)->name = 'Operating system';
         $os->translate(2)->name = 'Операционная система';
-        $this->assertTrue($os->save());
+        $this->assertTrue($os->save(), var_export($os->errors));
         $smartphone_general->link(
             'properties',
             $os
@@ -335,7 +339,8 @@ class DatabaseTest extends \PHPUnit_Extensions_Database_TestCase
         $validationResult = $productFromDatabase->validate();
         $this->assertFalse($validationResult, "We have added unexisting static value, but there was no validation error");
 
-
+        PropertiesHelper::deleteAllProperties($models);
+        $this->assertSame('0', Yii::$app->db->createCommand("SELECT COUNT(*) FROM {{product_eav}}")->queryScalar());
 //        $this->markTestSkipped('TBD');
     }
 
@@ -358,4 +363,15 @@ class DatabaseTest extends \PHPUnit_Extensions_Database_TestCase
 //
 //
 //    }
+
+    public function testPropertyHelpers()
+    {
+        $result = false;
+        try {
+            PropertiesHelper::applicablePropertyModelId('foo\bar\some');
+        } catch (\yii\base\Exception $e) {
+            $result = true;
+        }
+        $this->assertTrue($result, 'No exception if there is not correct applicable property models record for classname');
+    }
 }

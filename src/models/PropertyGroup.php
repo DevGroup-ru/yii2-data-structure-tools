@@ -38,7 +38,7 @@ class PropertyGroup extends ActiveRecord
     {
         parent::__construct($config);
         if ($className !== null) {
-            $this->property_group_model_id = PropertiesHelper::propertyGroupModelId($className);
+            $this->applicable_property_model_id = PropertiesHelper::applicablePropertyModelId($className);
         }
     }
 
@@ -74,10 +74,10 @@ class PropertyGroup extends ActiveRecord
     {
         return [
             [['internal_name'], 'required',],
-            [['sort_order', 'property_group_model_id'], 'integer'],
+            [['sort_order', 'applicable_property_model_id'], 'integer'],
             [['is_auto_added'], 'filter', 'filter'=>'boolval'],
-            ['property_group_model_id', function ($attribute) {
-                return PropertiesHelper::classNameForPropertyGroupModelId($this->$attribute) !== false;
+            ['applicable_property_model_id', function ($attribute) {
+                return PropertiesHelper::classNameForApplicablePropertyModelId($this->$attribute) !== false;
             }],
         ];
     }
@@ -148,7 +148,7 @@ class PropertyGroup extends ActiveRecord
     public function autoAddToObjects()
     {
         /** @var \yii\db\ActiveRecord $modelClassName */
-        $modelClassName = PropertiesHelper::classNameForPropertyGroupModelId($this->property_group_model_id);
+        $modelClassName = PropertiesHelper::classNameForApplicablePropertyModelId($this->property_group_model_id);
 
     }
 

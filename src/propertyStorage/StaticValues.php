@@ -163,4 +163,13 @@ class StaticValues extends AbstractPropertyStorage
 
         return true;
     }
+
+    /**
+     * @inheritdoc
+     */
+    public function beforePropertyValidate(Property &$property)
+    {
+        $property->data_type = Property::DATA_TYPE_INTEGER;
+        return true;
+    }
 }

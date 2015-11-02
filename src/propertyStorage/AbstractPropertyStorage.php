@@ -2,6 +2,7 @@
 
 namespace DevGroup\DataStructure\propertyStorage;
 
+use DevGroup\DataStructure\models\Property;
 use Yii;
 use yii\db\ActiveRecord;
 use yii\helpers\ArrayHelper;
@@ -63,4 +64,92 @@ abstract class AbstractPropertyStorage
      * @return boolean
      */
     abstract public function storeValues(&$models);
+
+    /**
+     * Action that should be done by property storage before property adding.
+     * Property storage can override this function to add specific actions like schema manipulation.
+     * @param Property $property Reference to property model
+     * @return bool Success status, true if all's ok
+     */
+    public function beforePropertyAdd(Property &$property)
+    {
+        return true;
+    }
+
+    /**
+     * Action that should be done by property storage after property adding.
+     * Property storage can override this function to add specific actions like schema manipulation.
+     * @param Property $property Reference to property model
+     * @return void
+     */
+    public function afterPropertyAdd(Property &$property)
+    {
+
+    }
+
+    /**
+     * Action that should be done by property storage before property change.
+     * Property storage can override this function to add specific actions like schema manipulation.
+     * @param Property $property Reference to property model
+     * @return bool Success status, true if all's ok
+     */
+    public function beforePropertyChange(Property &$property)
+    {
+        return true;
+    }
+
+    /**
+     * Action that should be done by property storage after property change.
+     * Property storage can override this function to add specific actions like schema manipulation.
+     * @param Property $property Reference to property model
+     * @return void
+     */
+    public function afterPropertyChange(Property &$property)
+    {
+
+    }
+
+    /**
+     * Action that should be done by property storage before property deletion.
+     * Property storage can override this function to add specific actions like schema manipulation.
+     * @param Property $property Reference to property model
+     * @return bool Success status, true if all's ok
+     */
+    public function beforePropertyDelete(Property &$property)
+    {
+        return true;
+    }
+
+    /**
+     * Action that should be done by property storage after property deletion.
+     * Property storage can override this function to add specific actions like schema manipulation.
+     * @param Property $property Reference to property model
+     * @return void
+     */
+    public function afterPropertyDelete(Property &$property)
+    {
+
+    }
+
+    /**
+     * Action that should be done by property storage before property validation.
+     * Property storage can override this function to add specific actions like redefining data type.
+     * @param Property $property Reference to property model
+     * @return bool Success status, true if all's ok
+     */
+    public function beforePropertyValidate(Property &$property)
+    {
+        return true;
+    }
+
+    /**
+     * Action that should be done by property storage after property validation.
+     * Property storage can override this function to add specific actions like redefining data type.
+     * @param Property $property Reference to property model
+     * @return void
+     */
+    public function afterPropertyValidate(Property &$property)
+    {
+
+    }
 }

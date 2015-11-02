@@ -7,6 +7,11 @@ use Yii;
 use yii\console\Controller;
 use yii\console\Exception;
 
+/**
+ * Class PropertiesController is a helper for yii2 cli
+ * @codeCoverageIgnore
+ * @package DevGroup\DataStructure\commands
+ */
 class PropertiesController extends Controller
 {
     public function actionIndex($className)

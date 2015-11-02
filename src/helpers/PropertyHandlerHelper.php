@@ -6,11 +6,18 @@ use DevGroup\DataStructure\models\PropertyHandlers;
 use Yii;
 use yii\base\Exception;
 
+/**
+ * Class PropertyHandlerHelper represents helper functions for Property Handlers
+ * @package DevGroup\DataStructure\helpers
+ */
 class PropertyHandlerHelper
 {
     /** @var PropertyHandlerHelper */
-    private static $instance = null;
+    public static $instance = null;
 
+    /**
+     * @var null|\DevGroup\DataStructure\propertyHandler\AbstractPropertyHandler[] Array of all handlers with initiated classes(not ActiveRecord)
+     */
     private $handlers = null;
 
     /**

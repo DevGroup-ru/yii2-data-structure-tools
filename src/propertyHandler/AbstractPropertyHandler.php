@@ -66,6 +66,4 @@ abstract class AbstractPropertyHandler
     {
         return get_called_class();
     }
-
-
 }

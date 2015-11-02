@@ -11,51 +11,29 @@ use yii\helpers\ArrayHelper;
 
 class PropertiesHelper
 {
-    /**
-     * @var \DevGroup\DataStructure\propertyStorage\AbstractPropertyStorage[]
-     */
-    private static $_storageHandlers = null;
 
     /**
-     * @var array Hash map of className to property_group_model.id
+     * @var array Hash map of className to applicable_property_models.id
      */
-    private static $_property_group_models = null;
-
-    /**
-     * @return \DevGroup\DataStructure\propertyStorage\AbstractPropertyStorage[] PropertyStorage indexed by PropertyStorage.id
-     */
-    public static function storageHandlers()
-    {
-        if (static::$_storageHandlers === null) {
-            static::$_storageHandlers = Yii::$app->cache->lazy(function () {
-                $rows = PropertyStorage::find()
-                    ->asArray()
-                    ->all();
-                return ArrayHelper::map($rows, 'id', function ($item) {
-                    return new $item['class_name']($item['id']);
-                });
-            }, 'StorageHandlers', 86400, PropertyStorage::commonTag());
-        }
-        return static::$_storageHandlers;
-    }
+    protected static $applicablePropertyModels = null;
 
     /**
      * @param bool|false $forceRefresh
      *
      * @return array
      */
-    private static function retrievePropertyGroupModels($forceRefresh = false)
+    private static function retrieveApplicablePropertyModels($forceRefresh = false)
     {
-        if (static::$_property_group_models === null || $forceRefresh === true) {
+        if (static::$applicablePropertyModels === null || $forceRefresh === true) {
             if ($forceRefresh === true) {
-                Yii::$app->cache->delete('PropertyGroupModelsMap');
+                Yii::$app->cache->delete('ApplicablePropertyModels');
             }
 
-            static::$_property_group_models = Yii::$app->cache->lazy(function () {
+            static::$applicablePropertyModels = Yii::$app->cache->lazy(function () {
                 $query = new \yii\db\Query();
                 $rows = $query
                     ->select(['id', 'class_name'])
-                    ->from('{{%property_group_models}}')
+                    ->from('{{%applicable_property_models}}')
                     ->all();
                 array_walk($rows, function (&$item) {
                     $item['id'] = intval($item['id']);
@@ -65,9 +43,9 @@ class PropertiesHelper
                     'class_name',
                     'id'
                 );
-            }, 'PropertyGroupModelsMap', 86400);
+            }, 'ApplicablePropertyModels', 86400);
         }
-        return static::$_property_group_models;
+        return static::$applicablePropertyModels;
     }
 
     /**
@@ -79,29 +57,29 @@ class PropertiesHelper
      * @return integer
      * @throws \yii\base\Exception
      */
-    public static function propertyGroupModelId($className, $forceRefresh = false)
+    public static function applicablePropertyModelId($className, $forceRefresh = false)
     {
-        static::retrievePropertyGroupModels($forceRefresh);
+        static::retrieveApplicablePropertyModels($forceRefresh);
 
-        if (isset(static::$_property_group_models[$className])) {
-            return static::$_property_group_models[$className];
+        if (isset(static::$applicablePropertyModels[$className])) {
+            return static::$applicablePropertyModels[$className];
         } else {
             throw new Exception('Property group model record not found for class: ' . $className);
         }
     }
 
     /**
-     * Returns class name of Model for which property group model record is associated
+     * Returns class name of Model for which property or property_group model record is associated
      *
      * @param string      $id
      * @param bool|false  $forceRefresh
      *
      * @return string|false
      */
-    public static function classNameForPropertyGroupModelId($id, $forceRefresh = false)
+    public static function classNameForApplicablePropertyModelId($id, $forceRefresh = false)
     {
-        static::retrievePropertyGroupModels($forceRefresh);
-        return array_search($id, static::$_property_group_models);
+        static::retrieveApplicablePropertyModels($forceRefresh);
+        return array_search($id, static::$applicablePropertyModels);
     }
 
     /**
@@ -123,7 +101,7 @@ class PropertiesHelper
         static::fillPropertyGroups($models);
         static::ensurePropertiesAttributes($models);
 
-        $storageHandlers = static::storageHandlers();
+        $storageHandlers = PropertyStorageHelper::storageHandlers();
 
         Yii::beginProfile('Fill properties for models');
 
@@ -164,7 +142,7 @@ class PropertiesHelper
      */
     public static function deleteAllProperties(&$models)
     {
-        $storageHandlers = static::storageHandlers();
+        $storageHandlers = PropertyStorageHelper::storageHandlers();
 
         Yii::beginProfile('Fill properties for models');
 
@@ -292,7 +270,7 @@ class PropertiesHelper
             }
         );
 
-        $storageHandlers = static::storageHandlers();
+        $storageHandlers = PropertyStorageHelper::storageHandlers();
 
         $result = true;
 

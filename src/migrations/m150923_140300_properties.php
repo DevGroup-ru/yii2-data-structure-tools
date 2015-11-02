@@ -19,6 +19,7 @@ class m150923_140300_properties extends Migration
 
         $this->createTable('{{%property}}', [
             'id' => $this->primaryKey(),
+            'applicable_property_model_id' => $this->integer()->notNull(),
             'key' => $this->string(80)->notNull(),
             'data_type' => $this->boolean()->defaultValue(0),
             'is_internal' => $this->boolean()->defaultValue(0),
@@ -50,11 +51,11 @@ class m150923_140300_properties extends Migration
             'id' => $this->primaryKey(),
             'internal_name' => $this->string()->notNull(),
             'sort_order' => $this->integer()->notNull()->defaultValue(0),
-            'property_group_model_id' => $this->integer()->notNull(),
+            'applicable_property_model_id' => $this->integer()->notNull(),
             'is_auto_added' => $this->boolean()->defaultValue(0),
         ], $tableOptions);
 
-        $this->createIndex('by_models', '{{%property_group}}', ['property_group_model_id']);
+        $this->createIndex('by_models', '{{%property_group}}', ['applicable_property_model_id']);
 
         $this->createTable('{{%property_property_group}}', [
             'property_id' => $this->integer()->notNull(),
@@ -72,7 +73,7 @@ class m150923_140300_properties extends Migration
             'sort_order' => $this->integer()->notNull()->defaultValue(0),
         ], $tableOptions);
 
-        $this->createTable('{{%property_group_models}}', [
+        $this->createTable('{{%applicable_property_models}}', [
             'id' => $this->primaryKey(),
             'class_name' => $this->string()->notNull(),
         ], $tableOptions);
@@ -180,7 +181,7 @@ class m150923_140300_properties extends Migration
         $this->dropTable('{{%static_value_translation}}');
         $this->dropTable('{{%static_value}}');
 
-        $this->dropTable('{{%property_group_models}}');
+        $this->dropTable('{{%applicable_property_models}}');
         $this->dropTable('{{%property_handlers}}');
     }
 
