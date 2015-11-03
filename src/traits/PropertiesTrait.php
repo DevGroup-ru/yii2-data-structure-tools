@@ -9,7 +9,8 @@ use yii\helpers\ArrayHelper;
 use yii\web\ServerErrorHttpException;
 
 /**
- * Class PropertiesTrait
+ * Class PropertiesTrait adds properties-related functions to model
+ *
  * @package DevGroup\DataStructure\traits
  * @mixin \yii\db\ActiveRecord
  * @property integer $id
@@ -42,13 +43,14 @@ trait PropertiesTrait
     public function ensurePropertyGroupIds()
     {
         if ($this->propertyGroupIds === null) {
-            $array = [&$this];
+            $array = [ &$this ];
             PropertiesHelper::fillPropertyGroups($array);
         }
     }
 
     /**
      * Ensures that $propertiesIds is filled. Also fills $property_group_ids if needed.
+     *
      * @param boolean $force True to force refreshing properties ids even if they are filled.
      */
     public function ensurePropertiesIds($force = false)
@@ -69,6 +71,7 @@ trait PropertiesTrait
 
     /**
      * Ensures that $propertiesAttributes is filled. Also fills $propertiesIds and $property_group_ids if needed.
+     *
      * @param boolean $force True to force refreshing propertiesAttributes even if they are filled.
      */
     public function ensurePropertiesAttributes($force = false)
@@ -120,7 +123,9 @@ trait PropertiesTrait
     }
 
     /**
-     * @return string Static values bindings table name. Override this in your model class if needed.
+     * Static values bindings table name. Override this in your model class if needed.
+     *
+     * @return string
      */
     public static function staticValuesBindingsTable()
     {
@@ -129,7 +134,9 @@ trait PropertiesTrait
     }
 
     /**
-     * @return string EAV table name. Override this in your model class if needed.
+     * EAV table name. Override this in your model class if needed.
+     *
+     * @return string
      */
     public static function eavTable()
     {
@@ -138,7 +145,9 @@ trait PropertiesTrait
     }
 
     /**
-     * @return string Table inheritance table name. Override this in your model class if needed.
+     * Table inheritance table name. Override this in your model class if needed.
+     *
+     * @return string
      */
     public static function tableInheritanceTable()
     {
@@ -147,7 +156,9 @@ trait PropertiesTrait
     }
 
     /**
-     * @return string Binded property groups ids. Override this in your model class if needed.
+     * Binded property groups ids. Override this in your model class if needed.
+     *
+     * @return string
      */
     public static function bindedPropertyGroupsTable()
     {
@@ -170,7 +181,9 @@ trait PropertiesTrait
     }
 
     /**
-     * @return array Array of validation rules for properties
+     * Array of validation rules for properties
+     *
+     * @return array
      */
     public function propertiesRules()
     {
@@ -178,7 +191,7 @@ trait PropertiesTrait
 
         $this->ensurePropertiesAttributes();
 
-        foreach ($this->propertiesAttributes as $propertyId => $propertyKey) {
+        foreach ($this->propertiesIds as $propertyId) {
             /** @var Property $property */
             $property = Property::findById($propertyId);
             $handler = $property->handler();

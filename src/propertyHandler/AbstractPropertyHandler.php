@@ -29,6 +29,12 @@ abstract class AbstractPropertyHandler
         return true;
     }
 
+    /**
+     * @param \DevGroup\DataStructure\models\Property $property
+     * @param                                         $insert
+     *
+     * @return bool
+     */
     public function beforePropertyModelSave(Property &$property, $insert)
     {
         return true;

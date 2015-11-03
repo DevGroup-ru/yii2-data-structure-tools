@@ -8,6 +8,7 @@ namespace DevGroup\DataStructure\tests;
 use DevGroup\DataStructure\helpers\PropertiesHelper;
 use DevGroup\DataStructure\helpers\PropertiesTableGenerator;
 use DevGroup\DataStructure\helpers\PropertyHandlerHelper;
+use DevGroup\DataStructure\helpers\PropertyStorageHelper;
 use DevGroup\DataStructure\models\Property;
 use DevGroup\DataStructure\models\PropertyGroup;
 use DevGroup\DataStructure\models\StaticValue;
@@ -179,6 +180,8 @@ class DatabaseTest extends \PHPUnit_Extensions_Database_TestCase
 
     public function testActiveRecord()
     {
+        $this->assertSame(2, PropertiesHelper::applicablePropertyModelId(Category::className()));
+        $this->assertSame(1, PropertiesHelper::applicablePropertyModelId(Product::className(), true));
         // property group for all products
         $package_properties = new PropertyGroup(Product::className());
         $package_properties->internal_name = 'Package properties';
@@ -280,6 +283,7 @@ class DatabaseTest extends \PHPUnit_Extensions_Database_TestCase
 
         // static values test
         $this->assertTrue($product->addPropertyGroup($smartphone_general));
+        $this->assertFalse($product->addPropertyGroup($smartphone_general), 'Should not allow adding one group twice');
 
         $this->assertSame([], StaticValue::valuesForProperty($os));
 
@@ -331,6 +335,8 @@ class DatabaseTest extends \PHPUnit_Extensions_Database_TestCase
 
         $models = [&$productFromDatabase];
         PropertiesHelper::fillProperties($models);
+        // this should not call again and covers special line "if ($firstModel->propertyGroupIds !== null)"
+        PropertiesHelper::fillProperties($models);
 
         $this->assertSame(127.001, $productFromDatabase->weight);
         $this->assertSame(1, $productFromDatabase->os);
@@ -344,25 +350,25 @@ class DatabaseTest extends \PHPUnit_Extensions_Database_TestCase
 //        $this->markTestSkipped('TBD');
     }
 
-//    public function testPackedJsonFields()
-//    {
-//        /** @var Product $product */
-//        $product = Product::findOne(1);
-//        $this->assertEquals([], $product->data);
-//        $testArray = ['test'=>1, 2=>'foo', 'bar' => false];
-//        $product->data = $testArray;
-//        $this->assertEquals($testArray, $product->data);
-//        $this->assertTrue($product->save());
-//        $this->assertEquals($testArray, $product->data);
-//
-//        $product = Product::findOne(1);
-//        $this->assertEquals($testArray, $product->data);
-//
-//        $product = Product::findOne(2);
-//        $this->assertNull($product->data);
-//
-//
-//    }
+    public function testPackedJsonFields()
+    {
+        /** @var Product $product */
+        $product = Product::findOne(1);
+        $this->assertEquals([], $product->data);
+        $testArray = ['test'=>1, 2=>'foo', 'bar' => false];
+        $product->data = $testArray;
+        $this->assertEquals($testArray, $product->data);
+        $this->assertTrue($product->save());
+        $this->assertEquals($testArray, $product->data);
+
+        $product = Product::findOne(1);
+        $this->assertEquals($testArray, $product->data);
+
+        $product = Product::findOne(2);
+        $this->assertNull($product->data);
+
+
+    }
 
     public function testPropertyHelpers()
     {
@@ -373,5 +379,13 @@ class DatabaseTest extends \PHPUnit_Extensions_Database_TestCase
             $result = true;
         }
         $this->assertTrue($result, 'No exception if there is not correct applicable property models record for classname');
+
+        $result = false;
+        try {
+            PropertyStorageHelper::storageById(65535);
+        } catch (\yii\base\Exception $e) {
+            $result = true;
+        }
+        $this->assertTrue($result, 'No exception if there is not correct storage id specified');
     }
 }

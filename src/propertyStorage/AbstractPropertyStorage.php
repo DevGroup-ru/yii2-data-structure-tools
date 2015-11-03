@@ -152,4 +152,15 @@ abstract class AbstractPropertyStorage
     {
 
     }
+
+    /**
+     * Special event after models with possible properties inserted to db.
+     * Used for example for creating index document or table inheritance row.
+     *
+     * @param ActiveRecord[]|\DevGroup\DataStructure\traits\PropertiesTrait[]|\DevGroup\DataStructure\behaviors\HasProperties[] $models
+     */
+    public function modelsInserted(&$models)
+    {
+
+    }
 }
