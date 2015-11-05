@@ -338,18 +338,21 @@ class Property extends ActiveRecord
 
     /**
      * A proxy method for LoadModel
-     * @param $id
+     * @param integer $id
+     * @param boolean $throwException
      * @return Property
      * @throws \Exception
      */
-    public static function findById($id)
+    public static function findById($id, $throwException = true)
     {
+        $e = $throwException ? new ServerErrorHttpException("Property with id $id not found") : false;
+
         return static::loadModel(
             $id,
             false,
             true,
             86400,
-            new ServerErrorHttpException("Property with id $id not found"),
+            $e,
             true
         );
     }

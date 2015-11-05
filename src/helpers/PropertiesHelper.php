@@ -2,12 +2,14 @@
 
 namespace DevGroup\DataStructure\helpers;
 
+use DevGroup\DataStructure\models\Property;
 use DevGroup\DataStructure\models\PropertyGroup;
-use DevGroup\DataStructure\models\PropertyStorage;
 use Yii;
 use yii\base\Exception;
+use yii\base\UnknownPropertyException;
 use yii\db\Query;
 use yii\helpers\ArrayHelper;
+use yii\web\ServerErrorHttpException;
 
 class PropertiesHelper
 {
@@ -297,5 +299,20 @@ class PropertiesHelper
             $result[$model->id] = $index;
         }
         return $result;
+    }
+    /**
+     * @param \yii\db\ActiveRecord|\DevGroup\DataStructure\traits\PropertiesTrait $model
+     * @param string $attribute
+     * @throws UnknownPropertyException
+     * @throws ServerErrorHttpException
+     * @return Property
+     */
+    public static function getPropertyModel($model, $attribute)
+    {
+        $propertyId = array_search($attribute, $model->propertiesAttributes);
+        if ($propertyId === false) {
+            throw new UnknownPropertyException("Attribute $attribute not found in model ".$model->className());
+        }
+        return Property::findById($propertyId, false);
     }
 }

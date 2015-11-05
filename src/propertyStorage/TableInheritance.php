@@ -48,9 +48,9 @@ class TableInheritance extends AbstractPropertyStorage
                     if ($key === 'model_id') {
                         continue;
                     }
+
                     /** @var Property $property */
-                    $propertyId = array_search($key, $model->propertiesAttributes);
-                    $property = $propertyId > 0 ? Property::findById($propertyId) : null;
+                    $property = PropertiesHelper::getPropertyModel($model, $key);
                     if ($property === null) {
                         // skip unbinded property
                         continue;
