@@ -136,10 +136,15 @@ class DatabaseTest extends \PHPUnit_Extensions_Database_TestCase
     protected function tearDown()
     {
         parent::tearDown();
+
         $generator = PropertiesTableGenerator::getInstance();
 
         $generator->drop(Product::className());
         $generator->drop(Category::className());
+        // all identity map should be cleared
+        Property::$identityMap = [];
+
+        Yii::$app->cache->flush();
         $this->destroyApplication();
     }
     /**
@@ -151,6 +156,51 @@ class DatabaseTest extends \PHPUnit_Extensions_Database_TestCase
             \Yii::$app->session->close();
         }
         \Yii::$app = null;
+    }
+
+    public function testTableInheritance()
+    {
+        $product = new Product();
+        $product->name = 'Powerbank';
+        $this->assertTrue($product->save());
+
+        $propertyGroup = new PropertyGroup(Product::className());
+        $propertyGroup->internal_name = 'Specification';
+        $this->assertTrue($propertyGroup->save());
+
+        $power = new Property();
+        $power->key = 'power';
+        $power->applicable_property_model_id = PropertiesHelper::applicablePropertyModelId($product->className());
+        $power->translate(1)->name = 'Power';
+        $power->translate(2)->name = 'Power';
+        $power->data_type = Property::DATA_TYPE_INTEGER;
+        $power->storage_id = 3;
+        $power->property_handler_id = PropertyHandlerHelper::getInstance()->handlerIdByClassName(
+            \DevGroup\DataStructure\propertyHandler\TextField::className()
+        );
+        $this->assertTrue($power->validate());
+        $saved = $power->save();
+
+        $this->assertTrue($saved, var_export($power->errors, true));
+
+        $propertyGroup->link(
+            'properties',
+            $power
+        );
+
+        $this->assertTrue($product->addPropertyGroup($propertyGroup));
+        $product->power = 120;
+        $this->assertSame(120, $product->power);
+        $models = [ &$product ];
+        $this->assertTrue(PropertiesHelper::storeValues($models));
+        $this->assertTrue($product->save());
+
+        /** @var Product $productFromDb */
+        $productFromDb = Product::findOne($product->id);
+        $models = [ &$productFromDb ];
+        PropertiesHelper::fillProperties($models);
+        $this->assertSame(120, $productFromDb->power);
+
     }
 
     public function testHelpers()
@@ -176,6 +226,22 @@ class DatabaseTest extends \PHPUnit_Extensions_Database_TestCase
 
         $id = PropertyHandlerHelper::getInstance()->handlerIdByClassName(\DevGroup\DataStructure\propertyHandler\StaticValues::className());
         $this->assertEquals(1, $id);
+
+        $result = false;
+        try {
+            PropertiesHelper::applicablePropertyModelId('foo\bar\some');
+        } catch (\yii\base\Exception $e) {
+            $result = true;
+        }
+        $this->assertTrue($result, 'No exception if there is not correct applicable property models record for classname');
+
+        $result = false;
+        try {
+            PropertyStorageHelper::storageById(65535);
+        } catch (\yii\base\Exception $e) {
+            $result = true;
+        }
+        $this->assertTrue($result, 'No exception if there is not correct storage id specified');
     }
 
     public function testActiveRecord()
@@ -231,7 +297,7 @@ class DatabaseTest extends \PHPUnit_Extensions_Database_TestCase
         );
         $os->translate(1)->name = 'Operating system';
         $os->translate(2)->name = 'Операционная система';
-        $this->assertTrue($os->save(), var_export($os->errors));
+        $this->assertTrue($os->save());
         $smartphone_general->link(
             'properties',
             $os
@@ -273,6 +339,7 @@ class DatabaseTest extends \PHPUnit_Extensions_Database_TestCase
         $this->assertEquals(1, count($product->propertyGroupIds));
         $this->assertSame([], $product->changedProperties);
         $this->assertFalse($product->propertiesValuesChanged);
+
         $this->assertNull($product->weight);
 
         $product->weight = 127.001;
@@ -322,7 +389,7 @@ class DatabaseTest extends \PHPUnit_Extensions_Database_TestCase
         $product->os = 1;
 
         $validationResult = $product->validate();
-        $this->assertTrue($validationResult, var_export($product->errors, true));
+        $this->assertTrue($validationResult);
 
         // save
         $models = [&$product];
@@ -368,24 +435,5 @@ class DatabaseTest extends \PHPUnit_Extensions_Database_TestCase
         $this->assertNull($product->data);
 
 
-    }
-
-    public function testPropertyHelpers()
-    {
-        $result = false;
-        try {
-            PropertiesHelper::applicablePropertyModelId('foo\bar\some');
-        } catch (\yii\base\Exception $e) {
-            $result = true;
-        }
-        $this->assertTrue($result, 'No exception if there is not correct applicable property models record for classname');
-
-        $result = false;
-        try {
-            PropertyStorageHelper::storageById(65535);
-        } catch (\yii\base\Exception $e) {
-            $result = true;
-        }
-        $this->assertTrue($result, 'No exception if there is not correct storage id specified');
     }
 }

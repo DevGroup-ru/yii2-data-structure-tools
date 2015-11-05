@@ -7,7 +7,6 @@ use DevGroup\DataStructure\models\Property;
 use Yii;
 use yii\db\ActiveRecord;
 use yii\db\Schema;
-use yii\db\SchemaBuilderTrait;
 use yii\helpers\ArrayHelper;
 
 class TableInheritance extends AbstractPropertyStorage
@@ -38,6 +37,7 @@ class TableInheritance extends AbstractPropertyStorage
 
         // fill models with properties
         foreach ($models as &$model) {
+            /** @var \yii\db\ActiveRecord|\DevGroup\DataStructure\traits\PropertiesTrait|\DevGroup\TagDependencyHelper\TagDependencyTrait $firstModel */
             $modelId = $model->id;
 
             if (isset($tableInheritanceRows[$modelId])) {
@@ -48,6 +48,14 @@ class TableInheritance extends AbstractPropertyStorage
                     if ($key === 'model_id') {
                         continue;
                     }
+                    /** @var Property $property */
+                    $propertyId = array_search($key, $model->propertiesAttributes);
+                    $property = $propertyId > 0 ? Property::findById($propertyId) : null;
+                    if ($property === null) {
+                        // skip unbinded property
+                        continue;
+                    }
+                    $value = Property::castValueToDataType($value, $property->data_type);
                     $model->$key = $value;
                 }
             }
@@ -81,37 +89,73 @@ class TableInheritance extends AbstractPropertyStorage
     public function storeValues(&$models)
     {
         if (count($models) === 0) {
-            return;
+            return true;
         }
 
         /** @var \yii\db\ActiveRecord|\DevGroup\DataStructure\traits\PropertiesTrait|\DevGroup\TagDependencyHelper\TagDependencyTrait $firstModel */
         $firstModel = reset($models);
 
-        // loop through models
-        //      loop through properties of ti type
-        //          find changed
-        //             update only changed(add to array of queries, run in transaction)
+        $db = $firstModel->getDb();
+
+        /** @var \yii\db\Command[] $queries */
+        $queries = [];
+
+        foreach ($models as $model) {
+            /** @var \yii\db\ActiveRecord|\DevGroup\DataStructure\traits\PropertiesTrait|\DevGroup\DataStructure\traits\PropertiesTrait $model */
+            $model->ensurePropertiesAttributes();
+
+            $modelTableInheritancePairs = [];
+
+            foreach ($model->propertiesAttributes as $propertyId => $key) {
+                $property = Property::findById($propertyId);
+                if ($property->storage_id === $this->storageId) {
+                    // check if this property changed
+                    if (in_array($propertyId, $model->changedProperties)) {
+                        $modelTableInheritancePairs[$key] = $model->$key;
+                    }
+                }
+            }
+            if (count($modelTableInheritancePairs) > 0) {
+                $queries[] = $db->createCommand()->update(
+                    $firstModel->tableInheritanceTable(),
+                    $modelTableInheritancePairs,
+                    [
+                        'model_id' => $model->id
+                    ]
+                );
+            }
+        }
+        if (count($queries) > 0) {
+            $db->transaction(function ($db) use ($queries) {
+                foreach ($queries as $query) {
+                    $query->execute();
+                }
+            });
+        }
+        return true;
     }
 
     /**
      * Creates table inheritance rows
-     * @todo SHOOT THIS EVENT
+     *
      * @param \DevGroup\DataStructure\behaviors\HasProperties[]|\DevGroup\DataStructure\traits\PropertiesTrait[]|\yii\db\ActiveRecord[] $models
      */
     public function modelsInserted(&$models)
     {
         /** @var \yii\db\Command $command */
-        if (count($models) === 0) {
-            return;
-        }
 
         /** @var \yii\db\ActiveRecord|\DevGroup\DataStructure\traits\PropertiesTrait $firstModel */
         $firstModel = reset($models);
 
+        $ids = [];
+        foreach ($models as $model) {
+            $ids [] = [$model->id];
+        }
         $command = $firstModel->getDb()->createCommand()
-            ->insert(
+            ->batchInsert(
                 $firstModel->tableInheritanceTable(),
-                ArrayHelper::getColumn($models, 'id', false)
+                ['model_id'],
+                $ids
             );
 
         $command->execute();
@@ -129,6 +173,7 @@ class TableInheritance extends AbstractPropertyStorage
             );
             return false;
         }
+        return true;
     }
 
     /**

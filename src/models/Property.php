@@ -2,7 +2,6 @@
 namespace DevGroup\DataStructure\models;
 
 use DevGroup\DataStructure\behaviors\PackedJsonAttributes;
-use DevGroup\DataStructure\helpers\PropertiesHelper;
 use DevGroup\DataStructure\helpers\PropertyHandlerHelper;
 use DevGroup\DataStructure\helpers\PropertyStorageHelper;
 use DevGroup\Multilingual\behaviors\MultilingualActiveRecord;
@@ -251,6 +250,11 @@ class Property extends ActiveRecord
 
     /**
      * Casts value to data type
+     *
+     * @param mixed   $value
+     * @param integer $type
+     *
+     * @return mixed
      */
     public static function castValueToDataType($value, $type)
     {
@@ -297,6 +301,7 @@ class Property extends ActiveRecord
             case Property::DATA_TYPE_TEXT:
                 return 'strval';
                 break;
+
             default:
                 return null;
         }

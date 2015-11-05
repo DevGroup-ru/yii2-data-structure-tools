@@ -175,12 +175,16 @@ class PropertiesHelper
 
         $binding_rows = Yii::$app->cache->lazy(function () use ($firstModel, $models) {
             $query = new Query();
-            return $query
+
+            $query
                 ->select(['model_id', 'property_group_id'])
                 ->from($firstModel->bindedPropertyGroupsTable())
                 ->where(PropertiesHelper::getInCondition($models))
-                ->orderBy(['sort_order' => SORT_ASC])
+                ->orderBy(['sort_order' => SORT_ASC]);
+
+            return $query
                 ->all($firstModel->getDb());
+
         }, static::generateCacheKey($models, 'property_groups_ids'), 86400, $firstModel->commonTag());
 
         array_walk(

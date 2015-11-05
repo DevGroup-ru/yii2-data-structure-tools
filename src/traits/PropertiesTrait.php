@@ -188,6 +188,9 @@ trait PropertiesTrait
     public function propertiesRules()
     {
         $rules = [];
+        if ($this->getIsNewRecord()) {
+            return [];
+        }
 
         $this->ensurePropertiesAttributes();
 

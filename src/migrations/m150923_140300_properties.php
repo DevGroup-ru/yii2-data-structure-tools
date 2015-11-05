@@ -162,6 +162,11 @@ class m150923_140300_properties extends Migration
             'class_name' => 'DevGroup\DataStructure\propertyStorage\EAV',
             'sort_order' => 1,
         ]);
+        $this->insert('{{%property_storage}}', [
+            'name' => 'Table Inheritance',
+            'class_name' => 'DevGroup\DataStructure\propertyStorage\TableInheritance',
+            'sort_order' => 3,
+        ]);
     }
 
     /**

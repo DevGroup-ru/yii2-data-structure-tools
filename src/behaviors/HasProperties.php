@@ -3,7 +3,9 @@
 namespace DevGroup\DataStructure\behaviors;
 
 use DevGroup\DataStructure\helpers\PropertiesHelper;
+use DevGroup\DataStructure\helpers\PropertyStorageHelper;
 use DevGroup\DataStructure\models\Property;
+use DevGroup\DataStructure\propertyStorage\TableInheritance;
 use Yii;
 use yii\base\Behavior;
 use yii\base\Exception;
@@ -40,7 +42,7 @@ class HasProperties extends Behavior
         return [
             ActiveRecord::EVENT_AFTER_FIND => 'afterFind',
             ActiveRecord::EVENT_BEFORE_DELETE => 'beforeDelete',
-            ActiveRecord::EVENT_AFTER_INSERT => 'afterSave',
+            ActiveRecord::EVENT_AFTER_INSERT => 'afterInsert',
             ActiveRecord::EVENT_AFTER_UPDATE => 'afterSave',
         ];
     }
@@ -168,6 +170,21 @@ class HasProperties extends Behavior
     }
 
     /**
+     * Performs after insert stuff
+     */
+    public function afterInsert()
+    {
+        /** @var \yii\db\ActiveRecord|\DevGroup\DataStructure\traits\PropertiesTrait $owner */
+        $owner = $this->owner;
+        $handlers = PropertyStorageHelper::storageHandlers();
+        $models = [ &$owner ];
+        foreach ($handlers as $handler) {
+            $handler->modelsInserted($models);
+        }
+        $this->afterSave();
+    }
+
+    /**
      * Performs after save stuff:
      * - saves dirty properties
      * - clears states of dirty properties
@@ -176,6 +193,7 @@ class HasProperties extends Behavior
     {
         /** @var \yii\db\ActiveRecord|\DevGroup\DataStructure\traits\PropertiesTrait $owner */
         $owner = $this->owner;
+
         if ($this->autoSaveProperties === true) {
             $models = [&$owner];
             PropertiesHelper::storeValues($models);
