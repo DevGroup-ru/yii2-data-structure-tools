@@ -132,7 +132,7 @@ class PropertyGroup extends ActiveRecord
 
         $this->invalidatePropertyIds();
 
-        if (isset($changedAttributes['is_auto_added']) && $this->is_auto_added === true) {
+        if (array_key_exists('is_auto_added', $changedAttributes) && $this->is_auto_added === true) {
             $this->autoAddToObjects();
         }
     }
@@ -147,9 +147,34 @@ class PropertyGroup extends ActiveRecord
 
     public function autoAddToObjects()
     {
-        /** @var \yii\db\ActiveRecord $modelClassName */
-        $modelClassName = PropertiesHelper::classNameForApplicablePropertyModelId($this->property_group_model_id);
+        /** @var \yii\db\ActiveRecord|\DevGroup\DataStructure\traits\PropertiesTrait $modelClassName */
+        $modelClassName = PropertiesHelper::classNameForApplicablePropertyModelId($this->applicable_property_model_id);
+        $modelIdsWithoutGroup = $modelClassName::find()
+            ->leftJoin(
+                $modelClassName::bindedPropertyGroupsTable() . ' bpg',
+                'bpg.model_id = id'
+            )
+            ->where('bpg.model_id IS NULL')
+            ->select('id')
+            ->column($modelClassName::getDb());
 
+        $insertRows = array_map(
+            function ($item) {
+                return [
+                    $item,
+                    $this->id
+                ];
+            },
+            $modelIdsWithoutGroup
+        );
+        $modelClassName::getDb()->createCommand()->batchInsert(
+            $modelClassName::bindedPropertyGroupsTable(),
+            [
+                'model_id',
+                'property_group_id',
+            ],
+            $insertRows
+        )->execute();
     }
 
     /**

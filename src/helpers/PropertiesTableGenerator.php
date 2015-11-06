@@ -2,6 +2,7 @@
 
 namespace DevGroup\DataStructure\helpers;
 
+use DevGroup\DataStructure\models\PropertyGroup;
 use Yii;
 use yii\db\SchemaBuilderTrait;
 
@@ -165,6 +166,14 @@ class PropertiesTableGenerator
             $bindedGroupsTable,
             ['model_id'],
             $className::tableName(),
+            ['id'],
+            'CASCADE'
+        );
+        $this->addForeignKey(
+            'fk'.crc32($className).'BPG1',
+            $bindedGroupsTable,
+            ['property_group_id'],
+            PropertyGroup::tableName(),
             ['id'],
             'CASCADE'
         );

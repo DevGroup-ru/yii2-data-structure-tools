@@ -61,7 +61,7 @@ class PropertiesHelper
      */
     public static function applicablePropertyModelId($className, $forceRefresh = false)
     {
-        static::retrieveApplicablePropertyModels($forceRefresh);
+        self::retrieveApplicablePropertyModels($forceRefresh);
 
         if (isset(static::$applicablePropertyModels[$className])) {
             return static::$applicablePropertyModels[$className];
@@ -80,7 +80,7 @@ class PropertiesHelper
      */
     public static function classNameForApplicablePropertyModelId($id, $forceRefresh = false)
     {
-        static::retrieveApplicablePropertyModels($forceRefresh);
+        self::retrieveApplicablePropertyModels($forceRefresh);
         return array_search($id, static::$applicablePropertyModels);
     }
 
@@ -175,6 +175,11 @@ class PropertiesHelper
             return;
         }
 
+        $tags = [
+            $firstModel->commonTag(),
+            PropertyGroup::commonTag(),
+        ];
+
         $binding_rows = Yii::$app->cache->lazy(function () use ($firstModel, $models) {
             $query = new Query();
 
@@ -187,7 +192,7 @@ class PropertiesHelper
             return $query
                 ->all($firstModel->getDb());
 
-        }, static::generateCacheKey($models, 'property_groups_ids'), 86400, $firstModel->commonTag());
+        }, static::generateCacheKey($models, 'property_groups_ids'), 86400, $tags);
 
         array_walk(
             $binding_rows,

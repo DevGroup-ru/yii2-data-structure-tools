@@ -62,7 +62,7 @@ class DatabaseTest extends \PHPUnit_Extensions_Database_TestCase
                     ],
                 ],
                 'cache' => [
-                    'class' => '\yii\caching\FileCache',
+                    'class' => '\yii\caching\ArrayCache',
                     'as lazy' => [
                         'class' => 'DevGroup\TagDependencyHelper\LazyCache',
                     ],
@@ -203,6 +203,29 @@ class DatabaseTest extends \PHPUnit_Extensions_Database_TestCase
 
     }
 
+    public function testAutoAdd()
+    {
+        $propertyGroup = new PropertyGroup(Product::className());
+        $propertyGroup->internal_name = 'Specification';
+        $propertyGroup->is_auto_added = true;
+        $this->assertTrue($propertyGroup->save());
+
+        /** @var Product $product */
+        $product = Product::findOne(1);
+        $models = [$product];
+        PropertiesHelper::fillPropertyGroups($models);
+        $this->assertSame([$propertyGroup->id], $product->propertyGroupIds);
+
+        $propertyGroup->delete();
+
+        $product = Product::findOne(1);
+        $models = [$product];
+        PropertiesHelper::fillPropertyGroups($models);
+        $this->assertSame([], $product->propertyGroupIds);
+
+        Yii::$app->cache->flush();
+    }
+
     public function testHelpers()
     {
         $good = false;
@@ -253,7 +276,6 @@ class DatabaseTest extends \PHPUnit_Extensions_Database_TestCase
         $package_properties->internal_name = 'Package properties';
         $package_properties->translate(1)->name = 'Package';
         $package_properties->translate(2)->name = 'Упаковка';
-        $package_properties->is_auto_added = true;
         $this->assertTrue($package_properties->save());
 
         // property group for smartphones only!
