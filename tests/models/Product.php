@@ -44,14 +44,14 @@ class Product extends \yii\db\ActiveRecord
     public function behaviors()
     {
         return [
-            'CacheableActiveRecord' => [
-                'class' => \DevGroup\TagDependencyHelper\CacheableActiveRecord::className(),
-            ],
             [
                 'class' => PackedJsonAttributes::className(),
             ],
             [
                 'class' => HasProperties::className(),
+            ],
+            'CacheableActiveRecord' => [
+                'class' => \DevGroup\TagDependencyHelper\CacheableActiveRecord::className(),
             ],
         ];
     }

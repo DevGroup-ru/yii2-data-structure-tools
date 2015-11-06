@@ -143,6 +143,7 @@ class PropertyGroup extends ActiveRecord
     public function invalidatePropertyIds()
     {
         Yii::$app->cache->delete("PropertyIdsForGroup:{$this->id}");
+        Yii::$app->cache->delete("AutoAddedGroupsIds:{$this->applicable_property_model_id}");
     }
 
     public function autoAddToObjects()
@@ -210,6 +211,33 @@ class PropertyGroup extends ActiveRecord
         );
         static::$groupIdToPropertyIds[$propertyGroupId] = $ids;
         return static::$groupIdToPropertyIds[$propertyGroupId];
+    }
+
+    /**
+     * Returns autoadded property group ids for specified $applicablePropertyModelId
+     *
+     * @param integer $applicablePropertyModelId
+     *
+     * @return integer[]
+     */
+    public static function getAutoAddedGroupsIds($applicablePropertyModelId)
+    {
+        return Yii::$app->cache->lazy(
+            function () use ($applicablePropertyModelId) {
+                return array_map(
+                    function ($item) {
+                        return intval($item);
+                    },
+                    PropertyGroup::find()
+                        ->select('id')
+                        ->where(['applicable_property_model_id' => $applicablePropertyModelId, 'is_auto_added'=>1])
+                        ->orderBy(['sort_order' => SORT_ASC])
+                        ->column()
+                );
+            },
+            'AutoAddedGroupsIds:'.$applicablePropertyModelId,
+            86400
+        );
     }
 
 //    public function link($name, $model, $extraColumns = [])

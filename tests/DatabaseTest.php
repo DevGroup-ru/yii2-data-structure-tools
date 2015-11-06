@@ -208,6 +208,7 @@ class DatabaseTest extends \PHPUnit_Extensions_Database_TestCase
         $propertyGroup = new PropertyGroup(Product::className());
         $propertyGroup->internal_name = 'Specification';
         $propertyGroup->is_auto_added = true;
+        $propertyGroup->name = 'Specs';
         $this->assertTrue($propertyGroup->save());
 
         /** @var Product $product */
@@ -215,6 +216,17 @@ class DatabaseTest extends \PHPUnit_Extensions_Database_TestCase
         $models = [$product];
         PropertiesHelper::fillPropertyGroups($models);
         $this->assertSame([$propertyGroup->id], $product->propertyGroupIds);
+
+        $newProduct = new Product();
+        $newProduct->name = 'Powerbank';
+        $this->assertTrue($newProduct->save());
+        $this->assertSame([$propertyGroup->id], $product->propertyGroupIds);
+
+        $product = Product::findOne($newProduct->id);
+        $models = [$product];
+        PropertiesHelper::fillPropertyGroups($models);
+        $this->assertSame([$propertyGroup->id], $product->propertyGroupIds);
+
 
         $propertyGroup->delete();
 

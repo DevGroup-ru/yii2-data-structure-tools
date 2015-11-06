@@ -5,6 +5,7 @@ namespace DevGroup\DataStructure\behaviors;
 use DevGroup\DataStructure\helpers\PropertiesHelper;
 use DevGroup\DataStructure\helpers\PropertyStorageHelper;
 use DevGroup\DataStructure\models\Property;
+use DevGroup\DataStructure\models\PropertyGroup;
 use DevGroup\DataStructure\propertyStorage\TableInheritance;
 use Yii;
 use yii\base\Behavior;
@@ -12,6 +13,7 @@ use yii\base\Exception;
 use yii\base\InvalidConfigException;
 use yii\base\Model;
 use yii\db\ActiveRecord;
+use yii\web\ServerErrorHttpException;
 
 class HasProperties extends Behavior
 {
@@ -200,6 +202,27 @@ class HasProperties extends Behavior
         }
         $owner->changedProperties = [];
         $owner->propertiesValuesChanged = false;
+
+        // check for auto added property groups
+        $owner->ensurePropertyGroupIds();
+        $autoAddedGroups = PropertyGroup::getAutoAddedGroupsIds(
+            PropertiesHelper::applicablePropertyModelId($owner->className())
+        );
+
+        foreach ($autoAddedGroups as $id) {
+            if (!in_array($id, $owner->propertyGroupIds)) {
+                /** @var PropertyGroup $propertyGroup */
+                $propertyGroup = PropertyGroup::loadModel(
+                    $id,
+                    false,
+                    true,
+                    86400,
+                    new ServerErrorHttpException("Property group with id $id not found"),
+                    true
+                );
+                $owner->addPropertyGroup($propertyGroup);
+            }
+        }
     }
 
     /**
