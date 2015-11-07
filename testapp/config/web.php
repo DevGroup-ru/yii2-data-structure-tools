@@ -13,6 +13,9 @@ $config = [
         'debug' => [
             'class' => 'yii\debug\Module',
         ],
+        'properties' => [
+            'class' => 'DevGroup\DataStructure\Properties\Module',
+        ],
     ],
     'components' => [
         'request' => [

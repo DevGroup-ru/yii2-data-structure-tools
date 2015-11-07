@@ -7,6 +7,7 @@ use DevGroup\Multilingual\traits\MultilingualTrait;
 use DevGroup\TagDependencyHelper\CacheableActiveRecord;
 use DevGroup\TagDependencyHelper\TagDependencyTrait;
 use Yii;
+use yii\data\ActiveDataProvider;
 use yii\db\ActiveRecord;
 use yii\db\Query;
 
@@ -75,11 +76,23 @@ class PropertyGroup extends ActiveRecord
         return [
             [['internal_name'], 'required',],
             [['sort_order', 'applicable_property_model_id'], 'integer'],
+            [['sort_order'], 'default', 'value' => 0],
+            [['id'], 'integer', 'on' => 'search'],
             [['is_auto_added'], 'filter', 'filter'=>'boolval'],
             ['applicable_property_model_id', function ($attribute) {
                 return PropertiesHelper::classNameForApplicablePropertyModelId($this->$attribute) !== false;
             }],
         ];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function scenarios()
+    {
+        $scenarios = parent::scenarios();
+        $scenarios['search'] = ['id', 'internal_name', 'sort_order', 'is_auto_added', 'name'];
+        return $scenarios;
     }
 
     /**
@@ -146,6 +159,11 @@ class PropertyGroup extends ActiveRecord
         Yii::$app->cache->delete("AutoAddedGroupsIds:{$this->applicable_property_model_id}");
     }
 
+    /**
+     * Finds new applicable models and binds this group to them
+     *
+     * @throws \yii\db\Exception Database exception is thrown on error
+     */
     public function autoAddToObjects()
     {
         /** @var \yii\db\ActiveRecord|\DevGroup\DataStructure\traits\PropertiesTrait $modelClassName */
@@ -168,14 +186,16 @@ class PropertyGroup extends ActiveRecord
             },
             $modelIdsWithoutGroup
         );
-        $modelClassName::getDb()->createCommand()->batchInsert(
-            $modelClassName::bindedPropertyGroupsTable(),
-            [
-                'model_id',
-                'property_group_id',
-            ],
-            $insertRows
-        )->execute();
+        if (count($insertRows) > 0) {
+            $modelClassName::getDb()->createCommand()->batchInsert(
+                $modelClassName::bindedPropertyGroupsTable(),
+                [
+                    'model_id',
+                    'property_group_id',
+                ],
+                $insertRows
+            )->execute();
+        }
     }
 
     /**
@@ -214,7 +234,7 @@ class PropertyGroup extends ActiveRecord
     }
 
     /**
-     * Returns autoadded property group ids for specified $applicablePropertyModelId
+     * Returns auto-added property group ids for specified $applicablePropertyModelId
      *
      * @param integer $applicablePropertyModelId
      *
@@ -238,6 +258,49 @@ class PropertyGroup extends ActiveRecord
             'AutoAddedGroupsIds:'.$applicablePropertyModelId,
             86400
         );
+    }
+
+    /**
+     * Returns ActiveDataProvider for searching PropertyGroup models
+     *
+     * @param integer $applicablePropertyModelId  Applicable property model id
+     * @param array   $params                     Array of filter params
+     *
+     * @return \yii\data\ActiveDataProvider
+     *
+     * @codeCoverageIgnore
+     */
+    public function search($applicablePropertyModelId, $params)
+    {
+        $query = self::find()
+            ->where([
+                'applicable_property_model_id' => $applicablePropertyModelId,
+            ]);
+
+        $dataProvider = new ActiveDataProvider([
+            'query' => $query,
+            'pagination' => [
+                'pageSize' => 10,
+            ],
+        ]);
+        $dataProvider->sort->attributes['name'] = [
+            'asc' => ['property_group_translation.name' => SORT_ASC],
+            'desc' => ['property_group_translation.name' => SORT_DESC],
+        ];
+
+        if (!($this->load($params))) {
+            return $dataProvider;
+        }
+
+        // perform filtering
+        $query->andFilterWhere(['id' => $this->id]);
+        $query->andFilterWhere(['like', 'internal_name', $this->internal_name]);
+        $query->andFilterWhere(['is_auto_added' => $this->is_auto_added]);
+
+        // filter by multilingual field
+        $query->andFilterWhere(['like', 'property_group_translation.name', $this->name]);
+
+        return $dataProvider;
     }
 
 //    public function link($name, $model, $extraColumns = [])

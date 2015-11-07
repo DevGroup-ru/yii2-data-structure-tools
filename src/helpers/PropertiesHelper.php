@@ -17,7 +17,7 @@ class PropertiesHelper
     /**
      * @var array Hash map of className to applicable_property_models.id
      */
-    protected static $applicablePropertyModels = null;
+    public static $applicablePropertyModels = null;
 
     /**
      * @param bool|false $forceRefresh
@@ -63,8 +63,8 @@ class PropertiesHelper
     {
         self::retrieveApplicablePropertyModels($forceRefresh);
 
-        if (isset(static::$applicablePropertyModels[$className])) {
-            return static::$applicablePropertyModels[$className];
+        if (isset(self::$applicablePropertyModels[$className])) {
+            return self::$applicablePropertyModels[$className];
         } else {
             throw new Exception('Property group model record not found for class: ' . $className);
         }
@@ -81,7 +81,7 @@ class PropertiesHelper
     public static function classNameForApplicablePropertyModelId($id, $forceRefresh = false)
     {
         self::retrieveApplicablePropertyModels($forceRefresh);
-        return array_search($id, static::$applicablePropertyModels);
+        return array_search($id, self::$applicablePropertyModels);
     }
 
     /**

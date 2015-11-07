@@ -97,9 +97,9 @@ class DatabaseTest extends \PHPUnit_Extensions_Database_TestCase
 
             Yii::$app->getDb()
                 ->createCommand()
-                ->batchInsert('{{%applicable_property_models}}', ['class_name'], [
-                    [Product::className(),],
-                    [Category::className(),],
+                ->batchInsert('{{%applicable_property_models}}', ['class_name', 'name'], [
+                    [Product::className(), 'Product'],
+                    [Category::className(), 'Category'],
                 ])->execute();
 
 

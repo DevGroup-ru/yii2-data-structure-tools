@@ -30,7 +30,7 @@ abstract class AbstractPropertyHandler
 
     /**
      * @param \DevGroup\DataStructure\models\Property $property
-     * @param                                         $insert
+     * @param bool                                    $insert
      *
      * @return bool
      */

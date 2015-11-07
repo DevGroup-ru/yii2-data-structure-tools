@@ -41,6 +41,9 @@ class Product extends \yii\db\ActiveRecord
         return '{{%product}}';
     }
 
+    /**
+     * @inheritdoc
+     */
     public function behaviors()
     {
         return [

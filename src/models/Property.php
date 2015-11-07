@@ -9,6 +9,7 @@ use DevGroup\Multilingual\traits\MultilingualTrait;
 use DevGroup\TagDependencyHelper\CacheableActiveRecord;
 use DevGroup\TagDependencyHelper\TagDependencyTrait;
 use Yii;
+use yii\data\ActiveDataProvider;
 use yii\db\ActiveRecord;
 use yii\db\Query;
 use yii\web\ServerErrorHttpException;
@@ -88,8 +89,85 @@ class Property extends ActiveRecord
             ['storage_id', function ($attribute) {
                 return PropertyStorageHelper::storageById($this->$attribute);
             }],
-            [['storage_id', 'data_type'], 'filter', 'filter'=>'intval'],
+            ['property_handler_id', function ($attribute) {
+                try {
+                    PropertyHandlerHelper::getInstance()->handlerById($this->$attribute);
+                } catch (\Exception $e) {
+                    return false;
+                }
+                return true;
+            }],
+            [['storage_id', 'data_type', 'property_handler_id'], 'filter', 'filter'=>'intval'],
+            ['id', 'integer', 'on' => 'search'],
         ];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function scenarios()
+    {
+        $scenarios = parent::scenarios();
+        $scenarios['search'] = [
+            'id',
+            'key',
+            'is_internal',
+            'allow_multiple_values',
+            'data_type',
+            'storage_id',
+            'property_handler_id',
+            'name',
+        ];
+        return $scenarios;
+    }
+
+    /**
+     * @param $propertyGroupId
+     * @param $params
+     *
+     * @return \yii\data\ActiveDataProvider
+     *
+     * @codeCoverageIgnore
+     */
+    public function search($propertyGroupId, $params)
+    {
+        $query = self::find();
+        if ($propertyGroupId !== null) {
+            $query
+                ->innerJoin(
+                    '{{%property_property_group}}',
+                    'property_property_group.property_id = id'
+                )
+                ->where(['property_property_group.property_group_id'=>$propertyGroupId]);
+        }
+
+        $dataProvider = new ActiveDataProvider([
+            'query' => $query,
+            'pagination' => [
+                'pageSize' => 10,
+            ],
+        ]);
+        $dataProvider->sort->attributes['name'] = [
+            'asc' => ['property_group_translation.name' => SORT_ASC],
+            'desc' => ['property_group_translation.name' => SORT_DESC],
+        ];
+
+        if (!($this->load($params))) {
+            return $dataProvider;
+        }
+
+        // perform filtering
+        $query->andFilterWhere(['id' => $this->id]);
+        $query->andFilterWhere(['like', 'key', $this->key]);
+        $query->andFilterWhere(['is_internal' => $this->is_internal]);
+        $query->andFilterWhere(['data_type' => $this->data_type]);
+        $query->andFilterWhere(['storage_id' => $this->storage_id]);
+        $query->andFilterWhere(['property_handler_id' => $this->property_handler_id]);
+
+        // filter by multilingual field
+        $query->andFilterWhere(['like', 'property_translation.name', $this->name]);
+
+        return $dataProvider;
     }
 
     /**
@@ -203,6 +281,7 @@ class Property extends ActiveRecord
         $this->allow_multiple_values = boolval($this->allow_multiple_values);
         $this->is_internal = boolval($this->is_internal);
         $this->data_type = intval($this->data_type);
+        $this->property_handler_id = intval($this->property_handler_id);
     }
 
     /**

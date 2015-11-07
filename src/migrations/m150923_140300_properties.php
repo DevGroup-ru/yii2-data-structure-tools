@@ -76,6 +76,7 @@ class m150923_140300_properties extends Migration
         $this->createTable('{{%applicable_property_models}}', [
             'id' => $this->primaryKey(),
             'class_name' => $this->string()->notNull(),
+            'name' => $this->string()->notNull(),
         ], $tableOptions);
 
         $this->createTable('{{%property_handlers}}', [
