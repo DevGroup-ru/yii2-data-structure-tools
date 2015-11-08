@@ -17,6 +17,12 @@ use yii\helpers\ArrayHelper;
  * @package DevGroup\DataStructure\models
  * @mixin MultilingualActiveRecord
  * @mixin CacheableActiveRecord
+ *
+ * @param integer $sort_order
+ * @param integer $property_id
+ * @param string  $name
+ * @param string  $description
+ * @param string  $slug
  */
 class StaticValue extends ActiveRecord
 {
@@ -61,6 +67,30 @@ class StaticValue extends ActiveRecord
         return '{{%static_value}}';
     }
 
+    /**
+     * Performs beforeSave event
+     *
+     * @param bool $insert
+     *
+     * @return bool
+     */
+    public function beforeSave($insert)
+    {
+        if (!$this->sort_order) {
+            $property = Property::findById($this->property_id);
+            $this->sort_order = count(static::valuesForProperty($property));
+        }
+        return parent::beforeSave($insert);
+    }
+
+    /**
+     * Returns array of possible values for property.
+     * Array consists of arrays with elements: name, description, slug and key is static_value.id
+     *
+     * @param \DevGroup\DataStructure\models\Property $property
+     *
+     * @return array
+     */
     public static function valuesForProperty(Property $property)
     {
         $propertyId = $property->id;
