@@ -42,20 +42,13 @@ $this->params['breadcrumbs'][] = $this->title;
                 'class' => \DevGroup\AdminUtils\columns\ActionColumn::className(),
                 'buttons' => [
                     'edit' => [
-                        'url' => 'edit-property-group',
+                        'url' => 'edit-property',
                         'icon' => 'pencil',
                         'class' => 'btn-primary',
                         'label' => Yii::t('app', 'Edit'),
                     ],
-                    'properties' => [
-                        'url' => 'list-group-properties',
-                        'icon' => 'list',
-                        'class' => 'btn-success',
-                        'label' => Yii::t('app', 'Group properties'),
-                        'text' => Yii::t('app', 'Properties'),
-                    ],
                     'delete' => [
-                        'url' => 'delete-property-group',
+                        'url' => 'delete-property',
                         'icon' => 'trash-o',
                         'class' => 'btn-danger',
                         'label' => Yii::t('app', 'Delete'),

@@ -2,8 +2,13 @@
 
 namespace DevGroup\DataStructure\Properties;
 
+use DevGroup\AdminUtils\events\ModelEditAction;
+use DevGroup\AdminUtils\events\ModelEditForm;
+use DevGroup\DataStructure\Properties\actions\EditProperty;
+use DevGroup\DataStructure\propertyHandler\StaticValues;
 use Yii;
 use yii\base\Module as BaseModule;
+use yii\web\View;
 
 /**
  * This is a module for you application backend part.
@@ -20,5 +25,11 @@ class Module extends BaseModule
     public function init()
     {
         parent::init();
+
+        ModelEditForm::on(
+            View::className(),
+            EditProperty::EVENT_FORM_AFTER_SUBMIT,
+            [StaticValues::className(), 'onPropertyEditForm']
+        );
     }
 }

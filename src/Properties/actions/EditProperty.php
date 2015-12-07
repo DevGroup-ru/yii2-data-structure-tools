@@ -2,16 +2,30 @@
 
 namespace DevGroup\DataStructure\Properties\actions;
 
+use DevGroup\AdminUtils\events\ModelEditAction;
 use DevGroup\DataStructure\models\Property;
 use DevGroup\DataStructure\models\PropertyGroup;
 use Yii;
 use yii\web\NotFoundHttpException;
 
+/**
+ * EditProperty is a universal action that can be used to handle creating and editing properties.
+ *
+ * @package DevGroup\DataStructure\Properties\actions
+ */
 class EditProperty extends BaseAction
 {
     public $listGroupPropertiesActionId = 'list-group-properties';
     public $listPropertyGroupsActionId = 'list-property-groups';
     public $viewFile = 'edit-property';
+
+    const EVENT_BEFORE_INSERT = 'before-insert';
+    const EVENT_BEFORE_UPDATE = 'before-update';
+    const EVENT_AFTER_INSERT  = 'after-insert';
+    const EVENT_AFTER_UPDATE  = 'after-update';
+
+    const EVENT_FORM_BEFORE_SUBMIT = 'form-before-submit';
+    const EVENT_FORM_AFTER_SUBMIT  = 'form-after-submit';
 
     /**
      * Runs action
@@ -23,6 +37,7 @@ class EditProperty extends BaseAction
      */
     public function run($propertyGroupId, $id = null)
     {
+        /** @var PropertyGroup $propertyGroup */
         $propertyGroup = PropertyGroup::loadModel(
             $propertyGroupId,
             false,
@@ -39,6 +54,7 @@ class EditProperty extends BaseAction
             86400,
             new NotFoundHttpException("PropertyGroup model with specified id not found")
         );
+        $model->applicable_property_model_id = $propertyGroup->applicable_property_model_id;
 
 
         if ($model->isNewRecord === false) {
@@ -54,7 +70,14 @@ class EditProperty extends BaseAction
                 }
             }
 
-            if ($model->save()) {
+            $event = new ModelEditAction($model);
+            $this->controller->trigger(
+                $model->isNewRecord ? self::EVENT_BEFORE_INSERT : self::EVENT_BEFORE_UPDATE,
+                $event
+            );
+
+
+            if ($event->isValid === true && $model->save()) {
                 if ($id === null) {
                     // That was new record - link it to property group
                     $propertyGroup->link(
@@ -65,12 +88,20 @@ class EditProperty extends BaseAction
                         ]
                     );
                 }
-                Yii::$app->session->setFlash('success', Yii::t('app', 'PropertyGroup saved.'));
 
-                return $this->controller->redirect([
-                    $this->listPropertyGroupsActionId,
-                    'id' => $propertyGroup->id,
-                ]);
+                $event = new ModelEditAction($model);
+                $this->controller->trigger($id === null ? self::EVENT_AFTER_INSERT : self::EVENT_AFTER_UPDATE, $event);
+
+                if ($event->isValid === true) {
+                    Yii::$app->session->setFlash('success', Yii::t('app', 'PropertyGroup saved.'));
+
+                    return $this->controller->redirect([
+                        $this->listGroupPropertiesActionId,
+                        'id' => $propertyGroup->id,
+                    ]);
+                }
+            } else {
+                Yii::$app->session->setFlash('error', Yii::t('app', 'Error occurred while saving property.'));
             }
         }
 

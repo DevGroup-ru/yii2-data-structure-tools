@@ -2,6 +2,7 @@
 
 namespace DevGroup\DataStructure\propertyHandler;
 
+use DevGroup\AdminUtils\events\ModelEditForm;
 use DevGroup\DataStructure\models\Property;
 use DevGroup\DataStructure\models\StaticValue;
 
@@ -64,5 +65,20 @@ class StaticValues extends AbstractPropertyHandler
     public function render($model, $attribute, $case)
     {
         // TODO: Implement render() method.
+    }
+
+    /**
+     * @param \DevGroup\AdminUtils\events\ModelEditForm $event
+     */
+    public static function onPropertyEditForm(ModelEditForm $event)
+    {
+        $view = $event->getView();
+        $model = $event->model;
+        echo $view->render(
+            '_static-values-grid',
+            [
+                'property' => $model,
+            ]
+        );
     }
 }

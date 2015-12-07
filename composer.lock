@@ -740,12 +740,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/yiisoft/yii2-framework.git",
-                "reference": "e0135b9140c4d63dfb276540f53833453bd2b875"
+                "reference": "7f2fe7317a11e8fb2c1b414f6e11cdb35b9e44d5"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/yiisoft/yii2-framework/zipball/e0135b9140c4d63dfb276540f53833453bd2b875",
-                "reference": "e0135b9140c4d63dfb276540f53833453bd2b875",
+                "url": "https://api.github.com/repos/yiisoft/yii2-framework/zipball/7f2fe7317a11e8fb2c1b414f6e11cdb35b9e44d5",
+                "reference": "7f2fe7317a11e8fb2c1b414f6e11cdb35b9e44d5",
                 "shasum": ""
             },
             "require": {
@@ -821,7 +821,7 @@
                 "framework",
                 "yii2"
             ],
-            "time": "2015-11-06 20:54:00"
+            "time": "2015-11-07 15:59:24"
         },
         {
             "name": "yiisoft/yii2-bootstrap",
@@ -1054,12 +1054,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/DevGroup-ru/yii2-admin-utils.git",
-                "reference": "d45a25a89cd7ce38a6291b01eab51d59c435371e"
+                "reference": "ed76770c1a545539960eb1fb4006cd42e74c75f8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/DevGroup-ru/yii2-admin-utils/zipball/d45a25a89cd7ce38a6291b01eab51d59c435371e",
-                "reference": "d45a25a89cd7ce38a6291b01eab51d59c435371e",
+                "url": "https://api.github.com/repos/DevGroup-ru/yii2-admin-utils/zipball/ed76770c1a545539960eb1fb4006cd42e74c75f8",
+                "reference": "ed76770c1a545539960eb1fb4006cd42e74c75f8",
                 "shasum": ""
             },
             "require": {
@@ -1098,7 +1098,7 @@
                 "extension",
                 "yii2"
             ],
-            "time": "2015-11-07 11:10:02"
+            "time": "2015-11-08 11:51:32"
         },
         {
             "name": "doctrine/instantiator",

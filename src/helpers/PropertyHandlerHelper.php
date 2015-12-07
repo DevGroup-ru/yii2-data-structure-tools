@@ -59,7 +59,7 @@ class PropertyHandlerHelper
                 }
 
                 return $handlers;
-            }, 'AllPropertyHandlers', 86400);
+            }, 'AllPropertyHandlers', 86400, PropertyHandlers::commonTag());
         }
         return $this->handlers;
     }

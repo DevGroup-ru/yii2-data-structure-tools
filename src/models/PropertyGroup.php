@@ -14,11 +14,13 @@ use yii\db\Query;
 /**
  * Class PropertyGroup
  *
- * @property integer $id
- * @property integer $property_group_model_id
- * @property integer $sort_order
- * @property boolean $is_auto_added
- * @property string  $internal_name
+ * @property integer    $id
+ * @property integer    $property_group_model_id
+ * @property integer    $sort_order
+ * @property boolean    $is_auto_added
+ * @property string     $internal_name
+ * @property Property[] $properties Properties via relation! Don't use it in frontend as it is not cacheable.
+ *
  * @mixin \DevGroup\Multilingual\behaviors\MultilingualActiveRecord
  */
 class PropertyGroup extends ActiveRecord
