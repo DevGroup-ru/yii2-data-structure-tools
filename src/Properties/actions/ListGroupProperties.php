@@ -2,6 +2,7 @@
 
 namespace DevGroup\DataStructure\Properties\actions;
 
+use DevGroup\AdminUtils\actions\BaseAdminAction;
 use DevGroup\DataStructure\models\Property;
 use DevGroup\DataStructure\models\PropertyGroup;
 use Yii;
@@ -12,7 +13,7 @@ use yii\web\NotFoundHttpException;
  *
  * @package DevGroup\DataStructure\Properties\actions
  */
-class ListGroupProperties extends BaseAction
+class ListGroupProperties extends BaseAdminAction
 {
     public $viewFile = 'list-group-properties';
 

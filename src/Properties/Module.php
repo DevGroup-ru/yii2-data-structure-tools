@@ -7,6 +7,8 @@ use DevGroup\AdminUtils\events\ModelEditForm;
 use DevGroup\DataStructure\Properties\actions\EditProperty;
 use DevGroup\DataStructure\propertyHandler\StaticValues;
 use Yii;
+use yii\base\Application;
+use yii\base\BootstrapInterface;
 use yii\base\Module as BaseModule;
 use yii\web\View;
 
@@ -20,7 +22,7 @@ use yii\web\View;
  *
  * @package DevGroup\DataStructure\ManageProperties
  */
-class Module extends BaseModule
+class Module extends BaseModule implements BootstrapInterface
 {
     public function init()
     {
@@ -31,5 +33,19 @@ class Module extends BaseModule
             EditProperty::EVENT_FORM_AFTER_SUBMIT,
             [StaticValues::className(), 'onPropertyEditForm']
         );
+    }
+
+    /**
+     * Bootstrap method to be called during application bootstrap stage.
+     *
+     * @param Application $app the application currently running
+     */
+    public function bootstrap($app)
+    {
+        $app->on(Application::EVENT_BEFORE_REQUEST, function () {
+            Yii::$app->setAliases([
+                '@dataStructure' => '@vendor/devgroup/yii2-data-structure-tools/src/',
+            ]);
+        });
     }
 }

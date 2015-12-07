@@ -2,11 +2,12 @@
 
 namespace DevGroup\DataStructure\Properties\actions;
 
+use DevGroup\AdminUtils\actions\BaseAdminAction;
 use DevGroup\DataStructure\models\PropertyGroup;
 use Yii;
 use yii\web\NotFoundHttpException;
 
-class EditPropertyGroup extends BaseAction
+class EditPropertyGroup extends BaseAdminAction
 {
     public $listPropertyGroupsActionId = 'list-property-groups';
     public $viewFile = 'edit-property-group';

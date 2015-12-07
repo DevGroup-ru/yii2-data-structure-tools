@@ -2,15 +2,15 @@
 
 namespace DevGroup\DataStructure\Properties\controllers;
 
+use DevGroup\AdminUtils\controllers\BaseController;
 use DevGroup\DataStructure\Properties\actions\DeletePropertyGroup;
 use DevGroup\DataStructure\Properties\actions\EditProperty;
 use DevGroup\DataStructure\Properties\actions\EditPropertyGroup;
 use DevGroup\DataStructure\Properties\actions\ListGroupProperties;
 use DevGroup\DataStructure\Properties\actions\ListPropertyGroups;
 use Yii;
-use yii\web\Controller;
 
-class ManageController extends Controller
+class ManageController extends BaseController
 {
     /**
      * This controller just uses actions in extension

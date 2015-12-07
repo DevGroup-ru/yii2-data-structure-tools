@@ -2,11 +2,12 @@
 
 namespace DevGroup\DataStructure\Properties\actions;
 
+use DevGroup\AdminUtils\actions\BaseAdminAction;
 use DevGroup\DataStructure\models\PropertyGroup;
 use Yii;
 use yii\web\NotFoundHttpException;
 
-class DeletePropertyGroup extends BaseAction
+class DeletePropertyGroup extends BaseAdminAction
 {
     public $listPropertyGroupsActionId = 'list-property-groups';
 
