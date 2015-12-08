@@ -47,7 +47,8 @@ class EditPropertyGroup extends BaseAdminAction
             }
         }
         $this->notify('test');
-        return $this->renderResponse([
+
+        return $this->render([
             'model' => $model,
             'applicablePropertyModelId' => $model->applicable_property_model_id,
             'listPropertyGroupsActionId' => $this->listPropertyGroupsActionId,
