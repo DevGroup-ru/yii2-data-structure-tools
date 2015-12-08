@@ -90,7 +90,14 @@ $this->params['breadcrumbs'][] = $this->title;
                 $editPropertyGroupActionId,
                 'applicablePropertyModelId' => $currentApplicablePropertyModel['id'],
             ],
-            ['class' => 'btn btn-success']
+            [
+                'class' => 'btn btn-success',
+                'data-admin-url' => \yii\helpers\Url::to([
+                    $editPropertyGroupActionId,
+                    'applicablePropertyModelId' => $currentApplicablePropertyModel['id'],
+                ])
+
+            ]
         )
         ?>
     </p>
