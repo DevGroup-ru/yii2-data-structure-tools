@@ -79,7 +79,7 @@ class StaticValues extends AbstractPropertyHandler
             '_static-values-grid',
             [
                 'property' => $model,
-                'dataProvider' => StaticValue::find()->search($model->id)
+                'dataProvider' => (new StaticValue())->search($model->id, \Yii::$app->request->get())
             ]
         );
     }
