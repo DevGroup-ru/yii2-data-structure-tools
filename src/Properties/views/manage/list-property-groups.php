@@ -27,7 +27,7 @@ $this->params['breadcrumbs'][] = $this->title;
             function ($item) use ($currentApplicablePropertyModel) {
                 return [
                         'label' => $item['name'],
-                        'url' => [Yii::$app->requestedAction->id, 'applicable_property_model_id' => $item['id']],
+                        'url' => [Yii::$app->requestedAction->id, 'applicablePropertyModelId' => $item['id']],
                         'active' => $currentApplicablePropertyModel['id'] === $item['id'],
                 ];
             },
