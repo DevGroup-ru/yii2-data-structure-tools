@@ -74,12 +74,13 @@ class StaticValues extends AbstractPropertyHandler
     {
         $view = $event->getView();
         $model = $event->model;
+        $staticValue = new StaticValue;
 
         echo $view->render(
             '_static-values-grid',
             [
                 'property' => $model,
-                'dataProvider' => (new StaticValue())->search($model->id, \Yii::$app->request->get())
+                'dataProvider' => $staticValue->search($model->id, \Yii::$app->request->get()),
             ]
         );
     }
