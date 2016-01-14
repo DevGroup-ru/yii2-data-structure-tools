@@ -30,7 +30,7 @@ class StaticValues extends AbstractPropertyHandler
         $key = $property->key;
         if ($property->allow_multiple_values) {
             return [
-                [$key, 'each', 'rule' => ['filter', 'filter'=>'intval']],
+                [$key, 'each', 'rule' => ['filter', 'filter' => 'intval']],
                 $this->existenceValidation($property),
             ];
         } else {
@@ -74,10 +74,12 @@ class StaticValues extends AbstractPropertyHandler
     {
         $view = $event->getView();
         $model = $event->model;
+
         echo $view->render(
             '_static-values-grid',
             [
                 'property' => $model,
+                'dataProvider' => StaticValue::find()->search($model->id)
             ]
         );
     }

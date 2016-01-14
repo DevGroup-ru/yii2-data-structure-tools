@@ -8,6 +8,7 @@ use DevGroup\TagDependencyHelper\NamingHelper;
 use DevGroup\TagDependencyHelper\TagDependencyTrait;
 use Yii;
 use yii\caching\TagDependency;
+use yii\data\ActiveDataProvider;
 use yii\db\ActiveRecord;
 use yii\db\Query;
 use yii\helpers\ArrayHelper;
@@ -20,9 +21,9 @@ use yii\helpers\ArrayHelper;
  *
  * @param integer $sort_order
  * @param integer $property_id
- * @param string  $name
- * @param string  $description
- * @param string  $slug
+ * @param string $name
+ * @param string $description
+ * @param string $slug
  */
 class StaticValue extends ActiveRecord
 {
@@ -161,5 +162,39 @@ class StaticValue extends ActiveRecord
             ]
         );
         parent::afterSave($insert, $changedAttributes);
+    }
+
+    /**
+     * @param $propertyGroupId
+     * @param $params
+     *
+     * @return \yii\data\ActiveDataProvider
+     *
+     * @codeCoverageIgnore
+     */
+    public function search($propertyId = null, $params)
+    {
+        $query = self::find();
+        if ($propertyId !== null) {
+            $query->where(['property_id' => $propertyId]);
+        }
+
+        $dataProvider = new ActiveDataProvider([
+            'query' => $query,
+            'pagination' => [
+                'pageSize' => 8,
+            ],
+        ]);
+        $dataProvider->sort->attributes['name'] = [
+            'asc' => ['static_value_translation.name' => SORT_ASC],
+            'desc' => ['static_value_translation.name' => SORT_DESC],
+        ];
+
+        if (!($this->load($params))) {
+            return $dataProvider;
+        }
+
+
+        return $dataProvider;
     }
 }

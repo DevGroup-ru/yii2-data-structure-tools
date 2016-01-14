@@ -46,7 +46,7 @@ class EditPropertyGroup extends BaseAdminAction
                 ]);
             }
         }
-        $this->notify('test');
+      //$this->notify('test');
 
         return $this->render([
             'model' => $model,
