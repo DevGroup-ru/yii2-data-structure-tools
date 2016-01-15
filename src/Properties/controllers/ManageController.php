@@ -4,6 +4,7 @@ namespace DevGroup\DataStructure\Properties\controllers;
 
 use DevGroup\AdminUtils\controllers\BaseController;
 use DevGroup\DataStructure\Properties\actions\DeletePropertyGroup;
+use DevGroup\DataStructure\Properties\actions\DeleteStaticValue;
 use DevGroup\DataStructure\Properties\actions\EditProperty;
 use DevGroup\DataStructure\Properties\actions\EditPropertyGroup;
 use DevGroup\DataStructure\Properties\actions\EditStaticValue;
@@ -37,6 +38,9 @@ class ManageController extends BaseController
             ],
             'edit-static-value' => [
                 'class' => EditStaticValue::className()
+            ],
+            'delete-static-value' => [
+                'class' => DeleteStaticValue::className()
             ]
         ];
     }

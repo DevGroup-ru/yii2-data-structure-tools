@@ -1,4 +1,5 @@
 <?php
+use DevGroup\AdminUtils\Helper;
 use DevGroup\DataStructure\models\Property;
 use DevGroup\DataStructure\models\StaticValue;
 use yii\data\ActiveDataProvider;
@@ -20,7 +21,7 @@ use yii\helpers\Html;
             [
                 'edit-static-value',
                 'property_id' => $property->id,
-                'return_url' => Yii::$app->request->url
+                'return_url' => Helper::returnUrl()
             ],
             [
                 'class' => 'btn btn-primary'
@@ -58,7 +59,7 @@ use yii\helpers\Html;
             ],
             'appendUrlParams' => [
                 'property_id' => $property->id,
-                'return_url' => Yii::$app->request->url
+                'return_url' => Helper::returnUrl()
             ],
         ],
     ],
