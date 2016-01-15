@@ -19,14 +19,18 @@ use yii\helpers\ArrayHelper;
  * @mixin MultilingualActiveRecord
  * @mixin CacheableActiveRecord
  *
- * @param integer $sort_order
- * @param integer $property_id
- * @param string $name
- * @param string $description
- * @param string $slug
+ * @property integer $sort_order
+ * @property integer $property_id
+ * @property string $name
+ * @property string $description
+ * @property string $slug
+ * @property Property $property
  */
 class StaticValue extends ActiveRecord
 {
+    /**
+     * @var array
+     */
     public static $valuesByPropertyId = [];
 
     use MultilingualTrait;
@@ -162,6 +166,14 @@ class StaticValue extends ActiveRecord
             ]
         );
         parent::afterSave($insert, $changedAttributes);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getProperty()
+    {
+        return $this->hasOne(Property::className(), ['id' => 'property_id']);
     }
 
     /**

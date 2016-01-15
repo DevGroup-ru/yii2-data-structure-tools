@@ -14,8 +14,21 @@ use yii\helpers\Html;
 ?>
     <h2><?= Html::encode(Yii::t('app', 'Static values')) ?></h2>
 
+    <div class="form-group">
+        <?= Html::a(
+            Yii::t('app', 'New Static value'),
+            [
+                'edit-static-value',
+                'property_id' => $property->id,
+                'return_url' => Yii::$app->request->url
+            ],
+            [
+                'class' => 'btn btn-primary'
+            ]
+        ) ?>
+    </div>
 
-<?=GridView::widget([
+<?= GridView::widget([
     'dataProvider' => $dataProvider,
     'filterModel' => $staticValue,
     'columns' => [
@@ -44,10 +57,10 @@ use yii\helpers\Html;
                 ],
             ],
             'appendUrlParams' => [
-                'id' => Yii::$app->request->get('id'),
-                'propertyGroupId' => Yii::$app->request->get('propertyGroupId'),
-                'returnUrl' => Yii::$app->request->get('returnUrl'),
+                'property_id' => $property->id,
+                'return_url' => Yii::$app->request->url
             ],
         ],
     ],
+    'tableOptions' => ['class' => 'table table-striped table-bordered']
 ]); ?>

@@ -6,6 +6,7 @@ use DevGroup\AdminUtils\controllers\BaseController;
 use DevGroup\DataStructure\Properties\actions\DeletePropertyGroup;
 use DevGroup\DataStructure\Properties\actions\EditProperty;
 use DevGroup\DataStructure\Properties\actions\EditPropertyGroup;
+use DevGroup\DataStructure\Properties\actions\EditStaticValue;
 use DevGroup\DataStructure\Properties\actions\ListGroupProperties;
 use DevGroup\DataStructure\Properties\actions\ListPropertyGroups;
 use Yii;
@@ -33,6 +34,9 @@ class ManageController extends BaseController
             ],
             'edit-property' => [
                 'class' => EditProperty::className(),
+            ],
+            'edit-static-value' => [
+                'class' => EditStaticValue::className()
             ]
         ];
     }

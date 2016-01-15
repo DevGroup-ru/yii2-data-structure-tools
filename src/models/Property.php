@@ -19,15 +19,21 @@ use yii\web\ServerErrorHttpException;
  *
  * @mixin \DevGroup\Multilingual\behaviors\MultilingualActiveRecord
  * @property integer $id
- * @property string  $key
+ * @property string $key
  * @property integer $data_type
  * @property boolean $is_internal
  * @property boolean $allow_multiple_values
  * @property integer $storage_id
  * @property integer $property_handler_id
- * @property array   $default_value
- * @property array   $handler_config
+ * @property array $default_value
+ * @property array $handler_config
  * @property integer $applicable_property_model_id
+ * @property string $name
+ * @property string $description
+ * @property string $slug
+ * @property PropertyGroup[] $propertyGroups
+ * @property PropertyGroup $defaultPropertyGroup
+ * @property StaticValue $staticValues
  *
  * @package DevGroup\DataStructure\models
  */
@@ -38,12 +44,12 @@ class Property extends ActiveRecord
     use MultilingualTrait;
     use TagDependencyTrait;
 
-    const DATA_TYPE_STRING         = 0;
-    const DATA_TYPE_INTEGER        = 1;
-    const DATA_TYPE_FLOAT          = 2;
-    const DATA_TYPE_TEXT           = 3;
-    const DATA_TYPE_PACKED_JSON    = 4;
-    const DATA_TYPE_BOOLEAN        = 5;
+    const DATA_TYPE_STRING = 0;
+    const DATA_TYPE_INTEGER = 1;
+    const DATA_TYPE_FLOAT = 2;
+    const DATA_TYPE_TEXT = 3;
+    const DATA_TYPE_PACKED_JSON = 4;
+    const DATA_TYPE_BOOLEAN = 5;
 
     /**
      * @inheritdoc
@@ -82,22 +88,28 @@ class Property extends ActiveRecord
             ['applicable_property_model_id', 'required',],
             ['key', 'unique'],
             ['key', 'required'],
-            ['key', 'string', 'max'=>80],
-            [['is_internal', 'allow_multiple_values'], 'filter', 'filter'=>'boolval'],
+            ['key', 'string', 'max' => 80],
+            [['is_internal', 'allow_multiple_values'], 'filter', 'filter' => 'boolval'],
             [['data_type'], 'integer',],
             [['data_type'], 'required',],
-            ['storage_id', function ($attribute) {
-                return PropertyStorageHelper::storageById($this->$attribute);
-            }],
-            ['property_handler_id', function ($attribute) {
-                try {
-                    PropertyHandlerHelper::getInstance()->handlerById($this->$attribute);
-                } catch (\Exception $e) {
-                    return false;
+            [
+                'storage_id',
+                function ($attribute) {
+                    return PropertyStorageHelper::storageById($this->$attribute);
                 }
-                return true;
-            }],
-            [['storage_id', 'data_type', 'property_handler_id'], 'filter', 'filter'=>'intval'],
+            ],
+            [
+                'property_handler_id',
+                function ($attribute) {
+                    try {
+                        PropertyHandlerHelper::getInstance()->handlerById($this->$attribute);
+                    } catch (\Exception $e) {
+                        return false;
+                    }
+                    return true;
+                }
+            ],
+            [['storage_id', 'data_type', 'property_handler_id'], 'filter', 'filter' => 'intval'],
             ['id', 'integer', 'on' => 'search'],
         ];
     }
@@ -138,7 +150,7 @@ class Property extends ActiveRecord
                     '{{%property_property_group}}',
                     'property_property_group.property_id = id'
                 )
-                ->where(['property_property_group.property_group_id'=>$propertyGroupId]);
+                ->where(['property_property_group.property_group_id' => $propertyGroupId]);
         }
 
         $dataProvider = new ActiveDataProvider([
@@ -202,7 +214,7 @@ class Property extends ActiveRecord
      * - flush needed caches
      * - trigger afterPropertyModelSave event of corresponding PropertyHandler
      *
-     * @param bool  $insert
+     * @param bool $insert
      * @param array $changedAttributes
      */
     public function afterSave($insert, $changedAttributes)
@@ -330,7 +342,7 @@ class Property extends ActiveRecord
     /**
      * Casts value to data type
      *
-     * @param mixed   $value
+     * @param mixed $value
      * @param integer $type
      *
      * @return mixed
@@ -435,4 +447,42 @@ class Property extends ActiveRecord
             true
         );
     }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getPropertyGroups()
+    {
+        return $this->hasMany(PropertyGroup::className(), ['id' => 'property_group_id'])
+            ->viaTable(
+                '{{%property_property_group}}',
+                [
+                    'property_id' => 'id'
+                ]
+            )->orderBy(['{{%property_group}}.sort_order' => SORT_ASC]);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getDefaultPropertyGroup()
+    {
+        return $this->hasOne(PropertyGroup::className(), ['id' => 'property_group_id'])
+            ->viaTable(
+                '{{%property_property_group}}',
+                [
+                    'property_id' => 'id'
+                ]
+            )->orderBy([PropertyGroup::tableName().'.sort_order' => SORT_ASC]);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getStaticValues()
+    {
+        return $this->hasMany(StaticValue::className(), ['property_id' => 'id'])
+            ->orderBy([StaticValue::tableName().'.sort_order' => SORT_ASC]);
+    }
+
 }
