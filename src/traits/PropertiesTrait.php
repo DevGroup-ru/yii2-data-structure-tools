@@ -38,6 +38,20 @@ trait PropertiesTrait
     public $propertiesValuesChanged = false;
 
     /**
+     * Build a valid table name with suffix
+     * @param string $suffix
+     * @return mixed|string
+     */
+    protected static function buildTableName($suffix = '')
+    {
+        if (strpos(static::tableName(), '}}') !== false) {
+            return str_replace('}}', $suffix . '}}', static::tableName());
+        } else {
+            return static::tableName() . $suffix;
+        }
+    }
+
+    /**
      * Ensures that $property_group_ids is retrieved
      */
     public function ensurePropertyGroupIds()
@@ -129,8 +143,7 @@ trait PropertiesTrait
      */
     public static function staticValuesBindingsTable()
     {
-        $baseTableName = trim(static::tableName(), '{}%');
-        return $baseTableName . '_static_values';
+        return static::buildTableName('_static_values');
     }
 
     /**
@@ -140,8 +153,7 @@ trait PropertiesTrait
      */
     public static function eavTable()
     {
-        $baseTableName = trim(static::tableName(), '{}%');
-        return $baseTableName . '_eav';
+        return static::buildTableName('_eav');
     }
 
     /**
@@ -151,8 +163,7 @@ trait PropertiesTrait
      */
     public static function tableInheritanceTable()
     {
-        $baseTableName = trim(static::tableName(), '{}%');
-        return $baseTableName . '_properties';
+        return static::buildTableName('_properties');
     }
 
     /**
@@ -162,8 +173,7 @@ trait PropertiesTrait
      */
     public static function bindedPropertyGroupsTable()
     {
-        $baseTableName = trim(static::tableName(), '{}%');
-        return $baseTableName . '_property_groups';
+        return static::buildTableName('_property_groups');
     }
 
     /**
