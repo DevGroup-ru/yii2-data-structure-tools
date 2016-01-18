@@ -17,7 +17,8 @@
         "devgroup/yii2-tag-dependency-helper": "^1.3.0",
         "yiisoft/yii2-elasticsearch": "^2.0@dev",
         "unclead/yii2-multiple-input": "~1.2.3",
-        "devgroup/yii2-multilingual": "*"
+        "devgroup/yii2-multilingual": "*",
+        "arogachev/yii2-sortable": "*"
     },
     "require-dev": {
         "phpunit/phpunit": "~4.0",
