@@ -160,7 +160,7 @@ class HasProperties extends Behavior
                 $diffCount = count(array_diff_assoc($owner->propertiesValues[$id], $value)) > 0;
                 $changed = $diffCount || count($owner->propertiesValues[$id]) != count($value);
             } else {
-                $changed = $value !== $owner->propertiesValues[$id];
+                $changed = $value != $owner->propertiesValues[$id];
             }
         }
         if ($changed === true) {
