@@ -7,8 +7,10 @@ use DevGroup\DataStructure\models\PropertyGroup;
 use Yii;
 use yii\base\Exception;
 use yii\base\UnknownPropertyException;
+use yii\caching\TagDependency;
 use yii\db\Query;
 use yii\helpers\ArrayHelper;
+use yii\helpers\VarDumper;
 use yii\web\ServerErrorHttpException;
 
 class PropertiesHelper
@@ -176,9 +178,11 @@ class PropertiesHelper
         }
 
         $tags = [
-            $firstModel->commonTag(),
             PropertyGroup::commonTag(),
         ];
+        foreach ($models as &$model) {
+            $tags[] = $model->objectTag();
+        }
 
         $binding_rows = Yii::$app->cache->lazy(function () use ($firstModel, $models) {
             $query = new Query();
@@ -261,6 +265,7 @@ class PropertiesHelper
                 // if there were propertiesIds filled - refresh them
                 $model->ensurePropertiesAttributes(true);
             }
+            TagDependency::invalidate($model->getTagDependencyCacheComponent(), [$model->objectTag()]);
         }
         return true;
     }
