@@ -116,6 +116,10 @@ class PropertiesHelper
 
             Yii::endProfile('Fill properties: ' . $storage->className());
         }
+        foreach ($models as $model) {
+            $model->changedProperties = [];
+            $model->propertiesValuesChanged = false;
+        }
         Yii::endProfile('Fill properties for models');
         return $models;
     }
