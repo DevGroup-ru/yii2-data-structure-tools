@@ -18,7 +18,7 @@
         "yiisoft/yii2-elasticsearch": "^2.0@dev",
         "unclead/yii2-multiple-input": "~1.2.3",
         "devgroup/yii2-multilingual": "*",
-        "arogachev/yii2-sortable": "*"
+        "arogachev/yii2-sortable": "^0.1.5"
     },
     "require-dev": {
         "phpunit/phpunit": "~4.0",
