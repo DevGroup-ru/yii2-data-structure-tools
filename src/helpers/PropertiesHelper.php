@@ -372,15 +372,13 @@ class PropertiesHelper
     /**
      * @param \yii\db\ActiveRecord|\DevGroup\DataStructure\traits\PropertiesTrait $model
      * @param string $attribute
-     * @throws UnknownPropertyException
-     * @throws ServerErrorHttpException
-     * @return Property
+     * @return Property | null
      */
     public static function getPropertyModel($model, $attribute)
     {
         $propertyId = array_search($attribute, $model->propertiesAttributes);
         if ($propertyId === false) {
-            throw new UnknownPropertyException("Attribute $attribute not found in model ".$model->className());
+            return null;
         }
         return Property::findById($propertyId, false);
     }
