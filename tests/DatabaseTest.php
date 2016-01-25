@@ -50,7 +50,7 @@ class DatabaseTest extends \PHPUnit_Extensions_Database_TestCase
         (new \yii\console\Application([
             'id' => 'unit',
             'basePath' => __DIR__,
-            'bootstrap' => ['log', 'multilingual'],
+            'bootstrap' => ['log'],
             'components' => [
                 'log' => [
                     'traceLevel' => 10,

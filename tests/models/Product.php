@@ -2,6 +2,7 @@
 
 namespace DevGroup\DataStructure\tests\models;
 
+use arogachev\sortable\behaviors\numerical\ContinuousNumericalSortableBehavior;
 use DevGroup\DataStructure\behaviors\HasProperties;
 use DevGroup\DataStructure\behaviors\PackedJsonAttributes;
 use DevGroup\DataStructure\traits\PropertiesTrait;
@@ -56,6 +57,10 @@ class Product extends \yii\db\ActiveRecord
             'CacheableActiveRecord' => [
                 'class' => \DevGroup\TagDependencyHelper\CacheableActiveRecord::className(),
             ],
+            'ContinuousNumericalSortableBehavior' => [
+                'class' => ContinuousNumericalSortableBehavior::className(),
+                'sortAttribute' => 'sort_order'
+            ]
         ];
     }
 }
