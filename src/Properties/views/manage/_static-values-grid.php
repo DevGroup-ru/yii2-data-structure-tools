@@ -6,6 +6,7 @@ use DevGroup\DataStructure\models\StaticValue;
 use yii\data\ActiveDataProvider;
 use yii\grid\GridView;
 use yii\helpers\Html;
+use yii\helpers\Url;
 use yii\widgets\Pjax;
 
 /***
@@ -30,9 +31,12 @@ use yii\widgets\Pjax;
             'class' => 'btn btn-primary'
         ]
     ) ?>
-</div>
-<div id="static-values-sortable">
-    <?php Pjax::begin(); ?>
+
+    <?php $pjax = Pjax::begin([
+        'options'=> [
+            'style' =>'overflow: scroll;'
+        ]
+    ]); ?>
     <?= GridView::widget([
         'dataProvider' => $dataProvider,
         'filterModel' => $staticValue,
@@ -40,7 +44,10 @@ use yii\widgets\Pjax;
         'columns' => [
             [
                 'class' => SortableColumn::className(),
-                'gridContainerId' => 'static-values-sortable',
+                'template' => '<div class="sortable-section">{moveWithDragAndDrop}</div>',
+                'needConfirmationOnMove' => false,
+                'baseUrl' => Url::to(['/properties/sort']) . '/',
+                'gridContainerId' => $pjax->id,
                 'visible' => true
             ],
             'id',
@@ -74,8 +81,7 @@ use yii\widgets\Pjax;
             ],
         ],
 
-        // 'tableOptions' => ['class' => 'table table-striped table-bordered']
+         'tableOptions' => ['class' => 'table table-striped table-bordered'],
     ]); ?>
+    <div class="clearfix"></div>
     <?php Pjax::end(); ?>
-
-</div>
