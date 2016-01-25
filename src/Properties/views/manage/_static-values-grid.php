@@ -45,7 +45,7 @@ use yii\widgets\Pjax;
             [
                 'class' => SortableColumn::className(),
                 'template' => '<div class="sortable-section">{moveWithDragAndDrop}</div>',
-                'needConfirmationOnMove' => false,
+                'confirmMove' => false,
                 'baseUrl' => Url::to(['/properties/sort']) . '/',
                 'gridContainerId' => $pjax->id,
                 'visible' => true
