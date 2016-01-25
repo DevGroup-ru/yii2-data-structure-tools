@@ -1,6 +1,7 @@
 <?php
 namespace DevGroup\DataStructure\models;
 
+use arogachev\sortable\behaviors\numerical\ContinuousNumericalSortableBehavior;
 use DevGroup\Multilingual\behaviors\MultilingualActiveRecord;
 use DevGroup\Multilingual\traits\MultilingualTrait;
 use DevGroup\TagDependencyHelper\CacheableActiveRecord;
@@ -48,6 +49,21 @@ class StaticValue extends ActiveRecord
         parent::__construct($config);
     }
 
+
+    /**
+     * @inheritdoc
+     */
+    public function rules()
+    {
+        return [
+            [['sort_order', 'property_id'], 'integer',],
+            [['property_id'], 'required',],
+            [['slug'], 'default', 'value' => ''],
+            [['id'], 'integer', 'on' => 'search'],
+            [['name','slug'], 'safe', 'on'=>'search'],
+            [['sort_order', 'property_id'], 'filter', 'filter' => 'intval'],
+        ];
+    }
     /**
      * @inheritdoc
      */
@@ -61,6 +77,10 @@ class StaticValue extends ActiveRecord
             'CacheableActiveRecord' => [
                 'class' => CacheableActiveRecord::className(),
             ],
+            'ContinuousNumericalSortableBehavior' => [
+                'class' => ContinuousNumericalSortableBehavior::className(),
+                'sortAttribute' => 'sort_order'
+            ]
         ];
     }
 
@@ -202,9 +222,20 @@ class StaticValue extends ActiveRecord
             'desc' => ['static_value_translation.name' => SORT_DESC],
         ];
 
+        $dataProvider->sort->defaultOrder = ['sort_order' => SORT_ASC];
+
         if (!($this->load($params))) {
             return $dataProvider;
         }
+
+        // perform filtering
+        $query->andFilterWhere(['id' => $this->id]);
+        $query->andFilterWhere(['sort_order' => $this->sort_order]);
+
+
+        // filter by multilingual field
+        $query->andFilterWhere(['like', 'static_value_translation.slug', $this->slug]);
+        $query->andFilterWhere(['like', 'static_value_translation.name', $this->name]);
 
 
         return $dataProvider;

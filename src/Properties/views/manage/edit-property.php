@@ -3,6 +3,7 @@
 use DevGroup\AdminUtils\events\ModelEditForm;
 use DevGroup\DataStructure\Properties\actions\EditProperty;
 use DevGroup\DataStructure\Properties\helpers\FrontendPropertiesHelper;
+use yii\base\Event;
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 
@@ -68,5 +69,9 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <?php ActiveForm::end(); ?>
 
+    <?php
+    $event = new ModelEditForm(new ActiveForm(), $model);
+    $this->trigger(EditProperty::EVENT_AFTER_FORM, $event);
+    ?>
 
 </div>

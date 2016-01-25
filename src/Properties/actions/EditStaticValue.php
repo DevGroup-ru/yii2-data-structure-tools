@@ -29,6 +29,8 @@ class EditStaticValue extends BaseAdminAction
             $model->translations;
         }
 
+        $model->loadDefaultValues();
+
         if (Yii::$app->request->isPost && $model->load(Yii::$app->request->post())) {
             foreach (Yii::$app->request->post('StaticValueTranslation', []) as $language => $data) {
                 foreach ($data as $attribute => $translation) {

@@ -28,6 +28,9 @@ class EditProperty extends BaseAdminAction
     const EVENT_FORM_BEFORE_SUBMIT = 'form-before-submit';
     const EVENT_FORM_AFTER_SUBMIT  = 'form-after-submit';
 
+    const EVENT_BEFORE_FORM = 'before-form';
+    const EVENT_AFTER_FORM = 'after-form';
+
     /**
      * Runs action
      * @param             $propertyGroupId
@@ -63,7 +66,6 @@ class EditProperty extends BaseAdminAction
             $model->translations;
         }
 
-
         if (Yii::$app->request->isPost && $model->load(Yii::$app->request->post())) {
             foreach (Yii::$app->request->post('PropertyTranslation', []) as $language => $data) {
                 foreach ($data as $attribute => $translation) {
@@ -78,7 +80,8 @@ class EditProperty extends BaseAdminAction
             );
 
 
-            if ($event->isValid === true && $model->save()) {
+
+            if ($event->isValid === true && $model->save() && !Yii::$app->request->isPjax ) {
                 if ($id === null) {
                     // That was new record - link it to property group
                     $propertyGroup->link(

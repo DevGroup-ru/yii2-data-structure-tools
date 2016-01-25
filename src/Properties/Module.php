@@ -2,6 +2,7 @@
 
 namespace DevGroup\DataStructure\Properties;
 
+use arogachev\sortable\controllers\SortController;
 use DevGroup\AdminUtils\events\ModelEditAction;
 use DevGroup\AdminUtils\events\ModelEditForm;
 use DevGroup\DataStructure\Properties\actions\EditProperty;
@@ -24,13 +25,20 @@ use yii\web\View;
  */
 class Module extends BaseModule implements BootstrapInterface
 {
+    public $controllerMap = [
+        'sort' => [
+            'class' => SortController::class,
+        ]
+    ];
+
+
     public function init()
     {
         parent::init();
 
         ModelEditForm::on(
             View::className(),
-            EditProperty::EVENT_FORM_AFTER_SUBMIT,
+            EditProperty::EVENT_AFTER_FORM,
             [StaticValues::className(), 'onPropertyEditForm']
         );
     }
@@ -48,4 +56,6 @@ class Module extends BaseModule implements BootstrapInterface
             ]);
         });
     }
+
+
 }

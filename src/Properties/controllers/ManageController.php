@@ -17,6 +17,7 @@ use yii\web\Response;
 
 class ManageController extends BaseController
 {
+
     /**
      * This controller just uses actions in extension
      * @return array
