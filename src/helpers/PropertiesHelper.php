@@ -4,6 +4,8 @@ namespace DevGroup\DataStructure\helpers;
 
 use DevGroup\DataStructure\models\Property;
 use DevGroup\DataStructure\models\PropertyGroup;
+use DevGroup\DataStructure\models\PropertyPropertyGroup;
+use phpDocumentor\Reflection\DocBlock\Tag\PropertyReadTag;
 use Yii;
 use yii\base\Exception;
 use yii\base\UnknownPropertyException;
@@ -269,6 +271,59 @@ class PropertiesHelper
                 // if there were propertiesIds filled - refresh them
                 $model->ensurePropertiesAttributes(true);
             }
+            TagDependency::invalidate($model->getTagDependencyCacheComponent(), [$model->objectTag()]);
+        }
+        return true;
+    }
+
+    /**
+     * @param \yii\db\ActiveRecord[]|\DevGroup\DataStructure\traits\PropertiesTrait[] $models
+     * @param PropertyGroup $propertyGroup
+     * @return bool
+     */
+    public static function unbindGroupFromModels(&$models, PropertyGroup $propertyGroup)
+    {
+        foreach ($models as $model) {
+            if (in_array($propertyGroup->id, $model->propertyGroupIds) === false) {
+                // maybe it'll be better to throw special exception in such case
+                return false;
+            }
+            $query = (new Query())
+                ->select('property_id')
+                ->from(PropertyPropertyGroup::tableName())
+                ->where(
+                    [
+                        'property_group_id' => $propertyGroup->id,
+                    ]
+                );
+            $subQuerySql = (new Query())
+                ->select('property_id')
+                ->from($model->bindedPropertyGroupsTable() . ' opg')
+                ->innerJoin(
+                    PropertyPropertyGroup::tableName() . ' ppg',
+                    'opg.property_group_id = ppg.property_group_id'
+                )
+                ->groupBy('property_id')
+                ->having('COUNT(*) = 1')
+                ->where(
+                    [
+                        'model_id' => $model->id,
+                    ]
+                )->createCommand()->getRawSql();
+            $propertyIdsToDelete = $query->andWhere('property_id IN (' . $subQuerySql . ')')->column();
+            $storageHandlers = PropertyStorageHelper::storageHandlers();
+            foreach ($storageHandlers as $handler) {
+                $handler->deleteProperties($models, $propertyIdsToDelete);
+            }
+            $model->getDb()->createCommand()
+                ->delete(
+                    $model->bindedPropertyGroupsTable(),
+                    [
+                        'model_id' => $model->id,
+                        'property_group_id' => $propertyGroup->id,
+                    ]
+                )
+                ->execute();
             TagDependency::invalidate($model->getTagDependencyCacheComponent(), [$model->objectTag()]);
         }
         return true;

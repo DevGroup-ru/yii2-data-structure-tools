@@ -6,6 +6,7 @@ use DevGroup\DataStructure\helpers\PropertiesHelper;
 use DevGroup\DataStructure\models\Property;
 use Yii;
 use yii\db\ActiveRecord;
+use yii\db\Expression;
 use yii\db\Schema;
 use yii\helpers\ArrayHelper;
 
@@ -252,6 +253,27 @@ class TableInheritance extends AbstractPropertyStorage
             default:
                 return $schema->createColumnSchemaBuilder(Schema::TYPE_TEXT);
                 break;
+        }
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function deleteProperties($models, $propertyIds)
+    {
+        $columns = Property::find()
+            ->select(new Expression('""'))
+            ->where(['id' => $propertyIds])
+            ->indexBy('key')
+            ->column();
+        foreach ($models as $model) {
+            $model->getDb()->createCommand()->update(
+                $model->tableInheritanceTable(),
+                $columns,
+                [
+                    'model_id' => $model->id,
+                ]
+            )->execute();
         }
     }
 }

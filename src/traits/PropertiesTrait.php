@@ -5,6 +5,9 @@ namespace DevGroup\DataStructure\traits;
 use DevGroup\DataStructure\helpers\PropertiesHelper;
 use DevGroup\DataStructure\models\Property;
 use DevGroup\DataStructure\models\PropertyGroup;
+use DevGroup\TagDependencyHelper\TagDependencyTrait;
+use yii\caching\TagDependency;
+use yii\db\ActiveRecord;
 use yii\helpers\ArrayHelper;
 use yii\web\ServerErrorHttpException;
 
@@ -188,6 +191,12 @@ trait PropertiesTrait
     {
         $array = [ &$this ];
         return PropertiesHelper::bindGroupToModels($array, $propertyGroup);
+    }
+
+    public function deletePropertyGroup(PropertyGroup $propertyGroup)
+    {
+        $array = [$this];
+        return PropertiesHelper::unbindGroupFromModels($array, $propertyGroup);
     }
 
     /**

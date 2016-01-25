@@ -2,7 +2,9 @@
 
 namespace DevGroup\DataStructure\propertyStorage;
 
+use DevGroup\DataStructure\behaviors\HasProperties;
 use DevGroup\DataStructure\models\Property;
+use DevGroup\DataStructure\traits\PropertiesTrait;
 use Yii;
 use yii\db\ActiveRecord;
 use yii\helpers\ArrayHelper;
@@ -160,6 +162,15 @@ abstract class AbstractPropertyStorage
      * @param ActiveRecord[]|\DevGroup\DataStructure\traits\PropertiesTrait[]|\DevGroup\DataStructure\behaviors\HasProperties[] $models
      */
     public function modelsInserted(&$models)
+    {
+
+    }
+
+    /**
+     * @param ActiveRecord[] | PropertiesTrait[] | HasProperties[] $models
+     * @param int[] $propertyIds
+     */
+    public function deleteProperties($models, $propertyIds)
     {
 
     }

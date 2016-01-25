@@ -239,5 +239,16 @@ class EAV extends AbstractPropertyStorage
         }
     }
 
-
+    /**
+     * @inheritdoc
+     */
+    public function deleteProperties($models, $propertyIds)
+    {
+        foreach ($models as $model) {
+            $model->getDb()
+                ->createCommand()
+                ->delete($model->eavTable(), ['model_id' => $model->id, 'property_id' => (array)$propertyIds])
+                ->execute();
+        }
+    }
 }

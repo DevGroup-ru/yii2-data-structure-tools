@@ -3,6 +3,7 @@
 namespace DevGroup\DataStructure\propertyHandler;
 
 use DevGroup\DataStructure\models\Property;
+use yii\helpers\Html;
 
 class TextField extends AbstractPropertyHandler
 {
@@ -24,8 +25,19 @@ class TextField extends AbstractPropertyHandler
         }
     }
 
-    public function render($model, $attribute, $case)
+    public function render($model, $property, $case)
     {
-        // TODO: Implement render() method.
+        // @todo rewrite it. it's a dirty code for test.
+        $id = Html::getInputId($model, $property->key);
+        return Html::label(isset($model->propertiesAttributes[$property->id]) ? $model->propertiesAttributes[$property->id] : $property->name, $id)
+            . Html::input(
+            'text',
+            Html::getInputName($model, $property->key),
+            isset($model->propertiesValues[$property->id]) ? $model->propertiesValues[$property->id] : '',
+            [
+                'id' => $id,
+                'class' => 'form-control',
+            ]
+        ) . '<br />';
     }
 }

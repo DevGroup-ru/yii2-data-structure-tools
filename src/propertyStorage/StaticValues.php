@@ -6,6 +6,7 @@ use DevGroup\DataStructure\helpers\PropertiesHelper;
 use DevGroup\DataStructure\models\Property;
 use DevGroup\DataStructure\models\StaticValue;
 use Yii;
+use yii\elasticsearch\Query;
 use yii\helpers\ArrayHelper;
 
 class StaticValues extends AbstractPropertyStorage
@@ -171,5 +172,26 @@ class StaticValues extends AbstractPropertyStorage
     {
         $property->data_type = Property::DATA_TYPE_INTEGER;
         return true;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function deleteProperties($models, $propertyIds)
+    {
+        foreach ($models as $model) {
+            $subQuerySql = StaticValue::find()
+                ->select('id')
+                ->where(['property_id' => $propertyIds])
+                ->createCommand()
+                ->getRawSql();
+            $model->getDb()
+                ->createCommand()
+                ->delete(
+                    $model->staticValuesBindingsTable(),
+                    'model_id = \'' . (int)$model->id . '\' AND static_value_id IN (' . $subQuerySql . ')'
+                )
+                ->execute();
+        }
     }
 }
