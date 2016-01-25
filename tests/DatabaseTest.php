@@ -405,6 +405,7 @@ class DatabaseTest extends \PHPUnit_Extensions_Database_TestCase
 
         $linux = new StaticValue($os);
         $linux->name = 'Linux';
+        
         $this->assertTrue($linux->save());
 
         $this->assertSame([

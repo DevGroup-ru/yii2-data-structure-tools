@@ -57,7 +57,8 @@ class StaticValue extends ActiveRecord
     {
         return [
             [['sort_order', 'property_id'], 'integer',],
-            [['sort_order', 'property_id'], 'required',],
+            [['property_id'], 'required',],
+            [['slug'], 'default', 'value' => ''],
             [['id'], 'integer', 'on' => 'search'],
             [['name','slug'], 'safe', 'on'=>'search'],
             [['sort_order', 'property_id'], 'filter', 'filter' => 'intval'],
