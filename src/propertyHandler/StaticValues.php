@@ -66,19 +66,6 @@ class StaticValues extends AbstractPropertyHandler
 
     }
 
-    public function render($model, $property, $case)
-    {
-        return (new ActiveForm())
-            ->field($model, $property->key)
-            ->widget(Select2::className(), [
-                'data' => ArrayHelper::map($property->staticValues, 'id', 'name'),
-                'options' => ['placeholder' => 'Select a value ...'],
-                'pluginOptions' => [
-                    'allowClear' => true
-                ],
-            ]);
-    }
-
     /**
      * @param \DevGroup\AdminUtils\events\ModelEditForm $event
      */

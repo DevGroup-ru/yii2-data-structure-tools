@@ -2,12 +2,16 @@
 
 namespace DevGroup\DataStructure\propertyHandler;
 
-use DevGroup\DataStructure\helpers\PropertyHandlerHelper;
 use DevGroup\DataStructure\models\Property;
+use yii\base\Widget;
 
-
-abstract class AbstractPropertyHandler
+abstract class AbstractPropertyHandler extends Widget
 {
+    const BACKEND_RENDER = 'backend-render';
+    const BACKEND_EDIT = 'backend-edit';
+    const FRONTEND_RENDER = 'frontend-render';
+    const FRONTEND_EDIT = 'frontend-edit';
+
     public function __construct()
     {
 
@@ -28,6 +32,14 @@ abstract class AbstractPropertyHandler
         return true;
     }
 
+    public function convertView($view)
+    {
+        if (strpos($view, '@') !== false || strpos($view, '/') !== false || strpos($view, '\\') !== false) {
+            return $view;
+        }
+        return strtolower(substr(static::className(), strrpos(static::className(), '\\') + 1)) . '-' . $view;
+    }
+
     /**
      * @param \DevGroup\DataStructure\models\Property $property
      * @param bool                                    $insert
@@ -46,7 +58,16 @@ abstract class AbstractPropertyHandler
 
     abstract public function getValidationRules(Property $property);
 
-    abstract public function render($model, $attribute, $case);
+    public function renderProperty($model, $property, $view)
+    {
+        return $this->render(
+            $this->convertView($view),
+            [
+                'model' => $model,
+                'property' => $property,
+            ]
+        );
+    }
 
     /**
      * @return string class name with namespace

@@ -25,9 +25,4 @@ class TextField extends AbstractPropertyHandler
             ];
         }
     }
-
-    public function render($model, $property, $case)
-    {
-        return (new ActiveForm())->field($model, $property->key);
-    }
 }

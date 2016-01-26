@@ -6,6 +6,7 @@ use DevGroup\DataStructure\helpers\PropertiesHelper;
 use DevGroup\DataStructure\models\Property;
 use DevGroup\DataStructure\models\PropertyGroup;
 use DevGroup\DataStructure\models\PropertyPropertyGroup;
+use DevGroup\DataStructure\propertyHandler\AbstractPropertyHandler;
 use DevGroup\DataStructure\traits\PropertiesTrait;
 use rmrevin\yii\fontawesome\component\Icon;
 use yii\base\Exception;
@@ -71,7 +72,12 @@ class PropertiesForm extends Widget
                     ->where(['ppg.property_group_id' => $id])
                     ->all();
                 foreach ($properties as $property) {
-                    $content .= $property->handler()->render($this->model, $property, '');
+                    $content .= $property
+                        ->handler()
+                        ->renderProperty(
+                            $this->model, $property,
+                            AbstractPropertyHandler::BACKEND_EDIT
+                        );
                 }
                 $tabs[] = [
                     'label' => Html::encode($name)
