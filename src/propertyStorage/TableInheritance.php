@@ -9,7 +9,6 @@ use yii\db\ActiveRecord;
 use yii\db\Expression;
 use yii\db\Schema;
 use yii\helpers\ArrayHelper;
-use yii\helpers\VarDumper;
 
 class TableInheritance extends AbstractPropertyStorage
 {
