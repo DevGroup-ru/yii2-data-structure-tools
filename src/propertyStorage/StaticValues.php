@@ -32,7 +32,11 @@ class StaticValues extends AbstractPropertyStorage
                 ->from($firstModel->staticValuesBindingsTable())
                 ->innerJoin(StaticValue::tableName(), "$staticValuesBindingTable.static_value_id = {{static_value}}.id")
                 ->where(PropertiesHelper::getInCondition($models))
-                ->orderBy(["$staticValuesBindingTable.model_id" => SORT_ASC, "{{static_value}}.property_id" => SORT_ASC, "$staticValuesBindingTable.sort_order" => SORT_ASC])
+                ->orderBy([
+                    "$staticValuesBindingTable.model_id" => SORT_ASC,
+                    "{{static_value}}.property_id" => SORT_ASC,
+                    "$staticValuesBindingTable.sort_order" => SORT_ASC
+                ])
                 ->all($firstModel->getDb());
 
             $result = [];
@@ -120,10 +124,12 @@ class StaticValues extends AbstractPropertyStorage
                         $staticValuesChanged = true;
                     }
 
-                    $values = (array) $model->$key;
+                    $values = (array)$model->$key;
                     $counter = 0;
                     foreach ($values as $value) {
-                        $modelStaticValuesPairs[] = [$model->id, $value, $counter++];
+                        if (empty($value) === false) {
+                            $modelStaticValuesPairs[] = [$model->id, $value, $counter++];
+                        }
                     }
                 }
             }
@@ -143,22 +149,26 @@ class StaticValues extends AbstractPropertyStorage
             /** @var \yii\db\Connection $db */
             $db = $firstModel->getDb();
             $db->transaction(function (\yii\db\Connection $db) use ($deleteModelIds, $insertRows, $firstModel) {
-                $db
-                    ->createCommand()
-                    ->delete(
-                        $firstModel->staticValuesBindingsTable(),
-                        [
-                            'model_id' => $deleteModelIds,
-                        ]
-                    )->execute();
+                if (empty($deleteModelIds) === false) {
+                    $db
+                        ->createCommand()
+                        ->delete(
+                            $firstModel->staticValuesBindingsTable(),
+                            [
+                                'model_id' => $deleteModelIds,
+                            ]
+                        )->execute();
+                }
 
-                $db
-                    ->createCommand()
-                    ->batchInsert(
-                        $firstModel->staticValuesBindingsTable(),
-                        ['model_id', 'static_value_id', 'sort_order'],
-                        $insertRows
-                    )->execute();
+                if (empty($insertRows) === false) {
+                    $db
+                        ->createCommand()
+                        ->batchInsert(
+                            $firstModel->staticValuesBindingsTable(),
+                            ['model_id', 'static_value_id', 'sort_order'],
+                            $insertRows
+                        )->execute();
+                }
             });
         }
 

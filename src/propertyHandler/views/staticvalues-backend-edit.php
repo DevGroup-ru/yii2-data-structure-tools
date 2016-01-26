@@ -17,7 +17,8 @@ echo (new ActiveForm())
             'data' => ArrayHelper::map($property->staticValues, 'id', 'name'),
             'options' => ['placeholder' => 'Select a value ...'],
             'pluginOptions' => [
-                'allowClear' => true
+                'allowClear' => true,
+                'multiple' => $property->allow_multiple_values
             ],
         ]
     );
