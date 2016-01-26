@@ -5,6 +5,7 @@ namespace DevGroup\DataStructure\propertyHandler;
 use DevGroup\AdminUtils\events\ModelEditForm;
 use DevGroup\DataStructure\models\Property;
 use DevGroup\DataStructure\models\StaticValue;
+use kartik\select2\Select2;
 use yii\bootstrap\ActiveForm;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
@@ -69,9 +70,13 @@ class StaticValues extends AbstractPropertyHandler
     {
         return (new ActiveForm())
             ->field($model, $property->key)
-            ->dropDownList(
-                ArrayHelper::map($property->staticValues, 'id', 'name')
-            );
+            ->widget(Select2::className(), [
+                'data' => ArrayHelper::map($property->staticValues, 'id', 'name'),
+                'options' => ['placeholder' => 'Select a value ...'],
+                'pluginOptions' => [
+                    'allowClear' => true
+                ],
+            ]);
     }
 
     /**
