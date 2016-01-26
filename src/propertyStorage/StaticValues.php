@@ -11,7 +11,6 @@ use yii\helpers\ArrayHelper;
 
 class StaticValues extends AbstractPropertyStorage
 {
-
     /**
      * @inheritdoc
      */
@@ -19,6 +18,10 @@ class StaticValues extends AbstractPropertyStorage
     {
         /** @var \yii\db\ActiveRecord|\DevGroup\DataStructure\traits\PropertiesTrait|\DevGroup\TagDependencyHelper\TagDependencyTrait $firstModel */
         $firstModel = reset($models);
+        $tags = [];
+        foreach ($models as $model) {
+            $tags[] = $model->objectTag();
+        }
         $static_values_rows = Yii::$app->cache->lazy(function () use ($firstModel, $models) {
             $query = new \yii\db\Query();
             $staticValuesBindingTable = $firstModel->staticValuesBindingsTable();
@@ -55,7 +58,7 @@ class StaticValues extends AbstractPropertyStorage
             }
 
             return $result;
-        }, PropertiesHelper::generateCacheKey($models, 'static_values'), 86400, $firstModel->commonTag());
+        }, PropertiesHelper::generateCacheKey($models, 'static_values'), 86400, $tags);
 
         // fill models with static values
         $modelIdToArrayIndex = PropertiesHelper::idToArrayIndex($models);
