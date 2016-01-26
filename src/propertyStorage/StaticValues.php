@@ -192,12 +192,12 @@ class StaticValues extends AbstractPropertyStorage
      */
     public function deleteProperties($models, $propertyIds)
     {
+        $subQuerySql = StaticValue::find()
+            ->select('id')
+            ->where(['property_id' => $propertyIds])
+            ->createCommand()
+            ->getRawSql();
         foreach ($models as $model) {
-            $subQuerySql = StaticValue::find()
-                ->select('id')
-                ->where(['property_id' => $propertyIds])
-                ->createCommand()
-                ->getRawSql();
             $model->getDb()
                 ->createCommand()
                 ->delete(
