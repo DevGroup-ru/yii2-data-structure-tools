@@ -65,6 +65,7 @@ abstract class AbstractPropertyHandler extends Widget
             [
                 'model' => $model,
                 'property' => $property,
+                'handler' => $this
             ]
         );
     }

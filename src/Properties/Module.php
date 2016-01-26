@@ -25,12 +25,6 @@ use yii\web\View;
  */
 class Module extends BaseModule implements BootstrapInterface
 {
-    public $controllerMap = [
-        'sort' => [
-            'class' => SortController::class,
-        ]
-    ];
-
 
     public function init()
     {
@@ -50,6 +44,13 @@ class Module extends BaseModule implements BootstrapInterface
      */
     public function bootstrap($app)
     {
+
+        if (is_a($app, \yii\web\Application::className())) {
+            $this->controllerMap['sort'] = [
+                'class' => SortController::className(),
+            ];
+        }
+
         $app->on(Application::EVENT_BEFORE_REQUEST, function () {
             Yii::$app->setAliases([
                 '@dataStructure' => '@vendor/devgroup/yii2-data-structure-tools/src/',
