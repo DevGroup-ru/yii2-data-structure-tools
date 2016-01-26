@@ -5,6 +5,7 @@ namespace DevGroup\DataStructure\propertyHandler;
 use DevGroup\AdminUtils\events\ModelEditForm;
 use DevGroup\DataStructure\models\Property;
 use DevGroup\DataStructure\models\StaticValue;
+use yii\bootstrap\ActiveForm;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 
@@ -66,11 +67,11 @@ class StaticValues extends AbstractPropertyHandler
 
     public function render($model, $property, $case)
     {
-        // @todo rewrite it. it's a dirty code for test.
-        $id = Html::getInputId($model, $property->key);
-        return Html::label(isset($model->propertiesAttributes[$property->id]) ? $model->propertiesAttributes[$property->id] : $property->name, $id)
-        . Html::activeDropDownList($model, $property->key, ArrayHelper::map($property->staticValues, 'id', 'name')) . '<br />';
-
+        return (new ActiveForm())
+            ->field($model, $property->key)
+            ->dropDownList(
+                ArrayHelper::map($property->staticValues, 'id', 'name')
+            );
     }
 
     /**
