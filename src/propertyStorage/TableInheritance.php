@@ -9,6 +9,7 @@ use yii\db\ActiveRecord;
 use yii\db\Expression;
 use yii\db\Schema;
 use yii\helpers\ArrayHelper;
+use yii\helpers\VarDumper;
 
 class TableInheritance extends AbstractPropertyStorage
 {
@@ -263,17 +264,24 @@ class TableInheritance extends AbstractPropertyStorage
     {
         $columns = Property::find()
             ->select(new Expression('""'))
-            ->where(['id' => $propertyIds])
+            ->where(
+                [
+                    'id' => $propertyIds,
+                    'storage_id' => $this->storageId,
+                ]
+            )
             ->indexBy('key')
             ->column();
-        foreach ($models as $model) {
-            $model->getDb()->createCommand()->update(
-                $model->tableInheritanceTable(),
-                $columns,
-                [
-                    'model_id' => $model->id,
-                ]
-            )->execute();
+        if (count($columns) > 0) {
+            foreach ($models as $model) {
+                $model->getDb()->createCommand()->update(
+                    $model->tableInheritanceTable(),
+                    $columns,
+                    [
+                        'model_id' => $model->id,
+                    ]
+                )->execute();
+            }
         }
     }
 }
