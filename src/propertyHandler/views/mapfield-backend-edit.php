@@ -1,7 +1,7 @@
 <?php
 /**
  * @var \yii\db\ActiveRecord $model
- * @var DevGroup\DataStructure\propertyHandler\MapField $widget
+ * @var DevGroup\DataStructure\propertyHandler\MapField $this->context
  * @var \DevGroup\DataStructure\models\Property $property
  * @var yii\web\View $this
  */
@@ -9,6 +9,8 @@
 use kolyunya\yii2\widgets\MapInputWidget;
 use yii\helpers\Json;
 use yii\widgets\ActiveForm;
+
+
 
 try {
     $data = Json::decode($model->{$property->key});
@@ -22,17 +24,17 @@ echo (new ActiveForm())
     ->widget(
         MapInputWidget::className(),
         [
-            'key' => $widget->key,
-            'latitude' => $widget->latitude,
-            'longitude' => $widget->longitude,
-            'zoom' => (!empty($data['zoom']))  ? (int) $data['zoom'] : $widget->zoom,
-            'width' => $widget->width,
-            'height' => $widget->height,
-            'pattern' => $widget->pattern,
-            'mapType' => $widget->mapType,
-            'animateMarker' => $widget->animateMarker,
-            'alignMapCenter' => $widget->alignMapCenter,
-            'enableSearchBar' => $widget->enableSearchBar,
+            'key' => $this->context->key,
+            'latitude' => $this->context->latitude,
+            'longitude' => $this->context->longitude,
+            'zoom' => (!empty($data['zoom']))  ? (int) $data['zoom'] : $this->context->zoom,
+            'width' => $this->context->width,
+            'height' => $this->context->height,
+            'pattern' => $this->context->pattern,
+            'mapType' => $this->context->mapType,
+            'animateMarker' => $this->context->animateMarker,
+            'alignMapCenter' => $this->context->alignMapCenter,
+            'enableSearchBar' => $this->context->enableSearchBar,
         ]
     );
 $js = <<<JAVASCRIPT

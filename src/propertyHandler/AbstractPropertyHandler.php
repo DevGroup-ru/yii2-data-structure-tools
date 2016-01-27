@@ -84,8 +84,7 @@ abstract class AbstractPropertyHandler extends Widget
             $this->convertView($view),
             [
                 'model' => $model,
-                'property' => $property,
-                'widget' => $this
+                'property' => $property
             ]
         );
     }
