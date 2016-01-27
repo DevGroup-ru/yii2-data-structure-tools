@@ -1,8 +1,9 @@
 <?php
 /**
  * @var \yii\db\ActiveRecord $model
+ * @var \DevGroup\DataStructure\propertyHandler\AbstractPropertyHandler $widget
  * @var \DevGroup\DataStructure\models\Property $property
- * @var \DevGroup\DataStructure\propertyHandler\AbstractPropertyHandler $this
+ * @var yii\web\View $this
  */
 
 use yii\widgets\ActiveForm;
