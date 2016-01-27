@@ -10,6 +10,13 @@ use kolyunya\yii2\widgets\MapInputWidget;
 use yii\helpers\Json;
 use yii\widgets\ActiveForm;
 
+try {
+    $data = Json::decode($model->{$property->key});
+} catch (Exception $e) {
+    $data = null;
+}
+
+
 echo (new ActiveForm())
     ->field($model, $property->key)
     ->widget(
@@ -18,7 +25,7 @@ echo (new ActiveForm())
             'key' => $widget->key,
             'latitude' => $widget->latitude,
             'longitude' => $widget->longitude,
-            'zoom' => $widget->zoom,
+            'zoom' => (!empty($data['zoom']))  ? (int) $data['zoom'] : $widget->zoom,
             'width' => $widget->width,
             'height' => $widget->height,
             'pattern' => $widget->pattern,
@@ -29,19 +36,23 @@ echo (new ActiveForm())
         ]
     );
 $js = <<<JAVASCRIPT
+$('.kolyunya-map-input-widget').on(
+'makePoint',
+function(event) {
+   event.pointString = event.pointString.replace(/%zoom%/g,  event.MapInputWidget.getMap().getZoom() );
+});
 
 $('.kolyunya-map-input-widget').on(
-'initialize:after',
-function(event, obj) {
-    obj.MapInputWidget.setZoom(12);
-    obj.MapInputWidget.getMap().addListener(
+'initializeAfter',
+function(event) {
+
+  event.MapInputWidget.getMap().addListener(
     'zoom_changed',
     function(){
-    
+          event.MapInputWidget.setPosition(null)
         }
     );
-})
-
-
+}
+);
 JAVASCRIPT;
 echo $this->registerJs($js);
