@@ -4,7 +4,6 @@ namespace DevGroup\DataStructure\widgets;
 
 use DevGroup\DataStructure\helpers\PropertiesHelper;
 use DevGroup\DataStructure\models\Property;
-use DevGroup\DataStructure\models\PropertyGroup;
 use DevGroup\DataStructure\models\PropertyPropertyGroup;
 use DevGroup\DataStructure\propertyHandler\AbstractPropertyHandler;
 use DevGroup\DataStructure\traits\PropertiesTrait;
@@ -14,7 +13,6 @@ use yii\base\Widget;
 use yii\db\ActiveRecord;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
-use yii\helpers\VarDumper;
 
 class PropertiesForm extends Widget
 {
@@ -22,31 +20,31 @@ class PropertiesForm extends Widget
      * @var ActiveRecord | PropertiesTrait
      */
     public $model;
+
+    /**
+     * @var string view file for widget rendering
+     */
     public $viewFile = 'properties-form';
 
+    /**
+     * @var string route to "add property group" action
+     */
     public $addPropertyGroupRoute = 'properties/manage/add-model-property-group';
+
+    /**
+     * @var string route to "delete property group" action
+     */
     public $deletePropertyGroupRoute = 'properties/manage/delete-model-property-group';
 
-    public function run()
+    /**
+     * Build array for tabs.
+     * @param array $availableGroups
+     * @param array $attachedGroups
+     * @param $array $dropDownItems // @todo It is a temporary solution. In future we will be use a select2 widget.
+     * @return array
+     */
+    protected function buildTabsArray($availableGroups, $attachedGroups, &$dropDownItems)
     {
-        if (!$this->model instanceof ActiveRecord || !$this->model->hasMethod('ensurePropertyGroupIds')) {
-            // @todo May be just call empty return here?
-            throw new Exception('Field "model" must be an ActiveRecord and uses a PropertiesTrait');
-        }
-        //
-        $applicablePropertyModelId = PropertiesHelper::applicablePropertyModelId(get_class($this->model));
-        $availableGroups = ArrayHelper::map(
-            PropertyGroup::findAll(['applicable_property_model_id' => $applicablePropertyModelId]),
-            'id',
-            function($model) {
-                return !empty($model->name) ? $model->name : $model->internal_name;
-            }
-        );
-        //
-        $models = [$this->model];
-        PropertiesHelper::fillProperties($models);
-        $attachedGroups = $this->model->propertyGroupIds;
-        $dropDownItems = [];
         $tabs = [];
         foreach ($availableGroups as $id => $name) {
             $isAttached = in_array($id, $attachedGroups);
@@ -56,8 +54,10 @@ class PropertiesForm extends Widget
                 'url' => '#' . $id,
                 'linkOptions' => [
                     'data-group-id' => $id,
-                    'data-is-attached' => $isAttached,
                     'data-action' => 'add-property-group',
+                ],
+                'options' => [
+                    'class' => $isAttached ? 'hidden' : null,
                 ],
             ];
             if ($isAttached) {
@@ -94,6 +94,24 @@ class PropertiesForm extends Widget
                 ];
             }
         }
+        return $tabs;
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function run()
+    {
+        if (!$this->model instanceof ActiveRecord || !$this->model->hasMethod('ensurePropertyGroupIds')) {
+            throw new Exception('Field "model" must be an ActiveRecord and uses a PropertiesTrait');
+        }
+        PropertiesFormAsset::register($this->getView());
+        $availableGroups = PropertiesHelper::getAvailablePropertyGroupsList(get_class($this->model));
+        $models = [$this->model];
+        PropertiesHelper::fillProperties($models);
+        $attachedGroups = $this->model->propertyGroupIds;
+        $dropDownItems = [];
+        $tabs = $this->buildTabsArray($availableGroups, $attachedGroups, $dropDownItems);
         $tabs[] = [
             'label' => Html::button(new Icon('plus'), ['class' => 'btn btn-primary btn-xs']),
             'items' => $dropDownItems,

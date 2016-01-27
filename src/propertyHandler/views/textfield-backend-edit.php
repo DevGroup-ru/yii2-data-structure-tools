@@ -1,7 +1,6 @@
 <?php
 /**
  * @var \yii\db\ActiveRecord $model
- * @var \DevGroup\DataStructure\propertyHandler\AbstractPropertyHandler $widget
  * @var \DevGroup\DataStructure\models\Property $property
  * @var \DevGroup\DataStructure\propertyHandler\AbstractPropertyHandler | \yii\web\View $this
  */

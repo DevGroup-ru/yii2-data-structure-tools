@@ -66,7 +66,6 @@ class StaticValues extends AbstractPropertyHandler
 
     }
 
-
     /**
      * @param \DevGroup\AdminUtils\events\ModelEditForm $event
      */

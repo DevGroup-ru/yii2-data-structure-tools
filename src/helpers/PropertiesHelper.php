@@ -382,4 +382,34 @@ class PropertiesHelper
         }
         return Property::findById($propertyId, false);
     }
+
+    /**
+     * Get available property groups by class name.
+     * @param string $className
+     * @return array
+     * @throws Exception
+     */
+    public static function getAvailablePropertyGroupsList($className)
+    {
+        $applicablePropertyModelId = PropertiesHelper::applicablePropertyModelId($className);
+        $availableGroups = Yii::$app->cache->lazy(
+            function () use ($applicablePropertyModelId) {
+                return ArrayHelper::map(
+                    PropertyGroup::find()
+                        ->where(['applicable_property_model_id' => $applicablePropertyModelId])
+                        ->orderBy('sort_order ASC')
+                        ->all(),
+                    'id',
+                    function($model) {
+                        return !empty($model->name) ? $model->name : $model->internal_name;
+                    }
+                );
+
+            },
+            'AvailablePropertyGroupsList: ' . $applicablePropertyModelId,
+            86400,
+            PropertyGroup::commonTag()
+        );
+        return $availableGroups;
+    }
 }
