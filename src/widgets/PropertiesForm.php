@@ -40,11 +40,11 @@ class PropertiesForm extends Widget
      * Build array for tabs.
      * @param array $availableGroups
      * @param array $attachedGroups
-     * @param $array $dropDownItems // @todo It is a temporary solution. In future we will be use a select2 widget.
      * @return array
      */
-    protected function buildTabsArray($availableGroups, $attachedGroups, &$dropDownItems)
+    protected function buildTabsArray($availableGroups, $attachedGroups)
     {
+        $dropDownItems = [];
         $tabs = [];
         foreach ($availableGroups as $id => $name) {
             $isAttached = in_array($id, $attachedGroups);
@@ -94,6 +94,10 @@ class PropertiesForm extends Widget
                 ];
             }
         }
+        $tabs[] = [
+            'label' => Html::button(new Icon('plus'), ['class' => 'btn btn-primary btn-xs']),
+            'items' => $dropDownItems,
+        ];
         return $tabs;
     }
 
@@ -110,13 +114,7 @@ class PropertiesForm extends Widget
         $models = [$this->model];
         PropertiesHelper::fillProperties($models);
         $attachedGroups = $this->model->propertyGroupIds;
-        $dropDownItems = [];
-        $tabs = $this->buildTabsArray($availableGroups, $attachedGroups, $dropDownItems);
-        $tabs[] = [
-            'label' => Html::button(new Icon('plus'), ['class' => 'btn btn-primary btn-xs']),
-            'items' => $dropDownItems,
-        ];
-        $dropDownItems = null;
+        $tabs = $this->buildTabsArray($availableGroups, $attachedGroups);
         echo $this->render(
             $this->viewFile,
             [
