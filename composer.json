@@ -20,7 +20,7 @@
         "devgroup/yii2-multilingual": "*",
         "arogachev/yii2-sortable": "^0.1.5",
         "kartik-v/yii2-widget-select2": "^2.0.0",
-        "kolyunya/yii2-map-input-widget": "^1.1"
+        "hector68/yii2-map-input-widget": "^2.0"
     },
     "require-dev": {
         "phpunit/phpunit": "~4.0",

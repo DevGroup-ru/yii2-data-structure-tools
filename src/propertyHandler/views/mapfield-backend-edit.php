@@ -6,10 +6,9 @@
  * @var yii\web\View $this
  */
 
-use kolyunya\yii2\widgets\MapInputWidget;
+use hector68\yii2\widgets\MapInputWidget;
 use yii\helpers\Json;
 use yii\widgets\ActiveForm;
-
 
 
 try {
@@ -17,7 +16,6 @@ try {
 } catch (Exception $e) {
     $data = null;
 }
-
 
 echo (new ActiveForm())
     ->field($model, $property->key)
@@ -38,20 +36,19 @@ echo (new ActiveForm())
         ]
     );
 $js = <<<JAVASCRIPT
-$('.kolyunya-map-input-widget').on(
+$('.hector68-map-input-widget').on(
 'makePoint',
 function(event) {
    event.pointString = event.pointString.replace(/%zoom%/g,  event.MapInputWidget.getMap().getZoom() );
 });
 
-$('.kolyunya-map-input-widget').on(
+$('.hector68-map-input-widget').on(
 'initializeAfter',
 function(event) {
-
   event.MapInputWidget.getMap().addListener(
     'zoom_changed',
     function(){
-          event.MapInputWidget.setPosition(null)
+          event.MapInputWidget.setPosition(event.MapInputWidget.getMap().marker.getPosition())
         }
     );
 }
