@@ -45,7 +45,7 @@ if ((int)$property->allow_multiple_values === 1) {
     Select2SortableBundle::register($this);
     $id = \yii\helpers\Html::getInputId($model, $property->key);
     $this->registerJs(<<<js
-    $('#$id').select2Sortable();
+    $('#$id').select2Sortable({bindOrder:"sortableStop"});
 js
     );
 
