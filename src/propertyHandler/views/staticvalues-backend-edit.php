@@ -12,27 +12,34 @@ use yii\widgets\ActiveForm;
 use kartik\select2\Select2;
 use yii\helpers\ArrayHelper;
 
+
 $dataQuery = $property->getStaticValues();
 
 if ((int)$property->allow_multiple_values === 1 && !empty($model->{$property->key})) {
     $dataQuery->orderBy([
-        new \yii\db\Expression('FIELD(id, '.implode(',', $model->{$property->key}).'), sort_order')
+        new \yii\db\Expression('FIELD(id, ' . implode(',', $model->{$property->key}) . '), sort_order')
     ]);
 }
 
-echo (new ActiveForm())
+echo Html::tag('div', (new ActiveForm())
     ->field($model, $property->key)
     ->widget(
         Select2::className(),
         [
             'data' => ArrayHelper::map($dataQuery->all(), 'id', 'name'),
-            'options' => ['placeholder' => 'Select a value ...'],
+            'options' => [
+                'placeholder' => 'Select a value ...',
+            ],
             'pluginOptions' => [
                 'allowClear' => true,
                 'multiple' => (int)$property->allow_multiple_values === 1
             ],
         ]
-    );
+    ),
+    [
+        'style' => 'overflow: auto;'
+    ]
+);
 
 if ((int)$property->allow_multiple_values === 1) {
     Select2SortableBundle::register($this);
