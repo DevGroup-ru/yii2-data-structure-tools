@@ -18,7 +18,7 @@ use yii\helpers\Html;
         $values = [''];
     }
     ?>
-    <div class="m-form__col multi-eav">
+    <div class="m-form__col multi-eav <?= $model->hasErrors($property->key) ? 'has-error' : '' ?>">
         <label for="<?= $inputId ?>-0">
             <?= $model->getAttributeLabel($property->key) ?>
             <button class="btn btn-info btn-xs" data-action="add-new-eav-input"><i class="fa fa-plus"></i></button>
@@ -43,6 +43,7 @@ use yii\helpers\Html;
                 </div>
             </div>
         <?php endforeach; ?>
+        <div class="help-block"><?= implode('<br />', $model->getErrors($property->key)) ?></div>
     </div>
 <?php else: ?>
     <?php echo (new ActiveForm())->field($model, $property->key); ?>
