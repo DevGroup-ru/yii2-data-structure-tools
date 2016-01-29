@@ -6,11 +6,25 @@ use DevGroup\DataStructure\helpers\PropertiesHelper;
 use DevGroup\DataStructure\models\Property;
 use DevGroup\DataStructure\models\StaticValue;
 use Yii;
-use yii\elasticsearch\Query;
-use yii\helpers\ArrayHelper;
+use yii\db\Query;
 
 class StaticValues extends AbstractPropertyStorage
 {
+    /**
+     * Get static value ids sql by property id(s).
+     * @param int | int[] $id
+     * @return string
+     */
+    protected function getStaticValueIdsSql($id)
+    {
+        return (new Query())
+            ->select('id')
+            ->from(StaticValue::tableName())
+            ->where(['property_id' => $id])
+            ->createCommand()
+            ->getRawSql();
+    }
+
     /**
      * @inheritdoc
      */
@@ -192,19 +206,38 @@ class StaticValues extends AbstractPropertyStorage
      */
     public function deleteProperties($models, $propertyIds)
     {
-        $subQuerySql = StaticValue::find()
-            ->select('id')
-            ->where(['property_id' => $propertyIds])
-            ->createCommand()
-            ->getRawSql();
+        $subQuerySql = $this->getStaticValueIdsSql($propertyIds);
         foreach ($models as $model) {
             $model->getDb()
                 ->createCommand()
                 ->delete(
                     $model->staticValuesBindingsTable(),
-                    'model_id = \'' . (int)$model->id . '\' AND static_value_id IN (' . $subQuerySql . ')'
+                    'model_id = \'' . (int) $model->id . '\' AND static_value_id IN (' . $subQuerySql . ')'
                 )
                 ->execute();
+        }
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function afterPropertyDelete(Property &$property)
+    {
+        $classNames = static::getApplicablePropertyModelClassNames($property->id);
+        $subQuerySql = $this->getStaticValueIdsSql($property->id);
+        foreach ($classNames as $className) {
+            $className::getDb()
+                ->createCommand()
+                ->delete(
+                    $className::staticValuesBindingsTable(),
+                    'static_value_id IN (' . $subQuerySql . ')'
+                )
+                ->execute();
+        }
+        // This foreach is required for translation deleting
+        $staticValues = StaticValue::findAll(['property_id' => $property->id]);
+        foreach ($staticValues as $staticValue) {
+            $staticValue->delete();
         }
     }
 }
