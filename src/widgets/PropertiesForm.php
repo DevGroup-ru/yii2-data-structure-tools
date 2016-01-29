@@ -7,6 +7,7 @@ use DevGroup\DataStructure\models\Property;
 use DevGroup\DataStructure\models\PropertyPropertyGroup;
 use DevGroup\DataStructure\propertyHandler\AbstractPropertyHandler;
 use DevGroup\DataStructure\traits\PropertiesTrait;
+use kartik\select2\Select2;
 use rmrevin\yii\fontawesome\component\Icon;
 use yii\base\Exception;
 use yii\base\Widget;
@@ -44,22 +45,13 @@ class PropertiesForm extends Widget
      */
     protected function buildTabsArray($availableGroups, $attachedGroups)
     {
-        $dropDownItems = [];
+        $addGroupItems = [];
         $tabs = [];
         foreach ($availableGroups as $id => $name) {
+            if(!in_array($id, $attachedGroups)) {
+                $addGroupItems[$id] = $name;
+            }
             $isAttached = in_array($id, $attachedGroups);
-            $dropDownItems[] = [
-                'content' => '',
-                'label' => $name,
-                'url' => '#' . $id,
-                'linkOptions' => [
-                    'data-group-id' => $id,
-                    'data-action' => 'add-property-group',
-                ],
-                'options' => [
-                    'class' => $isAttached ? 'hidden' : null,
-                ],
-            ];
             if ($isAttached) {
                 $content = '';
                 /** @var Property[] $properties */
@@ -94,10 +86,26 @@ class PropertiesForm extends Widget
                 ];
             }
         }
+
         $tabs[] = [
-            'label' => Html::button(new Icon('plus'), ['class' => 'btn btn-primary btn-xs']),
-            'items' => $dropDownItems,
+            'label' => Select2::widget([
+                'data' => $addGroupItems,
+                'name' => 'plus-group',
+                'options' => [
+                    'onchange' => '$(this).data({"action":"add-property-group","group-id":this.value});  addGroup($(this));',
+                    'placeholder' => '(+) Add group',
+                    'style' => [
+                        'min-width' => '100px'
+                    ]
+                ],
+                'pluginOptions' => [
+                    'allowClear' => true
+                ],
+            ]),
+            'url' => '#',
+
         ];
+
         return $tabs;
     }
 
