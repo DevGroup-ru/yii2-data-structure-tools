@@ -38,7 +38,7 @@ class StaticValues extends AbstractPropertyHandler
             ];
         } else {
             return [
-                [$key, 'filter', 'skipOnEmpty' => true,'filter' => 'intval'],
+                [$key, 'filter', 'skipOnEmpty' => true, 'filter' => 'intval'],
                 $this->existenceValidation($property),
             ];
         }
@@ -71,19 +71,21 @@ class StaticValues extends AbstractPropertyHandler
      */
     public static function onPropertyEditForm(ModelEditForm $event)
     {
-        $view = $event->getView();
-        $model = $event->model;
-        $staticValue = new StaticValue($model);
-        $staticValue->setScenario('search');
-        $dataProvider = $staticValue->search($model->id, \Yii::$app->request->get());
+        if (!$event->model->isNewRecord) {
+            $view = $event->getView();
+            $model = $event->model;
+            $staticValue = new StaticValue($model);
+            $staticValue->setScenario('search');
+            $dataProvider = $staticValue->search($model->id, \Yii::$app->request->get());
 
-        echo $view->render(
-            '_static-values-grid',
-            [
-                'property' => $model,
-                'staticValue' => $staticValue,
-                'dataProvider' => $dataProvider,
-            ]
-        );
+            echo $view->render(
+                '_static-values-grid',
+                [
+                    'property' => $model,
+                    'staticValue' => $staticValue,
+                    'dataProvider' => $dataProvider,
+                ]
+            );
+        }
     }
 }
