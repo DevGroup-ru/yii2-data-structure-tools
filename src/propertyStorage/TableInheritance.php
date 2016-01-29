@@ -203,27 +203,6 @@ class TableInheritance extends AbstractPropertyStorage
     }
 
     /**
-     * @inheritdoc
-     */
-    public function beforePropertyDelete(Property &$property)
-    {
-        /** @var \yii\db\ActiveRecord|\DevGroup\DataStructure\traits\PropertiesTrait|\DevGroup\DataStructure\behaviors\HasProperties $applicableModel */
-        $applicableModel = PropertiesHelper::classNameForApplicablePropertyModelId($property->applicable_property_model_id);
-        $tableName = $applicableModel::tableInheritanceTable();
-        $db = $applicableModel::getDb();
-        /** @var \yii\db\Command $command */
-        $command = $db->createCommand()->dropColumn(
-            $tableName,
-            $property->key
-        );
-        // no exception here - is good result
-        // we don't catch exception here so user will se it as it is(ie. "Column 'foo' does not exist")
-        $command->execute();
-
-        return true;
-    }
-
-    /**
      * @param \yii\db\Connection $db
      * @param integer $type
      * @return string
@@ -281,6 +260,26 @@ class TableInheritance extends AbstractPropertyStorage
                     ]
                 )->execute();
             }
+        }
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function afterPropertyDelete(Property &$property)
+    {
+        $classNames = static::getApplicablePropertyModelClassNames($property->id);
+        foreach ($classNames as $className) {
+            $schema = $className::getDb()
+                ->getSchema()
+                ->getTableSchema($className::tableInheritanceTable());
+            if ($schema === null || $property->key === 'model_id' || in_array($property->key, $schema->columnNames) === false) {
+                continue;
+            }
+            $className::getDb()
+                ->createCommand()
+                ->dropColumn($className::tableInheritanceTable(), $property->key)
+                ->execute();
         }
     }
 }
