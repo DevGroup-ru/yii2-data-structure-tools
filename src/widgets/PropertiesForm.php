@@ -119,8 +119,6 @@ class PropertiesForm extends Widget
         }
         PropertiesFormAsset::register($this->getView());
         $availableGroups = PropertiesHelper::getAvailablePropertyGroupsList(get_class($this->model));
-        $models = [$this->model];
-        PropertiesHelper::fillProperties($models);
         $attachedGroups = $this->model->propertyGroupIds;
         $tabs = $this->buildTabsArray($availableGroups, $attachedGroups);
         echo $this->render(
