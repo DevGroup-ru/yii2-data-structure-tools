@@ -14,11 +14,7 @@ abstract class AbstractPropertyHandler extends Widget
     const BACKEND_EDIT = 'backend-edit';
     const FRONTEND_RENDER = 'frontend-render';
     const FRONTEND_EDIT = 'frontend-edit';
-
-    public function __construct()
-    {
-
-    }
+    
 
     public function afterFind($model, $attribute)
     {
