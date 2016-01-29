@@ -4,9 +4,12 @@ namespace DevGroup\DataStructure\propertyStorage;
 
 use DevGroup\DataStructure\behaviors\HasProperties;
 use DevGroup\DataStructure\models\Property;
+use DevGroup\DataStructure\models\PropertyGroup;
+use DevGroup\DataStructure\models\PropertyPropertyGroup;
 use DevGroup\DataStructure\traits\PropertiesTrait;
 use Yii;
 use yii\db\ActiveRecord;
+use yii\db\Query;
 use yii\helpers\ArrayHelper;
 
 /**
@@ -19,6 +22,33 @@ use yii\helpers\ArrayHelper;
  */
 abstract class AbstractPropertyStorage
 {
+    /**
+     * @var ActiveRecord[] | HasProperties[] | PropertiesTrait[] Applicable property model class names identity map by property id
+     */
+    protected static $applicablePropertyModelClassNames = [];
+
+    /**
+     * Get applicable property model class names by property id.
+     * @param int $id
+     * @return ActiveRecord[] | HasProperties[] | PropertiesTrait[]
+     */
+    protected static function getApplicablePropertyModelClassNames($id)
+    {
+        if (isset(static::$applicablePropertyModelClassNames[$id]) === false) {
+            $subQuery = PropertyPropertyGroup::find()
+                ->from(PropertyPropertyGroup::tableName() . ' ppg')
+                ->select('pg.applicable_property_model_id')
+                ->join('INNER JOIN', PropertyGroup::tableName() . ' pg', 'pg.id = ppg.property_group_id')
+                ->where(['ppg.property_id' => $id])
+                ->createCommand()->getRawSql();
+            static::$applicablePropertyModelClassNames[$id] = (new Query())
+                ->select('class_name')
+                ->from('{{%applicable_property_models}}')
+                ->where('id IN (' . $subQuery . ')')->column();
+        }
+        return static::$applicablePropertyModelClassNames[$id];
+    }
+    
     /**
      * @var int ID of storage in property_storage table
      */
