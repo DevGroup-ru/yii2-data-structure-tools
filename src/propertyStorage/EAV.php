@@ -4,7 +4,6 @@ namespace DevGroup\DataStructure\propertyStorage;
 
 use DevGroup\DataStructure\helpers\PropertiesHelper;
 use DevGroup\DataStructure\models\Property;
-use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
 use yii\db\Query;
 use yii\helpers\ArrayHelper;
@@ -248,6 +247,23 @@ class EAV extends AbstractPropertyStorage
             $model->getDb()
                 ->createCommand()
                 ->delete($model->eavTable(), ['model_id' => $model->id, 'property_id' => (array)$propertyIds])
+                ->execute();
+        }
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function afterPropertyDelete(Property &$property)
+    {
+        $classNames = static::getApplicablePropertyModelClassNames($property->id);
+        foreach ($classNames as $className) {
+            $className::getDb()
+                ->createCommand()
+                ->delete(
+                    $className::eavTable(),
+                    ['property_id' => $property->id]
+                )
                 ->execute();
         }
     }
