@@ -4,6 +4,7 @@ namespace DevGroup\DataStructure\Properties\controllers;
 
 use DevGroup\AdminUtils\controllers\BaseController;
 use DevGroup\DataStructure\models\PropertyGroup;
+use DevGroup\DataStructure\Properties\actions\DeleteProperty;
 use DevGroup\DataStructure\Properties\actions\DeletePropertyGroup;
 use DevGroup\DataStructure\Properties\actions\DeleteStaticValue;
 use DevGroup\DataStructure\Properties\actions\EditProperty;
@@ -42,11 +43,14 @@ class ManageController extends BaseController
                 'class' => EditProperty::className(),
             ],
             'edit-static-value' => [
-                'class' => EditStaticValue::className()
+                'class' => EditStaticValue::className(),
             ],
             'delete-static-value' => [
-                'class' => DeleteStaticValue::className()
-            ]
+                'class' => DeleteStaticValue::className(),
+            ],
+            'delete-property' => [
+                'class' => DeleteProperty::className(),
+            ],
         ];
     }
 
@@ -81,10 +85,5 @@ class ManageController extends BaseController
         /** @var PropertyGroup $group */
         $group = PropertyGroup::findOne($groupId);
         return $model->deletePropertyGroup($group);
-    }
-
-    public function actionRender()
-    {
-        //
     }
 }
