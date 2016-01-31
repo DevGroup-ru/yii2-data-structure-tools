@@ -25,16 +25,17 @@ use yii\web\View;
  */
 class Module extends BaseModule implements BootstrapInterface
 {
-    public $controllerMap = [
-        'sort' => [
-            'class' => SortController::class,
-        ]
-    ];
-
-
     public function init()
     {
         parent::init();
+
+        if (Yii::$app instanceof \yii\web\Application) {
+            $this->controllerMap = [
+                'sort' => [
+                    'class' => SortController::class,
+                ]
+            ];
+        }
 
         ModelEditForm::on(
             View::className(),
