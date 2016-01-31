@@ -33,7 +33,7 @@ use yii\web\ServerErrorHttpException;
  * @property string $slug
  * @property PropertyGroup[] $propertyGroups
  * @property PropertyGroup $defaultPropertyGroup
- * @property StaticValue $staticValues
+ * @property StaticValue[] $staticValues
  *
  * @package DevGroup\DataStructure\models
  */

@@ -145,7 +145,7 @@ class HasProperties extends Behavior
         if ($id === false) {
             throw new Exception("Property id for key $name not found");
         }
-        if (is_array($value) === false) {
+        if (is_array($value) === false && empty($value) === false) {
             /** @var Property $property */
             $property = Property::findById($id);
             if ($property->allow_multiple_values === true) {
@@ -160,7 +160,7 @@ class HasProperties extends Behavior
                 $diffCount = count(array_diff_assoc($owner->propertiesValues[$id], $value)) > 0;
                 $changed = $diffCount || count($owner->propertiesValues[$id]) != count($value);
             } else {
-                $changed = $value !== $owner->propertiesValues[$id];
+                $changed = $value != $owner->propertiesValues[$id];
             }
         }
         if ($changed === true) {

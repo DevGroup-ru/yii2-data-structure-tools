@@ -114,13 +114,11 @@ class EAV extends AbstractPropertyStorage
             return true;
         }
 
-        $deleteModelIds = [];
-        $deletePropertyIds = [];
         $insertRows = [];
+        $deleteRows = [];
 
         /** @var ActiveRecord|\DevGroup\DataStructure\traits\PropertiesTrait $firstModel */
         $firstModel = reset($models);
-
         foreach ($models as $model) {
             foreach ($model->changedProperties as $propertyId) {
                 /** @var Property $propertyModel */
@@ -129,6 +127,11 @@ class EAV extends AbstractPropertyStorage
                     continue;
                 }
                 if ($propertyModel->storage_id === $this->storageId) {
+                    if (isset($deleteRows[$model->id])) {
+                        $deleteRows[$model->id][] = $propertyId;
+                    } else {
+                        $deleteRows[$model->id] = [$propertyId];
+                    }
                     $newRows = $this->saveModelPropertyRow($model, $propertyModel);
                     foreach ($newRows as $row) {
                         $insertRows[] = $row;
@@ -137,30 +140,20 @@ class EAV extends AbstractPropertyStorage
             }
         }
 
-
-//        $cmd = $firstModel->getDb()->getQueryBuilder();
-//        $params=[];
-        /**
-         *
-         *
-         *
-         *
-         * @todo
-         * Тут должны быть связки типа (model_id=1 and property_id in (1,2,3)) OR (model_id=2 ANd property_id in (3,4,5))
-         *
-         *
-         *
-         */
-//        $cmd = $cmd->delete(
-//            $firstModel->eavTable(),
-//            [
-//                'model_id'    => $deleteModelIds,
-//                'property_id' => $deletePropertyIds,
-//            ],
-//            $params
-//        );
-//
-//        $firstModel->getDb()->createCommand($cmd)->execute();
+        if (count($deleteRows) > 0) {
+            if (count($deleteRows) > 1) {
+                $condition = ['OR'];
+                foreach ($deleteRows as $modelId => $propertyIds) {
+                    $condition = array_merge($condition, [['model_id' => $modelId, 'property_id' => $propertyIds]]);
+                }
+            } else {
+                $condition = [];
+                foreach ($deleteRows as $modelId => $propertyIds) {
+                    $condition = ['model_id' => $modelId, 'property_id' => $propertyIds];
+                }
+            }
+            $firstModel->getDb()->createCommand()->delete($firstModel->eavTable(), $condition)->execute();
+        }
 
         if (count($insertRows) === 0) {
             return true;
@@ -204,8 +197,8 @@ class EAV extends AbstractPropertyStorage
                 $modelId,
                 $propertyId,
                 $index,
-                $valueField === 'value_integer' ? $value : 0,
-                $valueField === 'value_float' ? $value : 0,
+                $valueField === 'value_integer' ? (int) $value : 0,
+                $valueField === 'value_float' ? (float) $value : 0,
                 $valueField === 'value_string' ? $value : '',
                 $valueField === 'value_text' ? $value : '',
             ];
@@ -245,5 +238,33 @@ class EAV extends AbstractPropertyStorage
         }
     }
 
+    /**
+     * @inheritdoc
+     */
+    public function deleteProperties($models, $propertyIds)
+    {
+        foreach ($models as $model) {
+            $model->getDb()
+                ->createCommand()
+                ->delete($model->eavTable(), ['model_id' => $model->id, 'property_id' => (array)$propertyIds])
+                ->execute();
+        }
+    }
 
+    /**
+     * @inheritdoc
+     */
+    public function afterPropertyDelete(Property &$property)
+    {
+        $classNames = static::getApplicablePropertyModelClassNames($property->id);
+        foreach ($classNames as $className) {
+            $className::getDb()
+                ->createCommand()
+                ->delete(
+                    $className::eavTable(),
+                    ['property_id' => $property->id]
+                )
+                ->execute();
+        }
+    }
 }

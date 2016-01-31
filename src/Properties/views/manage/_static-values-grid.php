@@ -45,7 +45,7 @@ use yii\widgets\Pjax;
             [
                 'class' => SortableColumn::className(),
                 'template' => '<div class="sortable-section">{moveWithDragAndDrop}</div>',
-                'needConfirmationOnMove' => false,
+                'confirmMove' => false,
                 'baseUrl' => Url::to(['/properties/sort']) . '/',
                 'gridContainerId' => $pjax->id,
                 'visible' => true
@@ -62,6 +62,11 @@ use yii\widgets\Pjax;
                         'icon' => 'pencil',
                         'class' => 'btn-primary',
                         'label' => Yii::t('app', 'Edit'),
+                        'options' => [
+                            'data' => [
+                                'pjax' => 'false'
+                            ]
+                        ]
                     ],
                     'delete' => [
                         'url' => 'delete-static-value',
@@ -69,7 +74,10 @@ use yii\widgets\Pjax;
                         'class' => 'btn-danger',
                         'label' => Yii::t('app', 'Delete'),
                         'options' => [
-                            'data-action' => 'delete',
+                            'data' => [
+                                'pjax' => 'false',
+                                'action' => 'delete'
+                            ]
                         ],
 
                     ],

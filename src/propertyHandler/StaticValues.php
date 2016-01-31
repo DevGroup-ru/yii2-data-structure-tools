@@ -5,6 +5,9 @@ namespace DevGroup\DataStructure\propertyHandler;
 use DevGroup\AdminUtils\events\ModelEditForm;
 use DevGroup\DataStructure\models\Property;
 use DevGroup\DataStructure\models\StaticValue;
+use yii\bootstrap\ActiveForm;
+use yii\helpers\ArrayHelper;
+use yii\helpers\Html;
 
 class StaticValues extends AbstractPropertyHandler
 {
@@ -30,12 +33,12 @@ class StaticValues extends AbstractPropertyHandler
         $key = $property->key;
         if ($property->allow_multiple_values) {
             return [
-                [$key, 'each', 'rule' => ['filter', 'filter' => 'intval']],
+                [$key, 'each', 'skipOnEmpty' => true, 'rule' => ['filter', 'filter' => 'intval']],
                 $this->existenceValidation($property),
             ];
         } else {
             return [
-                [$key, 'filter', 'filter' => 'intval'],
+                [$key, 'filter', 'skipOnEmpty' => true, 'filter' => 'intval'],
                 $this->existenceValidation($property),
             ];
         }
@@ -56,15 +59,11 @@ class StaticValues extends AbstractPropertyHandler
             'exist',
             'targetClass' => StaticValue::className(),
             'targetAttribute' => 'id',
-            'allowArray' => true,
+            'allowArray' => $property->allow_multiple_values,
             'filter' => ['property_id' => $property->id],
+            'skipOnEmpty' => true,
         ];
 
-    }
-
-    public function render($model, $attribute, $case)
-    {
-        // TODO: Implement render() method.
     }
 
     /**
@@ -72,19 +71,21 @@ class StaticValues extends AbstractPropertyHandler
      */
     public static function onPropertyEditForm(ModelEditForm $event)
     {
-        $view = $event->getView();
-        $model = $event->model;
-        $staticValue = new StaticValue($model);
-        $staticValue->setScenario('search');
-        $dataProvider = $staticValue->search($model->id, \Yii::$app->request->get());
+        if (!$event->model->isNewRecord) {
+            $view = $event->getView();
+            $model = $event->model;
+            $staticValue = new StaticValue($model);
+            $staticValue->setScenario('search');
+            $dataProvider = $staticValue->search($model->id, \Yii::$app->request->get());
 
-        echo $view->render(
-            '_static-values-grid',
-            [
-                'property' => $model,
-                'staticValue' => $staticValue,
-                'dataProvider' => $dataProvider,
-            ]
-        );
+            echo $view->render(
+                '_static-values-grid',
+                [
+                    'property' => $model,
+                    'staticValue' => $staticValue,
+                    'dataProvider' => $dataProvider,
+                ]
+            );
+        }
     }
 }

@@ -4,11 +4,15 @@ namespace DevGroup\DataStructure\helpers;
 
 use DevGroup\DataStructure\models\Property;
 use DevGroup\DataStructure\models\PropertyGroup;
+use DevGroup\DataStructure\models\PropertyPropertyGroup;
+use phpDocumentor\Reflection\DocBlock\Tag\PropertyReadTag;
 use Yii;
 use yii\base\Exception;
 use yii\base\UnknownPropertyException;
+use yii\caching\TagDependency;
 use yii\db\Query;
 use yii\helpers\ArrayHelper;
+use yii\helpers\VarDumper;
 use yii\web\ServerErrorHttpException;
 
 class PropertiesHelper
@@ -114,6 +118,10 @@ class PropertiesHelper
 
             Yii::endProfile('Fill properties: ' . $storage->className());
         }
+        foreach ($models as $model) {
+            $model->changedProperties = [];
+            $model->propertiesValuesChanged = false;
+        }
         Yii::endProfile('Fill properties for models');
         return $models;
     }
@@ -176,9 +184,11 @@ class PropertiesHelper
         }
 
         $tags = [
-            $firstModel->commonTag(),
             PropertyGroup::commonTag(),
         ];
+        foreach ($models as &$model) {
+            $tags[] = $model->objectTag();
+        }
 
         $binding_rows = Yii::$app->cache->lazy(function () use ($firstModel, $models) {
             $query = new Query();
@@ -261,6 +271,60 @@ class PropertiesHelper
                 // if there were propertiesIds filled - refresh them
                 $model->ensurePropertiesAttributes(true);
             }
+            TagDependency::invalidate($model->getTagDependencyCacheComponent(), [$model->objectTag()]);
+        }
+        return true;
+    }
+
+    /**
+     * @param \yii\db\ActiveRecord[]|\DevGroup\DataStructure\traits\PropertiesTrait[] $models
+     * @param PropertyGroup $propertyGroup
+     * @return bool
+     */
+    public static function unbindGroupFromModels(&$models, PropertyGroup $propertyGroup)
+    {
+        foreach ($models as $model) {
+            if (in_array($propertyGroup->id, $model->propertyGroupIds) === false) {
+                // maybe it'll be better to throw special exception in such case
+                return false;
+            }
+            $query = (new Query())
+                ->select('property_id')
+                ->from(PropertyPropertyGroup::tableName())
+                ->where(
+                    [
+                        'property_group_id' => $propertyGroup->id,
+                    ]
+                );
+            $subQuerySql = (new Query())
+                ->select('property_id')
+                ->from($model->bindedPropertyGroupsTable() . ' opg')
+                ->innerJoin(
+                    PropertyPropertyGroup::tableName() . ' ppg',
+                    'opg.property_group_id = ppg.property_group_id'
+                )
+                ->groupBy('property_id')
+                ->having('COUNT(*) = 1')
+                ->where(
+                    [
+                        'model_id' => $model->id,
+                    ]
+                )->createCommand()->getRawSql();
+            $propertyIdsToDelete = $query->andWhere('property_id IN (' . $subQuerySql . ')')->column();
+            $storageHandlers = PropertyStorageHelper::storageHandlers();
+            foreach ($storageHandlers as $handler) {
+                $handler->deleteProperties($models, $propertyIdsToDelete);
+            }
+            $model->getDb()->createCommand()
+                ->delete(
+                    $model->bindedPropertyGroupsTable(),
+                    [
+                        'model_id' => $model->id,
+                        'property_group_id' => $propertyGroup->id,
+                    ]
+                )
+                ->execute();
+            TagDependency::invalidate($model->getTagDependencyCacheComponent(), [$model->objectTag()]);
         }
         return true;
     }
@@ -308,16 +372,44 @@ class PropertiesHelper
     /**
      * @param \yii\db\ActiveRecord|\DevGroup\DataStructure\traits\PropertiesTrait $model
      * @param string $attribute
-     * @throws UnknownPropertyException
-     * @throws ServerErrorHttpException
-     * @return Property
+     * @return Property | null
      */
     public static function getPropertyModel($model, $attribute)
     {
         $propertyId = array_search($attribute, $model->propertiesAttributes);
         if ($propertyId === false) {
-            throw new UnknownPropertyException("Attribute $attribute not found in model ".$model->className());
+            return null;
         }
         return Property::findById($propertyId, false);
+    }
+
+    /**
+     * Get available property groups by class name.
+     * @param string $className
+     * @return array
+     * @throws Exception
+     */
+    public static function getAvailablePropertyGroupsList($className)
+    {
+        $applicablePropertyModelId = PropertiesHelper::applicablePropertyModelId($className);
+        $availableGroups = Yii::$app->cache->lazy(
+            function () use ($applicablePropertyModelId) {
+                return ArrayHelper::map(
+                    PropertyGroup::find()
+                        ->where(['applicable_property_model_id' => $applicablePropertyModelId])
+                        ->orderBy('sort_order ASC')
+                        ->all(),
+                    'id',
+                    function($model) {
+                        return !empty($model->name) ? $model->name : $model->internal_name;
+                    }
+                );
+
+            },
+            'AvailablePropertyGroupsList: ' . $applicablePropertyModelId,
+            86400,
+            PropertyGroup::commonTag()
+        );
+        return $availableGroups;
     }
 }
