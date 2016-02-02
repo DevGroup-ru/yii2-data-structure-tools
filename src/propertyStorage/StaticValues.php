@@ -78,24 +78,27 @@ class StaticValues extends AbstractPropertyStorage
         $modelIdToArrayIndex = PropertiesHelper::idToArrayIndex($models);
 
         foreach ($static_values_rows as $modelId => $propertyRows) {
-            $model = &$models[$modelIdToArrayIndex[$modelId]];
 
-            foreach ($propertyRows as $propertyId => $values) {
-                $property = Property::findById($propertyId);
-                $key = $property->key;
-                $type = $property->data_type;
+            if (isset($modelIdToArrayIndex[$modelId]) && isset($models[$modelIdToArrayIndex[$modelId]])) {
+                $model = &$models[$modelIdToArrayIndex[$modelId]];
 
-                array_walk(
-                    $values,
-                    function (&$value) use ($type) {
-                        $value = intval($value);
+                foreach ($propertyRows as $propertyId => $values) {
+                    $property = Property::findById($propertyId);
+                    $key = $property->key;
+                    $type = $property->data_type;
+
+                    array_walk(
+                        $values,
+                        function (&$value) use ($type) {
+                            $value = intval($value);
+                        }
+                    );
+
+                    if ($property->allow_multiple_values === false) {
+                        $values = reset($values);
                     }
-                );
-
-                if ($property->allow_multiple_values === false) {
-                    $values = reset($values);
+                    $model->$key = $values;
                 }
-                $model->$key = $values;
             }
         }
     }
@@ -212,7 +215,7 @@ class StaticValues extends AbstractPropertyStorage
                 ->createCommand()
                 ->delete(
                     $model->staticValuesBindingsTable(),
-                    'model_id = \'' . (int) $model->id . '\' AND static_value_id IN (' . $subQuerySql . ')'
+                    'model_id = \'' . (int)$model->id . '\' AND static_value_id IN (' . $subQuerySql . ')'
                 )
                 ->execute();
         }

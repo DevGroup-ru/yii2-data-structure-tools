@@ -5,10 +5,8 @@ namespace DevGroup\DataStructure\traits;
 use DevGroup\DataStructure\helpers\PropertiesHelper;
 use DevGroup\DataStructure\models\Property;
 use DevGroup\DataStructure\models\PropertyGroup;
-use DevGroup\TagDependencyHelper\TagDependencyTrait;
-use yii\caching\TagDependency;
-use yii\db\ActiveRecord;
 use yii\helpers\ArrayHelper;
+use yii\web\Application;
 use yii\web\ServerErrorHttpException;
 
 /**
@@ -28,7 +26,7 @@ trait PropertiesTrait
     /** @var null|integer[] Array of properties ids */
     public $propertiesIds = null;
 
-    /** @var null|string[] Array of properties attributes names indexed by property ids  */
+    /** @var null|string[] Array of properties attributes names indexed by property ids */
     public $propertiesAttributes = null;
 
     /** @var array Array of properties values indexed by property id */
@@ -60,7 +58,7 @@ trait PropertiesTrait
     public function ensurePropertyGroupIds()
     {
         if ($this->propertyGroupIds === null) {
-            $array = [ &$this ];
+            $array = [&$this];
             PropertiesHelper::fillPropertyGroups($array);
         }
     }
@@ -189,10 +187,14 @@ trait PropertiesTrait
      */
     public function addPropertyGroup(PropertyGroup $propertyGroup)
     {
-        $array = [ &$this ];
+        $array = [&$this];
         return PropertiesHelper::bindGroupToModels($array, $propertyGroup);
     }
 
+    /**
+     * @param PropertyGroup $propertyGroup
+     * @return bool
+     */
     public function deletePropertyGroup(PropertyGroup $propertyGroup)
     {
         $array = [$this];
@@ -207,20 +209,18 @@ trait PropertiesTrait
     public function propertiesRules()
     {
         $rules = [];
-        if ($this->getIsNewRecord()) {
-            return [];
-        }
-
         $this->ensurePropertiesAttributes();
 
-        foreach ($this->propertiesIds as $propertyId) {
-            /** @var Property $property */
-            $property = Property::findById($propertyId);
-            $handler = $property->handler();
+        if ($this->propertiesIds) {
+            foreach ($this->propertiesIds as $propertyId) {
+                /** @var Property $property */
+                $property = Property::findById($propertyId);
+                $handler = $property->handler();
 
-            $rules = ArrayHelper::merge($rules, $handler->getValidationRules($property));
+                $rules = ArrayHelper::merge($rules, $handler->getValidationRules($property));
+            }
         }
-
         return $rules;
     }
+
 }

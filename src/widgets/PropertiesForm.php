@@ -14,6 +14,8 @@ use yii\base\Widget;
 use yii\db\ActiveRecord;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
+use yii\web\Application;
+use yii\widgets\Pjax;
 
 class PropertiesForm extends Widget
 {
@@ -48,7 +50,7 @@ class PropertiesForm extends Widget
         $addGroupItems = [];
         $tabs = [];
         foreach ($availableGroups as $id => $name) {
-            if(!in_array($id, $attachedGroups)) {
+            if (!in_array($id, $attachedGroups)) {
                 $addGroupItems[$id] = $name;
             }
             $isAttached = in_array($id, $attachedGroups);
@@ -82,7 +84,13 @@ class PropertiesForm extends Widget
                                 'data-action' => 'delete-property-group',
                             ]
                         ),
-                    'content' => $content,
+                    'content' => $content . Html::hiddenInput(
+                            'propertyGroupIds[]',
+                            $id,
+                            [
+                                'class' => 'property-group-ids',
+                            ]
+                        ),
                 ];
             }
         }
@@ -92,7 +100,6 @@ class PropertiesForm extends Widget
                 'data' => $addGroupItems,
                 'name' => 'plus-group',
                 'options' => [
-                    'onchange' => '$(this).data({"action":"add-property-group","group-id":this.value});  addGroup($(this));',
                     'placeholder' => '(+) Add group',
                     'style' => [
                         'min-width' => '100px'
@@ -119,7 +126,9 @@ class PropertiesForm extends Widget
         }
         PropertiesFormAsset::register($this->getView());
         $availableGroups = PropertiesHelper::getAvailablePropertyGroupsList(get_class($this->model));
-        $attachedGroups = $this->model->propertyGroupIds;
+        $models = [$this->model];
+        PropertiesHelper::fillProperties($models);
+        $attachedGroups = $this->getAttachedGroups();
         $tabs = $this->buildTabsArray($availableGroups, $attachedGroups);
         echo $this->render(
             $this->viewFile,
@@ -130,4 +139,10 @@ class PropertiesForm extends Widget
             ]
         );
     }
+
+    public function getAttachedGroups()
+    {
+        return $this->model->propertyGroupIds;
+    }
+
 }

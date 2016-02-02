@@ -7,6 +7,7 @@ use DevGroup\DataStructure\models\Property;
 use Yii;
 use yii\db\ActiveRecord;
 use yii\db\Expression;
+use yii\db\Query;
 use yii\db\Schema;
 use yii\helpers\ArrayHelper;
 
@@ -25,11 +26,10 @@ class TableInheritance extends AbstractPropertyStorage
         $firstModel = reset($models);
 
         $tableInheritanceRows = Yii::$app->cache->lazy(function () use ($firstModel, $models) {
-            $rows =
-                $firstModel->getDb()->createCommand(
-                    'SELECT * FROM ' . $firstModel->tableInheritanceTable() . ' WHERE ' .
-                    PropertiesHelper::getInCondition($models)
-                )->queryAll();
+            $rows = (new Query())->select('*')
+                ->from($firstModel->tableInheritanceTable())
+                ->where(PropertiesHelper::getInCondition($models))
+                ->all($firstModel->getDb());
 
             return ArrayHelper::map($rows, 'model_id', function ($item) {
                 return $item;

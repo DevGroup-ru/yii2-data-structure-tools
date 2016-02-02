@@ -20,7 +20,7 @@ class HasProperties extends Behavior
     /** @var bool Should properties be automatically fetched after find */
     public $autoFetchProperties = false;
 
-    /** @var bool Should properties be automatically saved when model saves  */
+    /** @var bool Should properties be automatically saved when model saves */
     public $autoSaveProperties = false;
 
     /**
@@ -178,11 +178,25 @@ class HasProperties extends Behavior
     {
         /** @var \yii\db\ActiveRecord|\DevGroup\DataStructure\traits\PropertiesTrait $owner */
         $owner = $this->owner;
+        $groups = $owner->propertyGroupIds;
+        $owner->propertyGroupIds = null;
+
+        if ($groups) {
+            foreach ($groups as $group_id) {
+                /** @var PropertyGroup $group */
+                $group = PropertyGroup::findOne(['id' => $group_id]);
+                if($group) {
+                    $owner->addPropertyGroup($group);
+                }
+            }
+        }
+
         $handlers = PropertyStorageHelper::storageHandlers();
-        $models = [ &$owner ];
+        $models = [&$owner];
         foreach ($handlers as $handler) {
             $handler->modelsInserted($models);
         }
+
         $this->afterSave();
     }
 

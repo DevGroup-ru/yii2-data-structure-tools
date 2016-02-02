@@ -57,8 +57,8 @@ class PropertiesHelper
     /**
      * Returns id of property_group_models record for requested classname
      *
-     * @param string      $className
-     * @param bool|false  $forceRefresh
+     * @param string $className
+     * @param bool|false $forceRefresh
      *
      * @return integer
      * @throws \yii\base\Exception
@@ -77,8 +77,8 @@ class PropertiesHelper
     /**
      * Returns class name of Model for which property or property_group model record is associated
      *
-     * @param string      $id
-     * @param bool|false  $forceRefresh
+     * @param string $id
+     * @param bool|false $forceRefresh
      *
      * @return string|false
      */
@@ -130,7 +130,7 @@ class PropertiesHelper
      * Generates cache key based on models array, model table name and postfix
      *
      * @param \yii\db\ActiveRecord[] $models
-     * @param string                 $postfix
+     * @param string $postfix
      *
      * @return string
      */
@@ -237,7 +237,14 @@ class PropertiesHelper
      */
     public static function getInCondition(&$models)
     {
-        return $condition = 'model_id in (' . implode(',', ArrayHelper::getColumn($models, 'id', false)) . ')';
+
+        $inArray = array_filter(
+            ArrayHelper::getColumn($models, 'id', false),
+            function ($val) {
+                return $val !== null;
+            }
+        );
+        return $inArray === [] ? [] : ['model_id' => $inArray];
     }
 
     /**
@@ -369,6 +376,7 @@ class PropertiesHelper
         }
         return $result;
     }
+
     /**
      * @param \yii\db\ActiveRecord|\DevGroup\DataStructure\traits\PropertiesTrait $model
      * @param string $attribute
@@ -400,7 +408,7 @@ class PropertiesHelper
                         ->orderBy('sort_order ASC')
                         ->all(),
                     'id',
-                    function($model) {
+                    function ($model) {
                         return !empty($model->name) ? $model->name : $model->internal_name;
                     }
                 );
