@@ -211,7 +211,7 @@ trait PropertiesTrait
         $rules = [];
         $this->ensurePropertiesAttributes();
 
-        if ($this->propertiesIds) {
+        if (empty($this->propertiesIds) === false) {
             foreach ($this->propertiesIds as $propertyId) {
                 /** @var Property $property */
                 $property = Property::findById($propertyId);

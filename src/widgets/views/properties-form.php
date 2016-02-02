@@ -6,7 +6,6 @@
  * @var $this \yii\web\View | \DevGroup\DataStructure\widgets\PropertiesForm
  */
 
-use yii\helpers\Json;
 use yii\helpers\Url;
 use yii\widgets\Pjax;
 
@@ -36,19 +35,17 @@ use yii\widgets\Pjax;
         ]
     ]
 );
-$widget->end();
-
 $id = $widget->id;
 $this->registerJs(<<<JAVASCRIPT
-jQuery(function () {
     var pg = new propertyGroup('$id');
-    jQuery('body')
+    jQuery('form[method="post"]')
         .on('change', '[name="plus-group"]', function () {
             pg.addGroup(jQuery(this).val())
         })
         .on('click', '[data-action="delete-property-group"]', function () {
             pg.deleteGroup(jQuery(this).data('group-id'));
         });
-});
 JAVASCRIPT
 );
+$widget->end();
+

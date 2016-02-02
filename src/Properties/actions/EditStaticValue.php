@@ -4,6 +4,7 @@ namespace DevGroup\DataStructure\Properties\actions;
 
 use DevGroup\AdminUtils\actions\BaseAdminAction;
 use DevGroup\DataStructure\models\StaticValue;
+use DevGroup\DataStructure\Properties\Module;
 use Yii;
 use yii\web\NotFoundHttpException;
 
@@ -39,7 +40,7 @@ class EditStaticValue extends BaseAdminAction
             }
 
             if ($model->save()) {
-                Yii::$app->session->setFlash('success', Yii::t('app', 'Static value saved.'));
+                Yii::$app->session->setFlash('success', Module::t('app', 'Static value saved.'));
 
                 return $this->controller->redirect([
                     'edit-static-value',

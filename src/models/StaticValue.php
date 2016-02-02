@@ -2,6 +2,7 @@
 namespace DevGroup\DataStructure\models;
 
 use arogachev\sortable\behaviors\numerical\ContinuousNumericalSortableBehavior;
+use DevGroup\DataStructure\Properties\Module;
 use DevGroup\Multilingual\behaviors\MultilingualActiveRecord;
 use DevGroup\Multilingual\traits\MultilingualTrait;
 use DevGroup\TagDependencyHelper\CacheableActiveRecord;
@@ -90,6 +91,21 @@ class StaticValue extends ActiveRecord
     public static function tableName()
     {
         return '{{%static_value}}';
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function attributeLabels()
+    {
+        return [
+            'id' => Module::t('app', 'ID'),
+            'property_id' => Module::t('app', 'Property ID'),
+            'sort_order' => Module::t('app', 'Sort Order'),
+            'name' => Module::t('app', 'Name'),
+            'description' => Module::t('app', 'Description'),
+            'slug' => Module::t('app', 'Slug'),
+        ];
     }
 
     /**

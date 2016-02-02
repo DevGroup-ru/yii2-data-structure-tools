@@ -3,6 +3,7 @@
 namespace DevGroup\DataStructure\models;
 
 use DevGroup\DataStructure\behaviors\PackedJsonAttributes;
+use DevGroup\DataStructure\Properties\Module;
 use DevGroup\TagDependencyHelper\CacheableActiveRecord;
 use DevGroup\TagDependencyHelper\TagDependencyTrait;
 use Yii;
@@ -63,10 +64,10 @@ class PropertyHandlers extends \yii\db\ActiveRecord
     public function attributeLabels()
     {
         return [
-            'id' => Yii::t('app', 'ID'),
-            'name' => Yii::t('app', 'Name'),
-            'sort_order' => Yii::t('app', 'Sort Order'),
-            'default_config' => Yii::t('app', 'Default Config'),
+            'id' => Module::t('app', 'ID'),
+            'name' => Module::t('app', 'Name'),
+            'sort_order' => Module::t('app', 'Sort Order'),
+            'default_config' => Module::t('app', 'Default Config'),
         ];
     }
 

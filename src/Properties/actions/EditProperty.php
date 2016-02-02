@@ -6,6 +6,7 @@ use DevGroup\AdminUtils\actions\BaseAdminAction;
 use DevGroup\AdminUtils\events\ModelEditAction;
 use DevGroup\DataStructure\models\Property;
 use DevGroup\DataStructure\models\PropertyGroup;
+use DevGroup\DataStructure\Properties\Module;
 use Yii;
 use yii\web\NotFoundHttpException;
 
@@ -97,7 +98,7 @@ class EditProperty extends BaseAdminAction
                 $this->controller->trigger($id === null ? self::EVENT_AFTER_INSERT : self::EVENT_AFTER_UPDATE, $event);
 
                 if ($event->isValid === true) {
-                    Yii::$app->session->setFlash('success', Yii::t('app', 'PropertyGroup saved.'));
+                    Yii::$app->session->setFlash('success', Module::t('app', 'PropertyGroup saved.'));
 
                     return $this->controller->redirect([
                         $this->listGroupPropertiesActionId,
@@ -105,7 +106,7 @@ class EditProperty extends BaseAdminAction
                     ]);
                 }
             } else {
-                Yii::$app->session->setFlash('error', Yii::t('app', 'Error occurred while saving property.'));
+                Yii::$app->session->setFlash('error', Module::t('app', 'Error occurred while saving property.'));
             }
         }
 

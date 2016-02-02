@@ -4,6 +4,7 @@ namespace DevGroup\DataStructure\propertyStorage;
 
 use DevGroup\DataStructure\helpers\PropertiesHelper;
 use DevGroup\DataStructure\models\Property;
+use DevGroup\DataStructure\Properties\Module;
 use Yii;
 use yii\db\ActiveRecord;
 use yii\db\Expression;
@@ -170,7 +171,7 @@ class TableInheritance extends AbstractPropertyStorage
         if ($property->allow_multiple_values) {
             $property->addError(
                 'allow_multiple_values',
-                Yii::t('app', 'Property can\'t has multiple values if storage type is Table Inherited Row.')
+                Module::t('app', 'Property can\'t has multiple values if storage type is Table Inherited Row.')
             );
             return false;
         }

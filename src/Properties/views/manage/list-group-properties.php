@@ -1,5 +1,6 @@
 <?php
 
+use DevGroup\DataStructure\Properties\Module;
 use kartik\icons\Icon;
 use yii\helpers\Html;
 use yii\grid\GridView;
@@ -14,9 +15,9 @@ use yii\grid\GridView;
  * @var string                                      $editPropertyActionId
  */
 
-$this->title = Yii::t('app', 'Group properties') . ": {$propertyGroup->name}";
+$this->title = Module::t('app', 'Group properties') . ": {$propertyGroup->name}";
 $this->params['breadcrumbs'][] = [
-    'label' => Yii::t('app', 'Property groups'),
+    'label' => Module::t('app', 'Property groups'),
     'url' => [$listPropertyGroupsActionId],
 ];
 $this->params['breadcrumbs'][] = $this->title;
@@ -45,13 +46,13 @@ $this->params['breadcrumbs'][] = $this->title;
                         'url' => 'edit-property',
                         'icon' => 'pencil',
                         'class' => 'btn-primary',
-                        'label' => Yii::t('app', 'Edit'),
+                        'label' => Module::t('app', 'Edit'),
                     ],
                     'delete' => [
                         'url' => 'delete-property',
                         'icon' => 'trash-o',
                         'class' => 'btn-danger',
-                        'label' => Yii::t('app', 'Delete'),
+                        'label' => Module::t('app', 'Delete'),
                         'options' => [
                             'data-action' => 'delete',
                         ],
@@ -69,7 +70,7 @@ $this->params['breadcrumbs'][] = $this->title;
         <?=
         Html::a(
             Icon::show('plus') . '&nbsp;' .
-            Yii::t('app', 'Create property'),
+            Module::t('app', 'Create property'),
             [
                 $editPropertyActionId,
                 'propertyGroupId' => $propertyGroup->id,

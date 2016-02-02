@@ -3,6 +3,7 @@ use arogachev\sortable\grid\SortableColumn;
 use DevGroup\AdminUtils\Helper;
 use DevGroup\DataStructure\models\Property;
 use DevGroup\DataStructure\models\StaticValue;
+use DevGroup\DataStructure\Properties\Module;
 use yii\data\ActiveDataProvider;
 use yii\grid\GridView;
 use yii\helpers\Html;
@@ -17,11 +18,11 @@ use yii\widgets\Pjax;
 
 ?>
 
-<h2><?= Html::encode(Yii::t('app', 'Static values')) ?></h2>
+<h2><?= Html::encode(Module::t('app', 'Static values')) ?></h2>
 
 <div class="form-group">
     <?= Html::a(
-        Yii::t('app', 'New Static value'),
+        Module::t('app', 'New Static value'),
         [
             'edit-static-value',
             'property_id' => $property->id,
@@ -61,7 +62,7 @@ use yii\widgets\Pjax;
                         'url' => 'edit-static-value',
                         'icon' => 'pencil',
                         'class' => 'btn-primary',
-                        'label' => Yii::t('app', 'Edit'),
+                        'label' => Module::t('app', 'Edit'),
                         'options' => [
                             'data' => [
                                 'pjax' => 'false'
@@ -72,7 +73,7 @@ use yii\widgets\Pjax;
                         'url' => 'delete-static-value',
                         'icon' => 'trash-o',
                         'class' => 'btn-danger',
-                        'label' => Yii::t('app', 'Delete'),
+                        'label' => Module::t('app', 'Delete'),
                         'options' => [
                             'data' => [
                                 'pjax' => 'false',

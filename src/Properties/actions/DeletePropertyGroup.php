@@ -4,6 +4,7 @@ namespace DevGroup\DataStructure\Properties\actions;
 
 use DevGroup\AdminUtils\actions\BaseAdminAction;
 use DevGroup\DataStructure\models\PropertyGroup;
+use DevGroup\DataStructure\Properties\Module;
 use Yii;
 use yii\web\NotFoundHttpException;
 
@@ -30,7 +31,7 @@ class DeletePropertyGroup extends BaseAdminAction
             new NotFoundHttpException("PropertyGroup model with specified id not found")
         );
         if ($model->delete() !== false) {
-            Yii::$app->session->setFlash('warning', Yii::t('app', 'Property group deleted.'));
+            Yii::$app->session->setFlash('warning', Module::t('app', 'Property group deleted.'));
         }
         return $this->controller->redirect(
             [

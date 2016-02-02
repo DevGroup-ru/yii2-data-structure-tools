@@ -1,5 +1,6 @@
 <?php
 
+use DevGroup\DataStructure\Properties\Module;
 use kartik\icons\Icon;
 use yii\helpers\Html;
 use yii\grid\GridView;
@@ -13,7 +14,7 @@ use yii\grid\GridView;
  * @var string                                      $editPropertyGroupActionId
  */
 
-$this->title = Yii::t('app', 'Property groups');
+$this->title = Module::t('app', 'Property groups');
 $this->params['breadcrumbs'][] = $this->title;
 
 
@@ -54,20 +55,20 @@ $this->params['breadcrumbs'][] = $this->title;
                         'url' => 'edit-property-group',
                         'icon' => 'pencil',
                         'class' => 'btn-primary',
-                        'label' => Yii::t('app', 'Edit'),
+                        'label' => Module::t('app', 'Edit'),
                     ],
                     'properties' => [
                         'url' => 'list-group-properties',
                         'icon' => 'list',
                         'class' => 'btn-success',
-                        'label' => Yii::t('app', 'Group properties'),
-                        'text' => Yii::t('app', 'Properties'),
+                        'label' => Module::t('app', 'Group properties'),
+                        'text' => Module::t('app', 'Properties'),
                     ],
                     'delete' => [
                         'url' => 'delete-property-group',
                         'icon' => 'trash-o',
                         'class' => 'btn-danger',
-                        'label' => Yii::t('app', 'Delete'),
+                        'label' => Module::t('app', 'Delete'),
                         'options' => [
                             'data-action' => 'delete',
                         ],
@@ -85,7 +86,7 @@ $this->params['breadcrumbs'][] = $this->title;
         <?=
         Html::a(
             Icon::show('plus') . '&nbsp;' .
-            Yii::t('app', 'Create property group'),
+            Module::t('app', 'Create property group'),
             [
                 $editPropertyGroupActionId,
                 'applicablePropertyModelId' => $currentApplicablePropertyModel['id'],

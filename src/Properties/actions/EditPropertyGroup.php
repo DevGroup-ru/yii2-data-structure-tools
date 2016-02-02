@@ -4,6 +4,7 @@ namespace DevGroup\DataStructure\Properties\actions;
 
 use DevGroup\AdminUtils\actions\BaseAdminAction;
 use DevGroup\DataStructure\models\PropertyGroup;
+use DevGroup\DataStructure\Properties\Module;
 use Yii;
 use yii\web\NotFoundHttpException;
 
@@ -38,7 +39,7 @@ class EditPropertyGroup extends BaseAdminAction
             }
 
             if ($model->save()) {
-                Yii::$app->session->setFlash('success', Yii::t('app', 'PropertyGroup saved.'));
+                Yii::$app->session->setFlash('success', Module::t('app', 'PropertyGroup saved.'));
 
                 return $this->controller->redirect([
                     $this->listPropertyGroupsActionId,

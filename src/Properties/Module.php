@@ -56,7 +56,33 @@ class Module extends BaseModule implements BootstrapInterface
                 '@dataStructure' => '@vendor/devgroup/yii2-data-structure-tools/src/',
             ]);
         });
+
+        $this->registerTranslations();
     }
 
+    /**
+     * Add custom translations source
+     */
+    public function registerTranslations()
+    {
+        Yii::$app->i18n->translations['@vendor/devgroup/yii2-data-structure-tools/*'] = [
+            'class' => 'yii\i18n\PhpMessageSource',
+            'sourceLanguage' => 'en-US',
+            'basePath' => '@vendor/devgroup/yii2-data-structure-tools/src/translations',
+            'fileMap' => [
+                '@vendor/devgroup/yii2-data-structure-tools/app' => 'app.php',
+                '@vendor/devgroup/yii2-data-structure-tools/widget' => 'widget.php',
+            ],
+
+        ];
+    }
+
+    /**
+     * Add custom translations method
+     */
+    public static function t($category, $message, $params = [], $language = null)
+    {
+        return Yii::t('@vendor/devgroup/yii2-data-structure-tools/' . $category, $message, $params, $language);
+    }
 
 }

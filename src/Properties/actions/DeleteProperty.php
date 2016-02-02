@@ -4,6 +4,7 @@ namespace DevGroup\DataStructure\Properties\actions;
 
 use DevGroup\AdminUtils\actions\BaseAdminAction;
 use DevGroup\DataStructure\models\Property;
+use DevGroup\DataStructure\Properties\Module;
 use Yii;
 use yii\web\NotFoundHttpException;
 
@@ -22,7 +23,7 @@ class DeleteProperty extends BaseAdminAction
             new NotFoundHttpException("Property model with specified id not found")
         );
         if ($model->delete() !== false) {
-            Yii::$app->session->setFlash('warning', Yii::t('app', 'Property has been deleted.'));
+            Yii::$app->session->setFlash('warning', Module::t('app', 'Property has been deleted.'));
         }
         return $this->controller->redirect(
             [

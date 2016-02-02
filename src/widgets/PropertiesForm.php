@@ -5,6 +5,7 @@ namespace DevGroup\DataStructure\widgets;
 use DevGroup\DataStructure\helpers\PropertiesHelper;
 use DevGroup\DataStructure\models\Property;
 use DevGroup\DataStructure\models\PropertyPropertyGroup;
+use DevGroup\DataStructure\Properties\Module;
 use DevGroup\DataStructure\propertyHandler\AbstractPropertyHandler;
 use DevGroup\DataStructure\traits\PropertiesTrait;
 use kartik\select2\Select2;
@@ -17,6 +18,10 @@ use yii\helpers\Html;
 use yii\web\Application;
 use yii\widgets\Pjax;
 
+/**
+ * Class PropertiesForm
+ * @package DevGroup\DataStructure\widgets
+ */
 class PropertiesForm extends Widget
 {
     /**
@@ -100,7 +105,7 @@ class PropertiesForm extends Widget
                 'data' => $addGroupItems,
                 'name' => 'plus-group',
                 'options' => [
-                    'placeholder' => '(+) Add group',
+                    'placeholder' => Module::t('widget', '(+) Add group'),
                     'style' => [
                         'min-width' => '100px'
                     ]
@@ -140,6 +145,9 @@ class PropertiesForm extends Widget
         );
     }
 
+    /**
+     * @return \integer[]|null
+     */
     public function getAttachedGroups()
     {
         return $this->model->propertyGroupIds;

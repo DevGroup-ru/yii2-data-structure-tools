@@ -5,6 +5,7 @@ namespace DevGroup\DataStructure\Properties\helpers;
 use DevGroup\DataStructure\models\PropertyHandlers;
 use DevGroup\DataStructure\models\Property;
 use DevGroup\DataStructure\models\PropertyStorage;
+use DevGroup\DataStructure\Properties\Module;
 use Yii;
 use yii\db\Query;
 use yii\helpers\ArrayHelper;
@@ -24,12 +25,12 @@ class FrontendPropertiesHelper
     public static function dataTypeSelectOptions()
     {
         return [
-            Property::DATA_TYPE_STRING => Yii::t('app', 'String'),
-            Property::DATA_TYPE_TEXT => Yii::t('app', 'Text'),
-            Property::DATA_TYPE_INTEGER => Yii::t('app', 'Integer'),
-            Property::DATA_TYPE_FLOAT => Yii::t('app', 'Float'),
-            Property::DATA_TYPE_BOOLEAN => Yii::t('app', 'Boolean'),
-            Property::DATA_TYPE_PACKED_JSON => Yii::t('app', 'Packed JSON'),
+            Property::DATA_TYPE_STRING => Module::t('app', 'String'),
+            Property::DATA_TYPE_TEXT => Module::t('app', 'Text'),
+            Property::DATA_TYPE_INTEGER => Module::t('app', 'Integer'),
+            Property::DATA_TYPE_FLOAT => Module::t('app', 'Float'),
+            Property::DATA_TYPE_BOOLEAN => Module::t('app', 'Boolean'),
+            Property::DATA_TYPE_PACKED_JSON => Module::t('app', 'Packed JSON'),
         ];
     }
 

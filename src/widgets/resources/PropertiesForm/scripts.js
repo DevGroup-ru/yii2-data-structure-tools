@@ -9,9 +9,9 @@ propertyGroup = function (widgetId) {
     this.url = '';
 
     this.init = function (element, url) {
-        this.url = window.location.pathname;
-        el = jQuery('#' + element);
+        el = $('#' + element);
         el.trigger('init::before');
+        this.url = window.location.pathname;
         dataAddUrl = el.data('add-url');
         dataDeleteUrl = el.data('delete-url');
         modelId = el.data('model-id');
@@ -24,8 +24,8 @@ propertyGroup = function (widgetId) {
         } else {
             var attachedPropertyGroup = [];
             attachedPropertyGroup.push(id);
-            jQuery('.property-group-ids').each(function (key, el) {
-                attachedPropertyGroup.push(jQuery(el).val());
+            $('.property-group-ids').each(function (key, el) {
+                attachedPropertyGroup.push($(el).val());
             });
 
             window.location = this.url + '?' + $.param({"propertyGroupIds": attachedPropertyGroup});
@@ -37,9 +37,9 @@ propertyGroup = function (widgetId) {
             deleteGroupByModel(id);
         } else {
             var attachedPropertyGroup = [];
-            jQuery('.property-group-ids').each(function (key, el) {
-                if(id != jQuery(el).val()) {
-                    attachedPropertyGroup.push(jQuery(el).val());
+            $('.property-group-ids').each(function (key, el) {
+                if(id != $(el).val()) {
+                    attachedPropertyGroup.push($(el).val());
                 }
 
             });
@@ -48,11 +48,10 @@ propertyGroup = function (widgetId) {
     };
 
     addGroupByModel = function (id) {
-        jQuery.ajax({
+        $.ajax({
             'url': dataAddUrl,
-            'data': {
-                'groupId': id
-            },
+            type: 'post',
+            'data': {'groupId': id},
             'success': function (data) {
                 location.reload();
             }
@@ -61,11 +60,10 @@ propertyGroup = function (widgetId) {
     };
 
     deleteGroupByModel = function (id) {
-        jQuery.ajax({
+        $.ajax({
             'url': dataDeleteUrl,
-            'data': {
-                'groupId': id
-            },
+            type: 'delete',
+            'data': {'groupId': id},
             'success': function (data) {
                 location.reload();
             }

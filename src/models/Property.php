@@ -4,6 +4,7 @@ namespace DevGroup\DataStructure\models;
 use DevGroup\DataStructure\behaviors\PackedJsonAttributes;
 use DevGroup\DataStructure\helpers\PropertyHandlerHelper;
 use DevGroup\DataStructure\helpers\PropertyStorageHelper;
+use DevGroup\DataStructure\Properties\Module;
 use DevGroup\Multilingual\behaviors\MultilingualActiveRecord;
 use DevGroup\Multilingual\traits\MultilingualTrait;
 use DevGroup\TagDependencyHelper\CacheableActiveRecord;
@@ -131,6 +132,25 @@ class Property extends ActiveRecord
             'name',
         ];
         return $scenarios;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function attributeLabels()
+    {
+        return [
+            'id' => Module::t('app', 'ID'),
+            'applicable_property_model_id' => Module::t('app', 'Applicable Property Model ID'),
+            'key' => Module::t('app', 'Key'),
+            'data_type' => Module::t('app', 'Data Type'),
+            'is_internal' => Module::t('app', 'Is Internal'),
+            'allow_multiple_values' => Module::t('app', 'Allow Multiple Values'),
+            'storage_id' => Module::t('app', 'Storage ID'),
+            'packed_json_default_value' => Module::t('app', 'Packed Json Default Value'),
+            'property_handler_id' => Module::t('app', 'Property Handler ID'),
+            'name' => Module::t('app', 'Name'),
+        ];
     }
 
     /**

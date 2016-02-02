@@ -2,6 +2,7 @@
 namespace DevGroup\DataStructure\models;
 
 use DevGroup\DataStructure\helpers\PropertiesHelper;
+use DevGroup\DataStructure\Properties\Module;
 use DevGroup\Multilingual\behaviors\MultilingualActiveRecord;
 use DevGroup\Multilingual\traits\MultilingualTrait;
 use DevGroup\TagDependencyHelper\CacheableActiveRecord;
@@ -159,6 +160,21 @@ class PropertyGroup extends ActiveRecord
     {
         Yii::$app->cache->delete("PropertyIdsForGroup:{$this->id}");
         Yii::$app->cache->delete("AutoAddedGroupsIds:{$this->applicable_property_model_id}");
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function attributeLabels()
+    {
+        return [
+            'id' => Module::t('app', 'ID'),
+            'internal_name' => Module::t('app', 'Internal Name'),
+            'sort_order' => Module::t('app', 'Sort Order'),
+            'applicable_property_model_id' => Module::t('app', 'Applicable Property Model ID'),
+            'is_auto_added' => Module::t('app', 'Is Auto Added'),
+            'name' => Module::t('app', 'Name'),
+        ];
     }
 
     /**

@@ -3,6 +3,7 @@
 use DevGroup\AdminUtils\events\ModelEditForm;
 use DevGroup\DataStructure\Properties\actions\EditProperty;
 use DevGroup\DataStructure\Properties\helpers\FrontendPropertiesHelper;
+use DevGroup\DataStructure\Properties\Module;
 use yii\base\Event;
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
@@ -16,12 +17,12 @@ use yii\widgets\ActiveForm;
  * @var string                                      $listGroupPropertiesActionId
  */
 
-$this->params['breadcrumbs'][] = ['label' => Yii::t('app', 'Property groups'), 'url' => [$listPropertyGroupsActionId]];
-$this->params['breadcrumbs'][] = ['label' => Yii::t('app', 'Group properties') . ": $propertyGroup->internal_name", 'url' => [$listGroupPropertiesActionId, 'id'=>$propertyGroup->id]];
+$this->params['breadcrumbs'][] = ['label' => Module::t('app', 'Property groups'), 'url' => [$listPropertyGroupsActionId]];
+$this->params['breadcrumbs'][] = ['label' => Module::t('app', 'Group properties') . ": $propertyGroup->internal_name", 'url' => [$listGroupPropertiesActionId, 'id'=>$propertyGroup->id]];
 if ($model->isNewRecord) {
-    $this->title = Yii::t('app', 'New property');
+    $this->title = Module::t('app', 'New property');
 } else {
-    $this->title = Yii::t('app', 'Edit property') . ' ' . $model->id;
+    $this->title = Module::t('app', 'Edit property') . ' ' . $model->id;
 }
 
 $this->params['breadcrumbs'][] = $this->title;
@@ -57,7 +58,7 @@ $this->params['breadcrumbs'][] = $this->title;
         ?>
 
         <div class="form-group">
-            <?= Html::submitButton($model->isNewRecord ? Yii::t('app', 'Create') : Yii::t('app', 'Save'), ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>
+            <?= Html::submitButton($model->isNewRecord ? Module::t('app', 'Create') : Module::t('app', 'Save'), ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>
         </div>
 
     </div>

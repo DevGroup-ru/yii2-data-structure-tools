@@ -4,6 +4,7 @@ namespace DevGroup\DataStructure\Properties\actions;
 
 use DevGroup\AdminUtils\actions\BaseAdminAction;
 use DevGroup\DataStructure\models\StaticValue;
+use DevGroup\DataStructure\Properties\Module;
 use yii\web\NotFoundHttpException;
 use Yii;
 
@@ -21,7 +22,7 @@ class DeleteStaticValue extends BaseAdminAction
         );
 
         if ($model->delete() !== false) {
-            Yii::$app->session->setFlash('warning', Yii::t('app', 'Property static value deleted.'));
+            Yii::$app->session->setFlash('warning', Module::t('app', 'Property static value deleted.'));
         }
         return $this->controller->redirect($return_url);
     }

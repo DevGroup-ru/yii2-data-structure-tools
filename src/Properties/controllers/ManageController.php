@@ -15,10 +15,24 @@ use DevGroup\DataStructure\Properties\actions\ListPropertyGroups;
 use DevGroup\DataStructure\traits\PropertiesTrait;
 use Yii;
 use yii\db\ActiveRecord;
+use yii\web\BadRequestHttpException;
 use yii\web\Response;
 
 class ManageController extends BaseController
 {
+
+    public function behaviors()
+    {
+        return [
+            'verbs' => [
+                'class' => \yii\filters\VerbFilter::className(),
+                'actions' => [
+                    'delete-model-property-group' => ['delete'],
+                    'add-model-property-group' => ['post'],
+                ],
+            ],
+        ];
+    }
 
     /**
      * This controller just uses actions in extension
@@ -59,9 +73,14 @@ class ManageController extends BaseController
      * @param $modelId
      * @param $groupId
      */
-    public function actionAddModelPropertyGroup($className, $modelId, $groupId)
+    public function actionAddModelPropertyGroup($className, $modelId)
     {
         Yii::$app->response->format = Response::FORMAT_JSON;
+
+        if(!$groupId = Yii::$app->request->post('groupId')) {
+            throw new BadRequestHttpException();
+        }
+
         try {
             /** @var PropertiesTrait $model */
             $model = $className::findOne($modelId);
@@ -78,8 +97,11 @@ class ManageController extends BaseController
      * @param $modelId
      * @param $groupId
      */
-    public function actionDeleteModelPropertyGroup($className, $modelId, $groupId)
+    public function actionDeleteModelPropertyGroup($className, $modelId)
     {
+        if(!$groupId = Yii::$app->request->post('groupId')) {
+            throw new BadRequestHttpException();
+        }
         /** @var PropertiesTrait $model */
         $model = $className::findOne($modelId);
         /** @var PropertyGroup $group */
