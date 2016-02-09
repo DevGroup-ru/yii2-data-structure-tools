@@ -1,6 +1,7 @@
 <?php
 
 use yii\db\Migration;
+use DevGroup\DataStructure\models\ApplicablePropertyModels;
 
 /**
  * Base migration for properies
@@ -73,7 +74,7 @@ class m150923_140300_properties extends Migration
             'sort_order' => $this->integer()->notNull()->defaultValue(0),
         ], $tableOptions);
 
-        $this->createTable('{{%applicable_property_models}}', [
+        $this->createTable(ApplicablePropertyModels::tableName(), [
             'id' => $this->primaryKey(),
             'class_name' => $this->string()->notNull(),
             'name' => $this->string()->notNull(),
@@ -187,7 +188,7 @@ class m150923_140300_properties extends Migration
         $this->dropTable('{{%static_value_translation}}');
         $this->dropTable('{{%static_value}}');
 
-        $this->dropTable('{{%applicable_property_models}}');
+        $this->dropTable(ApplicablePropertyModels::tableName());
         $this->dropTable('{{%property_handlers}}');
     }
 

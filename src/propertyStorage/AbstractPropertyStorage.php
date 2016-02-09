@@ -3,6 +3,7 @@
 namespace DevGroup\DataStructure\propertyStorage;
 
 use DevGroup\DataStructure\behaviors\HasProperties;
+use DevGroup\DataStructure\models\ApplicablePropertyModels;
 use DevGroup\DataStructure\models\Property;
 use DevGroup\DataStructure\models\PropertyGroup;
 use DevGroup\DataStructure\models\PropertyPropertyGroup;
@@ -43,7 +44,7 @@ abstract class AbstractPropertyStorage
                 ->createCommand()->getRawSql();
             static::$applicablePropertyModelClassNames[$id] = (new Query())
                 ->select('class_name')
-                ->from('{{%applicable_property_models}}')
+                ->from(ApplicablePropertyModels::tableName())
                 ->where('id IN (' . $subQuery . ')')->column();
         }
         return static::$applicablePropertyModelClassNames[$id];

@@ -3,6 +3,7 @@
 namespace DevGroup\DataStructure\Properties\actions;
 
 use DevGroup\AdminUtils\actions\BaseAdminAction;
+use DevGroup\DataStructure\models\ApplicablePropertyModels;
 use DevGroup\DataStructure\models\PropertyGroup;
 use Yii;
 use yii\db\Query;
@@ -73,7 +74,7 @@ class ListPropertyGroups extends BaseAdminAction
             $query = new Query();
             $rows = $query
                 ->select(['id', 'class_name', 'name'])
-                ->from('{{%applicable_property_models}}')
+                ->from(ApplicablePropertyModels::tableName())
                 ->indexBy('id')
                 ->all();
 

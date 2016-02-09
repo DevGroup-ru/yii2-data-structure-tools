@@ -2,6 +2,7 @@
 
 namespace DevGroup\DataStructure\helpers;
 
+use DevGroup\DataStructure\models\ApplicablePropertyModels;
 use DevGroup\DataStructure\models\Property;
 use DevGroup\DataStructure\models\PropertyGroup;
 use DevGroup\DataStructure\models\PropertyPropertyGroup;
@@ -39,7 +40,7 @@ class PropertiesHelper
                 $query = new \yii\db\Query();
                 $rows = $query
                     ->select(['id', 'class_name'])
-                    ->from('{{%applicable_property_models}}')
+                    ->from(ApplicablePropertyModels::tableName())
                     ->all();
                 array_walk($rows, function (&$item) {
                     $item['id'] = intval($item['id']);
