@@ -23,6 +23,7 @@
         "hector68/yii2-map-input-widget": "^2.0"
     },
     "require-dev": {
+	"phpunit/phpunit": "~4.0",
         "yiisoft/yii2-bootstrap": "^2.0@dev",
         "devgroup/yii2-admin-utils": "dev-master",
         "devgroup/dotplant-dev": "~1.0.0"
