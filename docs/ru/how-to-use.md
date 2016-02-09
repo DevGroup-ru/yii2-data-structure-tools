@@ -55,8 +55,8 @@ public function rules()
 Ниже описана команда позволяющая создать необходимые таблицы для модели `app\models\Page`:
 
 ```php
-\DevGroup\DataStructure\helpers\PropertiesTableGenerator::generate('app\models\Page');
-// \DevGroup\DataStructure\helpers\PropertiesTableGenerator::generate(\app\models\Page::class); // Альтернативная версия
+\DevGroup\DataStructure\helpers\PropertiesTableGenerator::getInstance()->generate('app\models\Page');
+// \DevGroup\DataStructure\helpers\PropertiesTableGenerator::getInstance()->generate(\app\models\Page::class); // Альтернативная версия
 ```
 
 Как правило, такие операции проводятся в миграциях.
