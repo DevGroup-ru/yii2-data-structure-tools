@@ -201,6 +201,12 @@ class PropertiesTableGenerator extends Migration
         foreach ($tables as $table) {
             $this->dropTable($table);
         }
+        $this->delete(
+            ApplicablePropertyModels::tableName(),
+            [
+                'class_name' => $className,
+            ]
+        );
     }
 
     /**
