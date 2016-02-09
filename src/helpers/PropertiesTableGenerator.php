@@ -2,6 +2,7 @@
 
 namespace DevGroup\DataStructure\helpers;
 
+use DevGroup\DataStructure\models\ApplicablePropertyModels;
 use DevGroup\DataStructure\models\PropertyGroup;
 use Yii;
 use yii\db\SchemaBuilderTrait;
@@ -177,6 +178,13 @@ class PropertiesTableGenerator
             ['id'],
             'CASCADE'
         );
+        $this->insert(
+            ApplicablePropertyModels::tableName(),
+            [
+                'class_name' => $className,
+                'name' => substr($className, strrpos($className, '\\') + 1),
+            ]
+        );
     }
 
     /**
@@ -294,5 +302,19 @@ class PropertiesTableGenerator
     protected function getDb()
     {
         return $this->db;
+    }
+
+    /**
+     * Creates and executes an INSERT SQL statement.
+     * The method will properly escape the column names, and bind the values to be inserted.
+     * @param string $table the table that new rows will be inserted into.
+     * @param array $columns the column data (name => value) to be inserted into the table.
+     */
+    public function insert($table, $columns)
+    {
+        echo "    > insert into $table ...";
+        $time = microtime(true);
+        $this->db->createCommand()->insert($table, $columns)->execute();
+        echo ' done (time: ' . sprintf('%.3f', microtime(true) - $time) . "s)\n";
     }
 }
