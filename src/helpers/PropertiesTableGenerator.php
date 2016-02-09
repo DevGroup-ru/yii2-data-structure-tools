@@ -5,7 +5,7 @@ namespace DevGroup\DataStructure\helpers;
 use DevGroup\DataStructure\models\ApplicablePropertyModels;
 use DevGroup\DataStructure\models\PropertyGroup;
 use Yii;
-use yii\db\SchemaBuilderTrait;
+use yii\db\Migration;
 
 /**
  * Class PropertiesTableGenerator is a special helper for manipulating(creating/dropping) properties related tables
@@ -13,15 +13,8 @@ use yii\db\SchemaBuilderTrait;
  *
  * @package DevGroup\DataStructure\helpers
  */
-class PropertiesTableGenerator
+class PropertiesTableGenerator extends Migration
 {
-    use SchemaBuilderTrait;
-
-    /**
-     * @var \yii\db\Connection
-     */
-    private $db = null;
-
     /**
      * @var PropertiesTableGenerator
      */
@@ -211,92 +204,6 @@ class PropertiesTableGenerator
     }
 
     /**
-     * Copy-paste from \yii\db\Migration
-     * @codeCoverageIgnore
-     *
-     * @param      $table
-     * @param      $columns
-     * @param null $options
-     */
-    private function createTable($table, $columns, $options = null)
-    {
-        echo "    > create table $table ...";
-        $time = microtime(true);
-        $this->db->createCommand()->createTable($table, $columns, $options)->execute();
-        echo " done (time: " . sprintf('%.3f', microtime(true) - $time) . "s)\n";
-    }
-
-    /**
-     * Copy-paste from \yii\db\Migration
-     * @codeCoverageIgnore
-     *
-     * @param $name
-     * @param $table
-     * @param $columns
-     */
-    private function addPrimaryKey($name, $table, $columns)
-    {
-        echo "    > add primary key $name on $table (" .
-            (is_array($columns) ? implode(',', $columns) : $columns).
-            ") ...";
-        $time = microtime(true);
-        $this->db->createCommand()->addPrimaryKey($name, $table, $columns)->execute();
-        echo " done (time: " . sprintf('%.3f', microtime(true) - $time) . "s)\n";
-    }
-
-    /**
-     * Copy-paste from \yii\db\Migration
-     * @codeCoverageIgnore
-     *
-     * @param            $name
-     * @param            $table
-     * @param            $columns
-     * @param bool|false $unique
-     *
-     * @throws \yii\db\Exception
-     */
-    private function createIndex($name, $table, $columns, $unique = false)
-    {
-        echo "    > create" . ($unique ? ' unique' : '') .
-            " index $name on $table (" . implode(',', (array) $columns) .
-            ") ...";
-        $time = microtime(true);
-        $this->db->createCommand()->createIndex($name, $table, $columns, $unique)->execute();
-        echo " done (time: " . sprintf('%.3f', microtime(true) - $time) . "s)\n";
-    }
-
-    /**
-     * Copy-paste from \yii\db\Migration
-     * @codeCoverageIgnore
-     *
-     * @param $table
-     *
-     * @throws \yii\db\Exception
-     */
-    private function dropTable($table)
-    {
-        echo "    > drop table $table ...";
-        $time = microtime(true);
-        $this->db->createCommand()->dropTable($table)->execute();
-        echo " done (time: " . sprintf('%.3f', microtime(true) - $time) . "s)\n";
-    }
-    /**
-     * Copy-paste from \yii\db\Migration
-     * @codeCoverageIgnore
-     *
-     * @param $table
-     *
-     * @throws \yii\db\Exception
-     */
-    private function addForeignKey($name, $table, $columns, $refTable, $refColumns, $delete = null, $update = null)
-    {
-        echo "    > add foreign key $name: $table (" . implode(',', (array) $columns) . ") references $refTable (" . implode(',', (array) $refColumns) . ") ...";
-        $time = microtime(true);
-        $this->db->createCommand()->addForeignKey($name, $table, $columns, $refTable, $refColumns, $delete, $update)->execute();
-        echo " done (time: " . sprintf('%.3f', microtime(true) - $time) . "s)\n";
-    }
-
-    /**
      * @return \yii\db\Connection the database connection to be used for schema building.
      */
     protected function getDb()
@@ -304,17 +211,4 @@ class PropertiesTableGenerator
         return $this->db;
     }
 
-    /**
-     * Creates and executes an INSERT SQL statement.
-     * The method will properly escape the column names, and bind the values to be inserted.
-     * @param string $table the table that new rows will be inserted into.
-     * @param array $columns the column data (name => value) to be inserted into the table.
-     */
-    public function insert($table, $columns)
-    {
-        echo "    > insert into $table ...";
-        $time = microtime(true);
-        $this->db->createCommand()->insert($table, $columns)->execute();
-        echo ' done (time: ' . sprintf('%.3f', microtime(true) - $time) . "s)\n";
-    }
 }
