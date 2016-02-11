@@ -71,7 +71,8 @@ class StaticValues extends AbstractPropertyHandler
      */
     public static function onPropertyEditForm(ModelEditForm $event)
     {
-        if (!$event->model->isNewRecord) {
+
+        if (!$event->model->isNewRecord && $event->model->storage->class_name == \DevGroup\DataStructure\propertyStorage\StaticValues::className()) {
             $view = $event->getView();
             $model = $event->model;
             $staticValue = new StaticValue($model);

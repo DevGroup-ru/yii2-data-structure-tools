@@ -35,6 +35,7 @@ use yii\web\ServerErrorHttpException;
  * @property PropertyGroup[] $propertyGroups
  * @property PropertyGroup $defaultPropertyGroup
  * @property StaticValue[] $staticValues
+ * @property Storage $storage
  *
  * @package DevGroup\DataStructure\models
  */
@@ -503,6 +504,14 @@ class Property extends ActiveRecord
     {
         return $this->hasMany(StaticValue::className(), ['property_id' => 'id'])
             ->orderBy([StaticValue::tableName().'.sort_order' => SORT_ASC]);
+    }
+
+    /**
+     * @return \yii\db\ActiveQuery
+     */
+    public function getStorage()
+    {
+        return $this->hasOne(PropertyStorage::className(), ['id'=>'storage_id']);
     }
 
 }
