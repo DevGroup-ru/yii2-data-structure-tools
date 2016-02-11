@@ -6,6 +6,7 @@ use DevGroup\DataStructure\Properties\Module;
 use DevGroup\Multilingual\behaviors\MultilingualActiveRecord;
 use DevGroup\Multilingual\traits\MultilingualTrait;
 use DevGroup\TagDependencyHelper\CacheableActiveRecord;
+use DevGroup\TagDependencyHelper\NamingHelper;
 use DevGroup\TagDependencyHelper\TagDependencyTrait;
 use Yii;
 use yii\data\ActiveDataProvider;
@@ -245,7 +246,10 @@ class PropertyGroup extends ActiveRecord
 
             },
             "PropertyIdsForGroup:$propertyGroupId",
-            86400
+            86400,
+            [
+                NamingHelper::getObjectTag(PropertyGroup::class, $propertyGroupId),
+            ]
         );
         static::$groupIdToPropertyIds[$propertyGroupId] = $ids;
         return static::$groupIdToPropertyIds[$propertyGroupId];
@@ -274,7 +278,7 @@ class PropertyGroup extends ActiveRecord
                 );
             },
             'AutoAddedGroupsIds:'.$applicablePropertyModelId,
-            86400
+            86400 // @todo Add dependencies
         );
     }
 

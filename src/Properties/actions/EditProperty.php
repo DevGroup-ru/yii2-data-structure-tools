@@ -83,6 +83,13 @@ class EditProperty extends BaseAdminAction
 
 
             if ($event->isValid === true && $model->save() && !Yii::$app->request->isPjax ) {
+                \yii\caching\TagDependency::invalidate(
+                    $propertyGroup->getTagDependencyCacheComponent(),
+                    [
+                        $propertyGroup::commonTag(),
+                        $propertyGroup->objectTag()
+                    ]
+                );
                 if ($id === null) {
                     // That was new record - link it to property group
                     $propertyGroup->link(
