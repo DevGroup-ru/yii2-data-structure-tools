@@ -6,12 +6,10 @@ use DevGroup\DataStructure\helpers\PropertiesHelper;
 use DevGroup\DataStructure\helpers\PropertyStorageHelper;
 use DevGroup\DataStructure\models\Property;
 use DevGroup\DataStructure\models\PropertyGroup;
-use DevGroup\DataStructure\propertyStorage\TableInheritance;
 use Yii;
 use yii\base\Behavior;
 use yii\base\Exception;
 use yii\base\InvalidConfigException;
-use yii\base\Model;
 use yii\db\ActiveRecord;
 use yii\web\ServerErrorHttpException;
 
@@ -157,8 +155,17 @@ class HasProperties extends Behavior
         $changed = true;
         if (isset($owner->propertiesValues[$id])) {
             if (is_array($value) === true) {
-                $diffCount = count(array_diff_assoc($owner->propertiesValues[$id], $value)) > 0;
-                $changed = $diffCount || count($owner->propertiesValues[$id]) != count($value);
+                $first = reset($owner->propertiesValues[$id]);
+                $firstValue = reset($value);
+                if (true === is_array($first) && true === is_array($firstValue)) {
+                    $key = key($owner->propertiesValues[$id]);
+                    $valueKey = key($value);
+                    $diffCount = count(array_diff_assoc($first, $firstValue)) > 0;
+                    $changed = $diffCount || count($first) != count($firstValue) || $key != $valueKey;
+                } else {
+                    $diffCount = count(array_diff_assoc($owner->propertiesValues[$id], $value)) > 0;
+                    $changed = $diffCount || count($owner->propertiesValues[$id]) != count($value);
+                }
             } else {
                 $changed = $value != $owner->propertiesValues[$id];
             }
@@ -167,7 +174,6 @@ class HasProperties extends Behavior
             $owner->propertiesValuesChanged = true;
             $owner->changedProperties[] = $id;
         }
-
         $owner->propertiesValues[$id] = $value;
     }
 
