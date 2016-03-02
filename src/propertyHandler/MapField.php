@@ -15,11 +15,13 @@ class MapField  extends AbstractPropertyHandler
 
     public $zoom = 5;
 
+    public $description = "";
+
     public $width = '95%';
 
     public $height = '300px';
 
-    public $pattern = '{ "latitude":"%latitude%","longitude":"%longitude%","zoom":"%zoom%" }';
+    public $pattern = '{"latitude":"%latitude%","longitude":"%longitude%","zoom":"%zoom%", "description":"%description%"}';
 
     public $mapType = 'roadmap';
 
