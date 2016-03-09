@@ -37,12 +37,12 @@ class PropertiesForm extends Widget
     /**
      * @var string route to "add property group" action
      */
-    public $addPropertyGroupRoute = 'properties/manage/add-model-property-group';
+    public $addPropertyGroupRoute = '/properties/manage/add-model-property-group';
 
     /**
      * @var string route to "delete property group" action
      */
-    public $deletePropertyGroupRoute = 'properties/manage/delete-model-property-group';
+    public $deletePropertyGroupRoute = '/properties/manage/delete-model-property-group';
 
     /**
      * Build array for tabs.
