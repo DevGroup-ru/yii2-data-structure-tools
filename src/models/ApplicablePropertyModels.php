@@ -30,6 +30,8 @@ class ApplicablePropertyModels extends \yii\db\ActiveRecord
         return [
             [['class_name', 'name'], 'required'],
             [['class_name', 'name'], 'string', 'max' => 255],
+            [['class_name'], 'unique', 'targetAttribute' => 'class_name'],
+
         ];
     }
 
