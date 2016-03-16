@@ -102,6 +102,11 @@ class TableInheritance extends AbstractPropertyStorage
         /** @var \yii\db\Command[] $queries */
         $queries = [];
 
+        $existRows = (new Query())->select('model_id')
+            ->from($firstModel->tableInheritanceTable())
+            ->where(PropertiesHelper::getInCondition($models))
+            ->column($firstModel->getDb());
+
         foreach ($models as $model) {
             /** @var \yii\db\ActiveRecord|\DevGroup\DataStructure\traits\PropertiesTrait|\DevGroup\DataStructure\traits\PropertiesTrait $model */
             $model->ensurePropertiesAttributes();
@@ -118,13 +123,22 @@ class TableInheritance extends AbstractPropertyStorage
                 }
             }
             if (count($modelTableInheritancePairs) > 0) {
-                $queries[] = $db->createCommand()->update(
-                    $firstModel->tableInheritanceTable(),
-                    $modelTableInheritancePairs,
-                    [
-                        'model_id' => $model->id
-                    ]
-                );
+                if (in_array($model->id, $existRows) === true) {
+                    $queries[] = $db->createCommand()->update(
+                        $firstModel->tableInheritanceTable(),
+                        $modelTableInheritancePairs,
+                        [
+                            'model_id' => $model->id
+                        ]
+                    );
+                } else {
+                    $modelTableInheritancePairs['model_id'] = $model->id;
+                    $queries[] = $db->createCommand()
+                        ->insert(
+                            $firstModel->tableInheritanceTable(),
+                            $modelTableInheritancePairs
+                        );
+                }
             }
         }
         if (count($queries) > 0) {
@@ -135,32 +149,6 @@ class TableInheritance extends AbstractPropertyStorage
             });
         }
         return true;
-    }
-
-    /**
-     * Creates table inheritance rows
-     *
-     * @param \DevGroup\DataStructure\behaviors\HasProperties[]|\DevGroup\DataStructure\traits\PropertiesTrait[]|\yii\db\ActiveRecord[] $models
-     */
-    public function modelsInserted(&$models)
-    {
-        /** @var \yii\db\Command $command */
-
-        /** @var \yii\db\ActiveRecord|\DevGroup\DataStructure\traits\PropertiesTrait $firstModel */
-        $firstModel = reset($models);
-
-        $ids = [];
-        foreach ($models as $model) {
-            $ids [] = [$model->id];
-        }
-        $command = $firstModel->getDb()->createCommand()
-            ->batchInsert(
-                $firstModel->tableInheritanceTable(),
-                ['model_id'],
-                $ids
-            );
-
-        $command->execute();
     }
 
     /**
@@ -214,25 +202,18 @@ class TableInheritance extends AbstractPropertyStorage
         switch ($type) {
             case Property::DATA_TYPE_FLOAT:
                 return $schema->createColumnSchemaBuilder(Schema::TYPE_FLOAT);
-                break;
             case Property::DATA_TYPE_INTEGER:
                 return $schema->createColumnSchemaBuilder(Schema::TYPE_INTEGER);
-                break;
-
             case Property::DATA_TYPE_STRING:
                 /** @var \yii\db\ColumnSchemaBuilder $builder */
                 return $schema->createColumnSchemaBuilder(Schema::TYPE_STRING);
-                break;
-
             case Property::DATA_TYPE_BOOLEAN:
                 return $schema->createColumnSchemaBuilder(Schema::TYPE_BOOLEAN);
-                break;
-
             case Property::DATA_TYPE_TEXT:
             case Property::DATA_TYPE_PACKED_JSON:
+                return $schema->createColumnSchemaBuilder(Schema::TYPE_TEXT);
             default:
                 return $schema->createColumnSchemaBuilder(Schema::TYPE_TEXT);
-                break;
         }
     }
 
