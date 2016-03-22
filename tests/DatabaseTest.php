@@ -78,7 +78,7 @@ class DatabaseTest extends \PHPUnit_Extensions_Database_TestCase
                 'class' => Connection::className(),
                 'dsn' => 'mysql:host=localhost;dbname=yii2_datastructure',
                 'username' => 'root',
-                'password' => 'root',
+                'password' => '',
             ]);
 
             Yii::$app->getDb()->open();
