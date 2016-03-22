@@ -3,8 +3,11 @@
 namespace DevGroup\DataStructure\helpers;
 
 use DevGroup\DataStructure\models\ApplicablePropertyModels;
+use DevGroup\DataStructure\models\Property;
 use DevGroup\DataStructure\models\PropertyGroup;
+use DevGroup\DataStructure\models\StaticValue;
 use Yii;
+use yii\db\Connection;
 use yii\db\Migration;
 
 /**
@@ -15,6 +18,20 @@ use yii\db\Migration;
  */
 class PropertiesTableGenerator extends Migration
 {
+    /**
+     * @param string $fromTableName
+     * @param string $toTableName
+     * @param Connection $db
+     * @return mixed
+     */
+    public static function getForeignKeyName($fromTableName, $toTableName, $db = null)
+    {
+        if ($db === null) {
+            $db = Yii::$app->db;
+        }
+        return str_replace('`', '', $db->quoteSql('fk-' . $fromTableName . '-to-' . $toTableName));
+    }
+
     /**
      * @var PropertiesTableGenerator
      */
@@ -82,7 +99,15 @@ class PropertiesTableGenerator extends Migration
             ['id'],
             'CASCADE'
         );
-
+        $this->addForeignKey(
+            static::getForeignKeyName($staticValuesTable, StaticValue::tableName(), $this->db),
+            $staticValuesTable,
+            'static_value_id',
+            StaticValue::tableName(),
+            'id',
+            'CASCADE',
+            'CASCADE'
+        );
 
         // eav!
         $eavTable = $className::eavTable();
@@ -114,6 +139,15 @@ class PropertiesTableGenerator extends Migration
             ['model_id'],
             $className::tableName(),
             ['id'],
+            'CASCADE'
+        );
+        $this->addForeignKey(
+            static::getForeignKeyName($eavTable, Property::tableName(), $this->db),
+            $eavTable,
+            'property_id',
+            Property::tableName(),
+            'id',
+            'CASCADE',
             'CASCADE'
         );
 
