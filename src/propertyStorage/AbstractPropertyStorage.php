@@ -205,4 +205,14 @@ abstract class AbstractPropertyStorage
     {
 
     }
+
+    public static function afterBind($property, $propertyGroup)
+    {
+
+    }
+
+    public static function afterUnbind($property, $propertyGroup)
+    {
+
+    }
 }

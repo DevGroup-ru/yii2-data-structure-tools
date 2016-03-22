@@ -59,8 +59,6 @@ class EditProperty extends BaseAdminAction
             86400,
             new NotFoundHttpException("PropertyGroup model with specified id not found")
         );
-        $model->applicable_property_model_id = $propertyGroup->applicable_property_model_id;
-
 
         if ($model->isNewRecord === false) {
             // populate translations relation as we need to save all

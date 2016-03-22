@@ -1,10 +1,12 @@
 <?php
+
 namespace DevGroup\DataStructure\models;
 
 use DevGroup\DataStructure\behaviors\PackedJsonAttributes;
 use DevGroup\DataStructure\helpers\PropertyHandlerHelper;
 use DevGroup\DataStructure\helpers\PropertyStorageHelper;
 use DevGroup\DataStructure\Properties\Module;
+use DevGroup\DataStructure\propertyStorage\AbstractPropertyStorage;
 use DevGroup\Multilingual\behaviors\MultilingualActiveRecord;
 use DevGroup\Multilingual\traits\MultilingualTrait;
 use DevGroup\TagDependencyHelper\CacheableActiveRecord;
@@ -28,14 +30,13 @@ use yii\web\ServerErrorHttpException;
  * @property integer $property_handler_id
  * @property array $default_value
  * @property array $handler_config
- * @property integer $applicable_property_model_id
  * @property string $name
  * @property string $description
  * @property string $slug
  * @property PropertyGroup[] $propertyGroups
  * @property PropertyGroup $defaultPropertyGroup
  * @property StaticValue[] $staticValues
- * @property Storage $storage
+ * @property PropertyStorage $storage
  *
  * @package DevGroup\DataStructure\models
  */
@@ -86,8 +87,6 @@ class Property extends ActiveRecord
     public function rules()
     {
         return [
-            ['applicable_property_model_id', 'integer',],
-            ['applicable_property_model_id', 'required',],
             ['key', 'unique'],
             ['key', 'required'],
             ['key', 'string', 'max' => 80],
@@ -142,7 +141,6 @@ class Property extends ActiveRecord
     {
         return [
             'id' => Module::t('app', 'ID'),
-            'applicable_property_model_id' => Module::t('app', 'Applicable Property Model ID'),
             'key' => Module::t('app', 'Key'),
             'data_type' => Module::t('app', 'Data Type'),
             'is_internal' => Module::t('app', 'Is Internal'),
@@ -511,7 +509,20 @@ class Property extends ActiveRecord
      */
     public function getStorage()
     {
-        return $this->hasOne(PropertyStorage::className(), ['id'=>'storage_id']);
+        return $this->hasOne(PropertyStorage::className(), ['id' => 'storage_id']);
     }
 
+    public function afterBind($propertyGroup)
+    {
+        /** @var AbstractPropertyStorage $storageClassName */
+        $storageClassName = $this->storage->class_name;
+        $storageClassName::afterBind($this, $propertyGroup);
+    }
+
+    public function afterUnbind($propertyGroup)
+    {
+        /** @var AbstractPropertyStorage $storageClassName */
+        $storageClassName = $this->storage->class_name;
+        $storageClassName::afterUnbind($this, $propertyGroup);
+    }
 }

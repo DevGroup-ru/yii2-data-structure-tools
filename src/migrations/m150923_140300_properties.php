@@ -176,6 +176,7 @@ class m150923_140300_properties extends Migration
      */
     public function down()
     {
+        $this->db->createCommand("SET foreign_key_checks = 0")->execute();
         $this->dropTable('{{%property_property_group}}');
 
         $this->dropTable('{{%property_translation}}');
@@ -190,16 +191,6 @@ class m150923_140300_properties extends Migration
 
         $this->dropTable(ApplicablePropertyModels::tableName());
         $this->dropTable('{{%property_handlers}}');
+        $this->db->createCommand("SET foreign_key_checks = 1")->execute();
     }
-
-    /*
-    // Use safeUp/safeDown to run migration code within a transaction
-    public function safeUp()
-    {
-    }
-
-    public function safeDown()
-    {
-    }
-    */
 }

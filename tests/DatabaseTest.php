@@ -78,7 +78,7 @@ class DatabaseTest extends \PHPUnit_Extensions_Database_TestCase
                 'class' => Connection::className(),
                 'dsn' => 'mysql:host=localhost;dbname=yii2_datastructure',
                 'username' => 'root',
-                'password' => '',
+                'password' => 'root',
             ]);
 
             Yii::$app->getDb()->open();
@@ -157,11 +157,12 @@ class DatabaseTest extends \PHPUnit_Extensions_Database_TestCase
 
         $propertyGroup = new PropertyGroup(Product::className());
         $propertyGroup->internal_name = 'Specification';
+        $propertyGroup->translate(1)->name = 'Specification';
+        $propertyGroup->translate(2)->name = 'Specification';
         $this->assertTrue($propertyGroup->save());
 
         $power = new Property();
         $power->key = 'power';
-        $power->applicable_property_model_id = PropertiesHelper::applicablePropertyModelId($product->className());
         $power->translate(1)->name = 'Power';
         $power->translate(2)->name = 'Power';
         $power->data_type = Property::DATA_TYPE_INTEGER;
@@ -289,7 +290,6 @@ class DatabaseTest extends \PHPUnit_Extensions_Database_TestCase
         $this->assertTrue($smartphone_general->save());
 
         $weight = new Property();
-        $weight->applicable_property_model_id = PropertiesHelper::applicablePropertyModelId(Product::className());
         $weight->key = 'weight';
         $weight->storage_id = 2;
         $weight->data_type = Property::DATA_TYPE_FLOAT;
@@ -314,7 +314,6 @@ class DatabaseTest extends \PHPUnit_Extensions_Database_TestCase
         $this->assertEquals(1, count($properties));
 
         $os = new Property();
-        $os->applicable_property_model_id = PropertiesHelper::applicablePropertyModelId(Product::className());
         $os->key = 'os';
         $os->storage_id = 1;
         $os->property_handler_id = PropertyHandlerHelper::getInstance()->handlerIdByClassName(

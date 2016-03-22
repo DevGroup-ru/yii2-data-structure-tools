@@ -2,9 +2,13 @@
 
 namespace DevGroup\DataStructure\propertyStorage;
 
+use DevGroup\DataStructure\behaviors\HasProperties;
 use DevGroup\DataStructure\helpers\PropertiesHelper;
+use DevGroup\DataStructure\models\ApplicablePropertyModels;
 use DevGroup\DataStructure\models\Property;
+use DevGroup\DataStructure\models\PropertyGroup;
 use DevGroup\DataStructure\Properties\Module;
+use DevGroup\DataStructure\traits\PropertiesTrait;
 use Yii;
 use yii\db\ActiveRecord;
 use yii\db\Expression;
@@ -167,36 +171,11 @@ class TableInheritance extends AbstractPropertyStorage
     }
 
     /**
-     * Action that should be done by property storage before property adding.
-     * Property storage can override this function to add specific actions like schema manipulation.
-     * @param Property $property Reference to property model
-     * @return bool Success status, true if all's ok
-     */
-    public function beforePropertyAdd(Property &$property)
-    {
-        /** @var \yii\db\ActiveRecord|\DevGroup\DataStructure\traits\PropertiesTrait|\DevGroup\DataStructure\behaviors\HasProperties $applicableModel */
-        $applicableModel = PropertiesHelper::classNameForApplicablePropertyModelId($property->applicable_property_model_id);
-        $tableName = $applicableModel::tableInheritanceTable();
-        $db = $applicableModel::getDb();
-        /** @var \yii\db\Command $command */
-        $command = $db->createCommand()->addColumn(
-            $tableName,
-            $property->key,
-            $this->columnTypeForDataType($db, $property->data_type)
-        );
-        // no exception here - is good result
-        // we don't catch exception here so user will se it as it is(ie. "Duplicate column name 'foo'")
-        $command->execute();
-
-        return true;
-    }
-
-    /**
      * @param \yii\db\Connection $db
      * @param integer $type
      * @return string
      */
-    protected function columnTypeForDataType($db, $type)
+    protected static function columnTypeForDataType($db, $type)
     {
         $schema = $db->getSchema();
         switch ($type) {
@@ -250,18 +229,96 @@ class TableInheritance extends AbstractPropertyStorage
      */
     public function afterPropertyDelete(Property &$property)
     {
-        $classNames = static::getApplicablePropertyModelClassNames($property->id);
-        foreach ($classNames as $className) {
-            $schema = $className::getDb()
-                ->getSchema()
-                ->getTableSchema($className::tableInheritanceTable());
-            if ($schema === null || $property->key === 'model_id' || in_array($property->key, $schema->columnNames) === false) {
-                continue;
+        $propertyGroups = PropertyGroup::find()->all();
+        foreach ($propertyGroups as $propertyGroup) {
+            static::dropColumn($property, $propertyGroup);
+        }
+    }
+
+    /**
+     * @param Property $property
+     * @param PropertyGroup $propertyGroup
+     */
+    public static function afterBind($property, $propertyGroup)
+    {
+        static::addColumn($property, $propertyGroup);
+    }
+
+    /**
+     * @param Property $property
+     * @param PropertyGroup $propertyGroup
+     */
+    public static function afterUnbind($property, $propertyGroup)
+    {
+        static::dropColumn($property, $propertyGroup);
+    }
+
+    /**
+     * @param PropertyGroup $propertyGroup
+     * @return ActiveRecord|HasProperties|PropertiesTrait
+     */
+    public static function getModelClassNameByGroup($propertyGroup)
+    {
+        $className = ApplicablePropertyModels::find()
+            ->select('class_name')
+            ->where(['id' => $propertyGroup->applicable_property_model_id])
+            ->scalar();
+        if ($className === null) {
+            throw new \Exception('Model with id {id} not found');
+        }
+        return $className;
+    }
+
+    /**
+     * @param ActiveRecord|HasProperties|PropertiesTrait $className
+     * @return bool
+     * @throws \yii\db\Exception
+     */
+    public static function getColumns($className)
+    {
+        $schema = $className::getDb()
+            ->getSchema()
+            ->getTableSchema($className::tableInheritanceTable());
+        return $schema->columnNames;
+    }
+
+    /**
+     * @param Property $property
+     * @param PropertyGroup $propertyGroup
+     * @throws \Exception
+     */
+    public static function addColumn($property, $propertyGroup)
+    {
+        if ($property !== null && $propertyGroup !== null) {
+            $className = static::getModelClassNameByGroup($propertyGroup);
+            if (in_array($property->key, static::getColumns($className)) === false) {
+                $className::getDb()
+                    ->createCommand()
+                    ->addColumn(
+                        $className::tableInheritanceTable(),
+                        $property->key,
+                        static::columnTypeForDataType($className::getDb(), $property->data_type)
+                    )
+                    ->execute();
             }
-            $className::getDb()
-                ->createCommand()
-                ->dropColumn($className::tableInheritanceTable(), $property->key)
-                ->execute();
+        }
+    }
+
+    /**
+     * @param Property $property
+     * @param PropertyGroup $propertyGroup
+     * @throws \Exception
+     */
+    public static function dropColumn($property, $propertyGroup)
+    {
+        if ($property !== null && $propertyGroup !== null) {
+            $className = static::getModelClassNameByGroup($propertyGroup);
+            if (in_array($property->key, static::getColumns($className)) === true) {
+                $className::getDb()
+                    ->createCommand()
+                    ->dropColumn($className::tableInheritanceTable(), $property->key)
+                    ->execute();
+            }
         }
     }
 }
