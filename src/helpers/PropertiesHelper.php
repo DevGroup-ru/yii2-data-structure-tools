@@ -108,7 +108,7 @@ class PropertiesHelper
         static::fillPropertyGroups($models);
         static::ensurePropertiesAttributes($models);
 
-        $storageHandlers = PropertyStorageHelper::storageHandlers();
+        $storageHandlers = PropertyStorageHelper::getHandlersForModel(reset($models));
 
         Yii::beginProfile('Fill properties for models');
 
@@ -153,7 +153,7 @@ class PropertiesHelper
      */
     public static function deleteAllProperties(&$models)
     {
-        $storageHandlers = PropertyStorageHelper::storageHandlers();
+        $storageHandlers = PropertyStorageHelper::getHandlersForModel(reset($models));
 
         Yii::beginProfile('Fill properties for models');
 
@@ -319,7 +319,7 @@ class PropertiesHelper
                     ]
                 )->createCommand()->getRawSql();
             $propertyIdsToDelete = $query->andWhere('property_id IN (' . $subQuerySql . ')')->column();
-            $storageHandlers = PropertyStorageHelper::storageHandlers();
+            $storageHandlers = PropertyStorageHelper::getHandlersForModel(reset($models));
             foreach ($storageHandlers as $handler) {
                 $handler->deleteProperties($models, $propertyIdsToDelete);
             }
@@ -353,7 +353,7 @@ class PropertiesHelper
             }
         );
 
-        $storageHandlers = PropertyStorageHelper::storageHandlers();
+        $storageHandlers = PropertyStorageHelper::getHandlersForModel(reset($models));
 
         $result = true;
 

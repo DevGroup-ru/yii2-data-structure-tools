@@ -197,7 +197,7 @@ class HasProperties extends Behavior
             }
         }
 
-        $handlers = PropertyStorageHelper::storageHandlers();
+        $handlers = PropertyStorageHelper::getHandlersForModel($owner);
         $models = [&$owner];
         foreach ($handlers as $handler) {
             $handler->modelsInserted($models);

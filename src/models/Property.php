@@ -15,6 +15,7 @@ use Yii;
 use yii\data\ActiveDataProvider;
 use yii\db\ActiveRecord;
 use yii\db\Query;
+use yii\helpers\ArrayHelper;
 use yii\web\ServerErrorHttpException;
 
 /**
@@ -251,6 +252,12 @@ class Property extends ActiveRecord
             $storage->afterPropertyAdd($this);
         } else {
             $storage->afterPropertyChange($this);
+        }
+        if (in_array('storage_id', $changedAttributes) === true) {
+            $apmIds = ArrayHelper::getColumn($this->propertyGroups, 'applicable_property_model_id');
+            foreach (ApplicablePropertyModels::find()->select('class_name')->where(['id' => $apmIds])->column() as $className) {
+                PropertyStorageHelper::clearHandlersForClass($className);
+            }
         }
     }
 

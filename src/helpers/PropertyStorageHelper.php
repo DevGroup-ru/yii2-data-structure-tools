@@ -2,8 +2,13 @@
 
 namespace DevGroup\DataStructure\helpers;
 
+use DevGroup\DataStructure\models\ApplicablePropertyModels;
+use DevGroup\DataStructure\models\Property;
+use DevGroup\DataStructure\models\PropertyGroup;
+use DevGroup\DataStructure\models\PropertyPropertyGroup;
 use DevGroup\DataStructure\models\PropertyStorage;
 use Yii;
+use yii\db\ActiveRecord;
 use yii\helpers\ArrayHelper;
 use yii\web\ServerErrorHttpException;
 
@@ -17,6 +22,11 @@ class PropertyStorageHelper
      * @var \DevGroup\DataStructure\propertyStorage\AbstractPropertyStorage[]
      */
     private static $storageHandlers = null;
+
+    /**
+     * @var array[]
+     */
+    private static $applicablePropertyModelStorageIds = [];
 
     /**
      * @return \DevGroup\DataStructure\propertyStorage\AbstractPropertyStorage[] PropertyStorage indexed by PropertyStorage.id
@@ -34,6 +44,52 @@ class PropertyStorageHelper
             }, 'StorageHandlers', 86400, PropertyStorage::commonTag());
         }
         return self::$storageHandlers;
+    }
+
+    /**
+     * @return \DevGroup\DataStructure\propertyStorage\AbstractPropertyStorage[] PropertyStorage indexed by PropertyStorage.id
+     */
+    public static function getHandlersForModel(ActiveRecord $model)
+    {
+        $className = get_class($model);
+        if (isset(self::$applicablePropertyModelStorageIds[$className]) === false) {
+            $apmId = ApplicablePropertyModels::find()
+                ->select('id')
+                ->where(['class_name' => $className])
+                ->scalar();
+            if ($apmId === false) {
+                return [];
+            }
+            $pgIds = PropertyGroup::find()
+                ->select('id')
+                ->where(['applicable_property_model_id' => $apmId])
+                ->column();
+            if (empty($pgIds) === true) {
+                return [];
+            }
+            self::$applicablePropertyModelStorageIds[$className] = Property::find()
+                ->from(Property::tableName() . ' p')
+                ->distinct(true)
+                ->select('storage_id')
+                ->join('JOIN', PropertyPropertyGroup::tableName() . ' pg', 'p.id = pg.property_id AND pg.property_group_id IN (' . implode(',', $pgIds) . ')')
+                ->column();
+        }
+        $storageHandlers = static::storageHandlers();
+        $result = [];
+        foreach (self::$applicablePropertyModelStorageIds[$className] as $id) {
+            if (isset($storageHandlers[$id]) === true) {
+                $result[] = $storageHandlers[$id];
+            }
+        }
+        return $result;
+    }
+
+    /**
+     * @param string $className
+     */
+    public static function clearHandlersForClass($className)
+    {
+        unset(static::$applicablePropertyModelStorageIds[$className]);
     }
 
     /**

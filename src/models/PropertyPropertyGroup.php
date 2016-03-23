@@ -2,6 +2,7 @@
 
 namespace DevGroup\DataStructure\models;
 
+use DevGroup\DataStructure\helpers\PropertyStorageHelper;
 use Yii;
 
 /**
@@ -71,6 +72,13 @@ class PropertyPropertyGroup extends \yii\db\ActiveRecord
     {
         if ($insert === true) {
             $this->property->afterBind($this->propertyGroup);
+            $className = ApplicablePropertyModels::find()
+                ->select('class_name')
+                ->where(['id' => $this->propertyGroup->applicable_property_model_id])
+                ->scalar();
+            if ($className !== false) {
+                PropertyStorageHelper::clearHandlersForClass($className);
+            }
         }
         parent::afterSave($insert, $changedAttributes);
     }
