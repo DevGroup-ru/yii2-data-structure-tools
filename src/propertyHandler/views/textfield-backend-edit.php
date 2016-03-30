@@ -2,6 +2,7 @@
 /**
  * @var \yii\db\ActiveRecord $model
  * @var \DevGroup\DataStructure\models\Property $property
+ * @var ActiveForm $form
  * @var \DevGroup\DataStructure\propertyHandler\AbstractPropertyHandler | \yii\web\View $this
  */
 
@@ -46,5 +47,5 @@ use yii\helpers\Html;
         <div class="help-block"><?= implode('<br />', $model->getErrors($property->key)) ?></div>
     </div>
 <?php else: ?>
-    <?php echo (new ActiveForm())->field($model, $property->key); ?>
+    <?php echo $form->field($model, $property->key); ?>
 <?php endif; ?>

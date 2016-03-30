@@ -11,11 +11,13 @@ use DevGroup\DataStructure\traits\PropertiesTrait;
 use kartik\select2\Select2;
 use rmrevin\yii\fontawesome\component\Icon;
 use yii\base\Exception;
+use yii\base\InvalidParamException;
 use yii\base\Widget;
 use yii\db\ActiveRecord;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 use yii\web\Application;
+use yii\widgets\ActiveForm;
 use yii\widgets\Pjax;
 
 /**
@@ -28,6 +30,11 @@ class PropertiesForm extends Widget
      * @var ActiveRecord | PropertiesTrait
      */
     public $model;
+
+    /**
+     * @var ActiveForm
+     */
+    public $form;
 
     /**
      * @var string view file for widget rendering
@@ -75,7 +82,8 @@ class PropertiesForm extends Widget
                         ->handler()
                         ->renderProperty(
                             $this->model, $property,
-                            AbstractPropertyHandler::BACKEND_EDIT
+                            AbstractPropertyHandler::BACKEND_EDIT,
+                            $this->form
                         );
                 }
                 $tabs[] = [
@@ -129,6 +137,9 @@ class PropertiesForm extends Widget
         if (!$this->model instanceof ActiveRecord || !$this->model->hasMethod('ensurePropertyGroupIds')) {
             throw new Exception('Field "model" must be an ActiveRecord and uses a PropertiesTrait');
         }
+        if (false === $this->form instanceof ActiveForm) {
+            throw new InvalidParamException('Field "form" must be an ActiveForm');
+        }
         PropertiesFormAsset::register($this->getView());
         $availableGroups = PropertiesHelper::getAvailablePropertyGroupsList(get_class($this->model));
         $models = [$this->model];
@@ -141,6 +152,7 @@ class PropertiesForm extends Widget
                 'attachedGroups' => $attachedGroups,
                 'availableGroups' => $availableGroups,
                 'tabs' => $tabs,
+                'form' => $this->form,
             ]
         );
     }

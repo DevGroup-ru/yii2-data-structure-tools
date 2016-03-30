@@ -7,6 +7,7 @@ use DevGroup\DataStructure\models\Property;
 use DevGroup\DataStructure\traits\PropertiesTrait;
 use yii\base\Widget;
 use yii\db\ActiveRecord;
+use yii\widgets\ActiveForm;
 
 abstract class AbstractPropertyHandler extends Widget
 {
@@ -14,7 +15,7 @@ abstract class AbstractPropertyHandler extends Widget
     const BACKEND_EDIT = 'backend-edit';
     const FRONTEND_RENDER = 'frontend-render';
     const FRONTEND_EDIT = 'frontend-edit';
-    
+
 
     public function afterFind($model, $attribute)
     {
@@ -46,7 +47,7 @@ abstract class AbstractPropertyHandler extends Widget
 
     /**
      * @param \DevGroup\DataStructure\models\Property $property
-     * @param bool                                    $insert
+     * @param bool $insert
      *
      * @return bool
      */
@@ -72,15 +73,17 @@ abstract class AbstractPropertyHandler extends Widget
      * @param ActiveRecord | HasProperties | PropertiesTrait $model
      * @param Property $property
      * @param string $view
+     * @param null | ActiveForm $form
      * @return string
      */
-    public function renderProperty($model, $property, $view)
+    public function renderProperty($model, $property, $view, $form = null)
     {
         return $this->render(
             $this->convertView($view),
             [
                 'model' => $model,
-                'property' => $property
+                'property' => $property,
+                'form' => $form
             ]
         );
     }

@@ -1,6 +1,7 @@
 <?php
 /**
  * @var \yii\db\ActiveRecord $model
+ * @var ActiveForm $form
  * @var \DevGroup\DataStructure\models\Property $property
  * @var yii\web\View $this
  */
@@ -21,8 +22,8 @@ if ((int)$property->allow_multiple_values === 1 && !empty($model->{$property->ke
     ]);
 }
 
-echo Html::tag('div', (new ActiveForm())
-    ->field($model, $property->key)
+echo Html::tag('div',
+    $form->field($model, $property->key)
     ->widget(
         Select2::className(),
         [

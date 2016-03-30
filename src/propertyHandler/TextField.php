@@ -32,12 +32,12 @@ class TextField extends AbstractPropertyHandler
     /**
      * @inheritdoc
      */
-    public function renderProperty($model, $property, $view)
+    public function renderProperty($model, $property, $view, $form = null)
     {
         if ($property->allow_multiple_values === true) {
             JuiAsset::register($this->getView());
             TextFieldAsset::register($this->getView());
         }
-        return parent::renderProperty($model, $property, $view);
+        return parent::renderProperty($model, $property, $view, $form);
     }
 }
