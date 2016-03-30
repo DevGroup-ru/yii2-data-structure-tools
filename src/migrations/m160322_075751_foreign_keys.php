@@ -11,6 +11,27 @@ use yii\db\Migration;
 
 class m160322_075751_foreign_keys extends Migration
 {
+    public function addForeignKey($name, $table, $columns, $refTable, $refColumns, $delete = null, $update = null)
+    {
+        $schema = $this->db->schema->getTableSchema($table);
+        $table = trim($this->db->quoteSql($table), '`');
+        $refTable = trim($this->db->quoteSql($refTable), '`');
+        foreach ($schema->foreignKeys as $foreignKey) {
+            foreach ($foreignKey as $col => $refCol) {
+                if ($col === 0) {
+                    if ($refCol !== $refTable) {
+                        continue 2;
+                    } elseif ($refCol !== $table) {
+                        continue;
+                    }
+                }
+                if ($col === $columns && $refCol === $refColumns) {
+                    return;
+                }
+            }
+        }
+        parent::addForeignKey($name, $table, $columns, $refTable, $refColumns, $delete, $update);
+    }
 
     public function up()
     {
