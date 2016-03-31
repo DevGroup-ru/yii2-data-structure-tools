@@ -17,8 +17,7 @@ try {
     $data = null;
 }
 
-echo (new ActiveForm())
-    ->field($model, $property->key)
+echo $form->field($model, $property->key)
     ->widget(
         MapInputWidget::className(),
         [

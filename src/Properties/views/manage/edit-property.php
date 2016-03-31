@@ -68,11 +68,10 @@ $this->params['breadcrumbs'][] = $this->title;
     $this->trigger(EditProperty::EVENT_FORM_AFTER_SUBMIT, $event);
     ?>
 
-    <?php ActiveForm::end(); ?>
-
     <?php
-    $event = new ModelEditForm(new ActiveForm(), $model);
+    $event = new ModelEditForm($form, $model);
     $this->trigger(EditProperty::EVENT_AFTER_FORM, $event);
     ?>
+    <?php $form::end(); ?>
 
 </div>
