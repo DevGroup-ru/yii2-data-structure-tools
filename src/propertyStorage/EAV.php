@@ -3,10 +3,12 @@
 namespace DevGroup\DataStructure\propertyStorage;
 
 use DevGroup\DataStructure\helpers\PropertiesHelper;
+use DevGroup\DataStructure\models\ApplicablePropertyModels;
 use DevGroup\DataStructure\models\Property;
 use yii\db\ActiveRecord;
 use yii\db\Query;
 use yii\helpers\ArrayHelper;
+use yii\helpers\Json;
 
 class EAV extends AbstractPropertyStorage
 {
@@ -266,5 +268,41 @@ class EAV extends AbstractPropertyStorage
                 )
                 ->execute();
         }
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public static function getPropertyValuesByParams($propertyId, $params = '')
+    {
+        $property = Property::findById($propertyId);
+        $column = static::dataTypeToEavColumn($property->data_type);
+
+        if (is_string($params)) {
+            $params = str_replace('[column]', $column, $params);
+        } elseif (is_array($params)) {
+            $params = Json::decode(str_replace('[column]', $column, Json::encode($params)));
+        } else {
+            return [];
+        }
+
+        $classNames = static::getApplicablePropertyModelClassNames($propertyId);
+        $queries = [];
+        foreach ($classNames as $className) {
+            $query = new Query();
+            $query->select($column)->from($className::eavTable())->where($params);
+            $queries[] = $query;
+        }
+
+        if (empty($queries)) {
+            return [];
+        }
+        /**
+         * @var $query Query
+         */
+        for ($query = array_pop($queries); !empty($queries); $query->union(array_pop($queries)));
+
+
+        return $query->column();
     }
 }

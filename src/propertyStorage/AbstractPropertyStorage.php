@@ -21,7 +21,7 @@ use yii\helpers\ArrayHelper;
  *
  * @package DevGroup\DataStructure\propertyStorage
  */
-abstract class AbstractPropertyStorage
+abstract class AbstractPropertyStorage implements FiltrableStorageInterface
 {
     /**
      * @var ActiveRecord[] | HasProperties[] | PropertiesTrait[] Applicable property model class names identity map by property id
@@ -214,5 +214,13 @@ abstract class AbstractPropertyStorage
     public static function afterUnbind($property, $propertyGroup)
     {
 
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public static function getPropertyValuesByParams($propertyId, $params = '')
+    {
+        return [];
     }
 }

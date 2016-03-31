@@ -15,6 +15,7 @@ use yii\db\Expression;
 use yii\db\Query;
 use yii\db\Schema;
 use yii\helpers\ArrayHelper;
+use yii\helpers\Json;
 
 class TableInheritance extends AbstractPropertyStorage
 {
@@ -302,6 +303,45 @@ class TableInheritance extends AbstractPropertyStorage
                     ->execute();
             }
         }
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public static function getPropertyValuesByParams($propertyId, $params = '')
+    {
+        $property = Property::findById($propertyId);
+        $column = $property->key;
+
+        if (is_string($params)) {
+            $params = str_replace('[column]', $column, $params);
+        } elseif (is_array($params)) {
+            $params = Json::decode(str_replace('[column]', $column, Json::encode($params)));
+        } else {
+            return [];
+        }
+
+        $classNames = static::getApplicablePropertyModelClassNames($propertyId);
+        $queries = [];
+        foreach ($classNames as $className) {
+            $columns = self::getColumns($className);
+
+            if (array_search($column, $columns) !== false) {
+                $query = new Query();
+                $query->select($column)->from($className::tableInheritanceTable())->where($params);
+                $queries[] = $query;
+            }
+        }
+
+        if (empty($queries)) {
+            return [];
+        }
+        /**
+         * @var $query Query
+         */
+        for ($query = array_pop($queries); !empty($queries); $query->union(array_pop($queries)));
+        
+        return $query->column();
     }
 
     /**

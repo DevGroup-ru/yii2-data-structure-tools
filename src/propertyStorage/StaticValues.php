@@ -5,8 +5,10 @@ namespace DevGroup\DataStructure\propertyStorage;
 use DevGroup\DataStructure\helpers\PropertiesHelper;
 use DevGroup\DataStructure\models\Property;
 use DevGroup\DataStructure\models\StaticValue;
+use DevGroup\DataStructure\models\StaticValueTranslation;
 use Yii;
 use yii\db\Query;
+use yii\helpers\Json;
 
 class StaticValues extends AbstractPropertyStorage
 {
@@ -193,6 +195,23 @@ class StaticValues extends AbstractPropertyStorage
         }
 
         return true;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public static function getPropertyValuesByParams($propertyId, $params = '')
+    {
+        if (is_string($params)) {
+            $params = str_replace('[column]', 'description', $params);
+        } elseif (is_array($params)) {
+            $params = Json::decode(str_replace('[column]', 'description', Json::encode($params)));
+        } else {
+            return [];
+        }
+        return (new Query())->select('description')->from(StaticValueTranslation::tableName())->distinct()->where(
+            $params
+        )->innerJoin(StaticValue::tableName())->andWhere(['property_id' => $propertyId])->column();
     }
 
     /**

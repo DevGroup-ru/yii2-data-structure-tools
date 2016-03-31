@@ -421,4 +421,10 @@ class PropertiesHelper
         );
         return $availableGroups;
     }
+
+    public static function getPropertyValuesByParams(Property $property, $params = '')
+    {
+        $storageClass = $property->storage->class_name;
+        return $storageClass::getPropertyValuesByParams($property->id, $params);
+    }
 }
