@@ -18,7 +18,7 @@ class PropertyHandlerHelper
     /**
      * @var null|\DevGroup\DataStructure\propertyHandler\AbstractPropertyHandler[] Array of all handlers with initiated classes(not ActiveRecord)
      */
-    private $handlers = null;
+    private $_handlers = null;
 
     /**
      * @return PropertyHandlerHelper
@@ -46,8 +46,8 @@ class PropertyHandlerHelper
      */
     public function handlers()
     {
-        if ($this->handlers === null) {
-            $this->handlers = Yii::$app->cache->lazy(function () {
+        if ($this->_handlers === null) {
+            $this->_handlers = Yii::$app->cache->lazy(function () {
                 $models = PropertyHandlers::find()
                     ->orderBy(['sort_order' => SORT_ASC])
                     ->all();
@@ -61,7 +61,7 @@ class PropertyHandlerHelper
                 return $handlers;
             }, 'AllPropertyHandlers', 86400, PropertyHandlers::commonTag());
         }
-        return $this->handlers;
+        return $this->_handlers;
     }
 
     /**
@@ -74,8 +74,8 @@ class PropertyHandlerHelper
      */
     public function handlerById($id)
     {
-        if (isset($this->handlers[$id])) {
-            return $this->handlers[$id];
+        if (isset($this->_handlers[$id])) {
+            return $this->_handlers[$id];
         }
         throw new \Exception("Property handler with id $id not found");
     }

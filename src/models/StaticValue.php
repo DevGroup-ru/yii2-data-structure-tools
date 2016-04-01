@@ -213,14 +213,14 @@ class StaticValue extends ActiveRecord
     }
 
     /**
-     * @param $propertyGroupId
-     * @param $params
+     * @param null $propertyId
+     * @param array $params
      *
-     * @return \yii\data\ActiveDataProvider
-     *
+     * @return ActiveDataProvider
+     * @internal param $propertyGroupId
      * @codeCoverageIgnore
      */
-    public function search($propertyId = null, $params)
+    public function search($propertyId = null, $params = [])
     {
         $query = self::find();
         if ($propertyId !== null) {

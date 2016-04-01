@@ -10,7 +10,7 @@ use yii\widgets\ActiveForm;
 use yii\helpers\Html;
 
 ?>
-<?php if ($property->allow_multiple_values == 1): ?>
+<?php if ($property->allow_multiple_values == 1) : ?>
     <?php
     $inputName = Html::getInputName($model, $property->key) . '[]';
     $inputId = Html::getInputId($model, $property->key);
@@ -24,7 +24,7 @@ use yii\helpers\Html;
             <?= $model->getAttributeLabel($property->key) ?>
             <button class="btn btn-info btn-xs" data-action="add-new-eav-input"><i class="fa fa-plus"></i></button>
         </label>
-        <?php foreach ($values as $index => $value): ?>
+        <?php foreach ($values as $index => $value) : ?>
             <div class="input-group">
                 <div class="input-group-addon arrows"><i class="fa fa-arrows"></i></div>
                 <?=
@@ -46,6 +46,6 @@ use yii\helpers\Html;
         <?php endforeach; ?>
         <div class="help-block"><?= implode('<br />', $model->getErrors($property->key)) ?></div>
     </div>
-<?php else: ?>
+<?php else : ?>
     <?php echo $form->field($model, $property->key); ?>
 <?php endif; ?>

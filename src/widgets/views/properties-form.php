@@ -21,13 +21,15 @@ use yii\widgets\Pjax;
                         $this->context->addPropertyGroupRoute,
                         'className' => get_class($this->context->model),
                         'modelId' => $this->context->model->id,
-                    ]),
+                    ]
+                ),
                 'delete-url' => Url::toRoute(
                     [
                         $this->context->deletePropertyGroupRoute,
                         'className' => get_class($this->context->model),
                         'modelId' => $this->context->model->id,
-                    ]),
+                    ]
+                ),
                 'model-id' => $this->context->model->id
 
             ]
@@ -48,4 +50,3 @@ $this->registerJs(<<<JAVASCRIPT
 JAVASCRIPT
 );
 $widget->end();
-

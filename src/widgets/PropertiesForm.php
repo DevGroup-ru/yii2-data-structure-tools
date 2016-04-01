@@ -81,7 +81,8 @@ class PropertiesForm extends Widget
                     $content .= $property
                         ->handler()
                         ->renderProperty(
-                            $this->model, $property,
+                            $this->model,
+                            $property,
                             AbstractPropertyHandler::BACKEND_EDIT,
                             $this->form
                         );
@@ -98,12 +99,12 @@ class PropertiesForm extends Widget
                             ]
                         ),
                     'content' => $content . Html::hiddenInput(
-                            'propertyGroupIds[]',
-                            $id,
-                            [
+                        'propertyGroupIds[]',
+                        $id,
+                        [
                                 'class' => 'property-group-ids',
                             ]
-                        ),
+                    ),
                 ];
             }
         }
@@ -164,5 +165,4 @@ class PropertiesForm extends Widget
     {
         return $this->model->propertyGroupIds;
     }
-
 }

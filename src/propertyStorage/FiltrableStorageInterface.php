@@ -3,7 +3,6 @@
 
 namespace DevGroup\DataStructure\propertyStorage;
 
-
 use yii\db\ActiveRecord;
 
 interface FiltrableStorageInterface

@@ -191,7 +191,7 @@ class HasProperties extends Behavior
             foreach ($groups as $group_id) {
                 /** @var PropertyGroup $group */
                 $group = PropertyGroup::findOne(['id' => $group_id]);
-                if($group) {
+                if ($group) {
                     $owner->addPropertyGroup($group);
                 }
             }

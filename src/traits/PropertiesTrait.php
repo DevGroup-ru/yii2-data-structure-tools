@@ -222,5 +222,4 @@ trait PropertiesTrait
         }
         return $rules;
     }
-
 }

@@ -10,7 +10,6 @@ use hector68\yii2\widgets\MapInputWidget;
 use yii\helpers\Json;
 use yii\widgets\ActiveForm;
 
-
 try {
     $data = Json::decode($model->{$property->key});
 } catch (Exception $e) {
