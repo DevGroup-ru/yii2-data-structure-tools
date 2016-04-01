@@ -300,11 +300,10 @@ class EAV extends AbstractPropertyStorage
         /**
          * @var $query Query
          */
-        for ($query = array_pop($queries); !empty($queries);
-        $query->union(array_pop($queries))) {
-
-        }
-
+        $query = array_pop($queries);
+        while (!empty($queries)) {
+            $query->union(array_pop($queries));
+        };
 
         return $query->column();
     }
