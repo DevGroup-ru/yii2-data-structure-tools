@@ -427,4 +427,10 @@ class PropertiesHelper
         $storageClass = $property->storage->class_name;
         return $storageClass::getPropertyValuesByParams($property->id, $params);
     }
+
+    public static function getModelsByPropertyValues(Property $property, $values = [])
+    {
+        $storageClass = $property->storage->class_name;
+        return $storageClass::getModelsByPropertyValuesParams($property->id, $values);
+    }
 }

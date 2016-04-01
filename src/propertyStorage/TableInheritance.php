@@ -345,6 +345,28 @@ class TableInheritance extends AbstractPropertyStorage
     }
 
     /**
+     * @inheritdoc
+     */
+    public static function getModelsByPropertyValuesParams($propertyId, $values = [])
+    {
+        $result = [];
+        $property = Property::findById($propertyId);
+        $column = $property->key;
+        $classNames = static::getApplicablePropertyModelClassNames($propertyId);
+        foreach ($classNames as $className) {
+            $tmp = $className::find()->innerJoin(
+                $className::tableInheritanceTable() . ' MP',
+                'MP.model_id=' . $className::tableName() . '.id'
+            )->where(["MP.$column" => $values])->all();
+            if (!empty($tmp)) {
+                $result = ArrayHelper::merge($result, $tmp);
+            }
+        }
+
+        return $result;
+    }
+
+    /**
      * @param Property $property
      * @param PropertyGroup $propertyGroup
      * @throws \Exception

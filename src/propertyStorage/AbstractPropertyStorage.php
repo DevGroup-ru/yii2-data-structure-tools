@@ -223,4 +223,12 @@ abstract class AbstractPropertyStorage implements FiltrableStorageInterface
     {
         return [];
     }
+
+    /**
+     * @inheritdoc
+     */
+    public static function getModelsByPropertyValuesParams($propertyId, $values = [])
+    {
+        return [];
+    }
 }

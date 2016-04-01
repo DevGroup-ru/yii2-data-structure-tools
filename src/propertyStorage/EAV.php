@@ -305,4 +305,31 @@ class EAV extends AbstractPropertyStorage
 
         return $query->column();
     }
+
+    /**
+     * @inheritdoc
+     */
+    public static function getModelsByPropertyValuesParams($propertyId, $values = [])
+    {
+        $result = [];
+        $property = Property::findById($propertyId);
+        $classNames = static::getApplicablePropertyModelClassNames($propertyId);
+        $column = static::dataTypeToEavColumn($property->data_type);
+        foreach ($classNames as $className) {
+            $eavTable = $className::eavTable();
+            $tmp = $className::find()->innerJoin(
+                "$eavTable  EAV",
+                $className::tableName() . '.id= EAV.model_id'
+            )->andWhere(
+                [
+                    'EAV.property_id' => $propertyId,
+                    'EAV.' . $column => $values,
+                ]
+            )->all();
+            if (!empty($tmp)) {
+                $result = ArrayHelper::merge($result, $tmp);
+            }
+        }
+        return $result;
+    }
 }

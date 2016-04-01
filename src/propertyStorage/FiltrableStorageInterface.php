@@ -4,6 +4,8 @@
 namespace DevGroup\DataStructure\propertyStorage;
 
 
+use yii\db\ActiveRecord;
+
 interface FiltrableStorageInterface
 {
     /**
@@ -14,4 +16,12 @@ interface FiltrableStorageInterface
      * @return array of values
      */
     public static function getPropertyValuesByParams($propertyId, $params = '');
+
+    /**
+     * @param int $propertyId
+     * @param array|string $values
+     *
+     * @return ActiveRecord[]
+     */
+    public static function getModelsByPropertyValuesParams($propertyId, $values = []);
 }

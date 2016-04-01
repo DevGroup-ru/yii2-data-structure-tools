@@ -8,6 +8,7 @@ use DevGroup\DataStructure\models\StaticValue;
 use DevGroup\DataStructure\models\StaticValueTranslation;
 use Yii;
 use yii\db\Query;
+use yii\helpers\ArrayHelper;
 use yii\helpers\Json;
 
 class StaticValues extends AbstractPropertyStorage
@@ -202,16 +203,46 @@ class StaticValues extends AbstractPropertyStorage
      */
     public static function getPropertyValuesByParams($propertyId, $params = '')
     {
+        $column = 'description';
         if (is_string($params)) {
-            $params = str_replace('[column]', 'description', $params);
+            $params = str_replace('[column]', $column, $params);
         } elseif (is_array($params)) {
-            $params = Json::decode(str_replace('[column]', 'description', Json::encode($params)));
+            $params = Json::decode(str_replace('[column]', $column, Json::encode($params)));
         } else {
             return [];
         }
-        return (new Query())->select('description')->from(StaticValueTranslation::tableName())->distinct()->where(
+        return (new Query())->select($column)->from(StaticValueTranslation::tableName())->distinct()->where(
             $params
         )->innerJoin(StaticValue::tableName())->andWhere(['property_id' => $propertyId])->column();
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public static function getModelsByPropertyValuesParams($propertyId, $values = [])
+    {
+        $result = [];
+        $classNames = static::getApplicablePropertyModelClassNames($propertyId);
+        $column = 'description';
+        foreach ($classNames as $className) {
+            $tmp = $className::find()->innerJoin(
+                $className::staticValuesBindingsTable() . ' MSV',
+                'MSV.model_id=' . $className::tableName() . '.id'
+            )->innerJoin(StaticValue::tableName() . ' SV', 'SV.id=MSV.static_value_id')->innerJoin(
+                StaticValueTranslation::tableName() . ' SVT',
+                'SVT.model_id=SV.id'
+            )->andWhere(
+                [
+                    'SV.property_id' => $propertyId,
+                    "SVT.$column" => $values,
+                    'SVT.language_id' => Yii::$app->multilingual->language_id,
+                ]
+            )->all();
+
+            $result = ArrayHelper::merge($result, $tmp);
+
+        }
+        return $result;
     }
 
     /**
