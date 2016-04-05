@@ -5,6 +5,7 @@ namespace DevGroup\DataStructure\propertyStorage;
 use DevGroup\DataStructure\helpers\PropertiesHelper;
 use DevGroup\DataStructure\models\ApplicablePropertyModels;
 use DevGroup\DataStructure\models\Property;
+use yii\base\Exception;
 use yii\db\ActiveRecord;
 use yii\db\Query;
 use yii\helpers\ArrayHelper;
@@ -12,6 +13,8 @@ use yii\helpers\Json;
 
 class EAV extends AbstractPropertyStorage
 {
+
+
     /**
      * @inheritdoc
      */
@@ -278,13 +281,7 @@ class EAV extends AbstractPropertyStorage
         $property = Property::findById($propertyId);
         $column = static::dataTypeToEavColumn($property->data_type);
 
-        if (is_string($params)) {
-            $params = str_replace('[column]', $column, $params);
-        } elseif (is_array($params)) {
-            $params = Json::decode(str_replace('[column]', $column, Json::encode($params)));
-        } else {
-            return [];
-        }
+        $params = static::prepareParams($params, $column);
 
         $classNames = static::getApplicablePropertyModelClassNames($propertyId);
         $queries = [];
@@ -312,7 +309,7 @@ class EAV extends AbstractPropertyStorage
     /**
      * @inheritdoc
      */
-    public static function getModelsByPropertyValuesParams(
+    public static function getModelsByPropertyValues(
         $propertyId,
         $values = [],
         $returnType = self::RETURN_ALL
@@ -332,18 +329,7 @@ class EAV extends AbstractPropertyStorage
                     'EAV.' . $column => $values,
                 ]
             )->addGroupBy($className::primaryKey());
-            switch ($returnType) {
-                case self::RETURN_COUNT:
-                    $result += $tmpQuery->count();
-                    break;
-                case self::RETURN_QUERY:
-                    $result[] = $tmpQuery;
-                    break;
-                default:
-                    if (!empty($tmpQuery)) {
-                        $result = ArrayHelper::merge($result, $tmpQuery->all());
-                    }
-            }
+            $result = static::valueByReturnType($returnType, $tmpQuery, $result);
 
         }
         return $result;

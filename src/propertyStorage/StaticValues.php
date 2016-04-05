@@ -219,7 +219,7 @@ class StaticValues extends AbstractPropertyStorage
     /**
      * @inheritdoc
      */
-    public static function getModelsByPropertyValuesParams(
+    public static function getModelsByPropertyValues(
         $propertyId,
         $values = [],
         $returnType = self::RETURN_ALL
@@ -241,18 +241,7 @@ class StaticValues extends AbstractPropertyStorage
                     'SVT.language_id' => Yii::$app->multilingual->language_id,
                 ]
             )->addGroupBy($className::primaryKey());
-            switch ($returnType) {
-                case self::RETURN_COUNT:
-                    $result += $tmpQuery->count();
-                    break;
-                case self::RETURN_QUERY:
-                    $result[] = $tmpQuery;
-                    break;
-                default:
-                    if (!empty($tmpQuery)) {
-                        $result = ArrayHelper::merge($result, $tmpQuery->all());
-                    }
-            }
+            $result = static::valueByReturnType($returnType, $tmpQuery, $result);
         }
         return $result;
     }

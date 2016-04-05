@@ -29,7 +29,7 @@ interface FiltrableStorageInterface
      *
      * @return \yii\db\ActiveRecord[]|\yii\db\ActiveQuery[]|int
      */
-    public static function getModelsByPropertyValuesParams(
+    public static function getModelsByPropertyValues(
         $propertyId,
         $values = [],
         $returnType = self::RETURN_ALL

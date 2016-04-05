@@ -9,9 +9,11 @@ use DevGroup\DataStructure\models\PropertyGroup;
 use DevGroup\DataStructure\models\PropertyPropertyGroup;
 use DevGroup\DataStructure\traits\PropertiesTrait;
 use Yii;
+use yii\base\Exception;
 use yii\db\ActiveRecord;
 use yii\db\Query;
 use yii\helpers\ArrayHelper;
+use yii\helpers\Json;
 
 /**
  * Class AbstractPropertyStorage
@@ -61,6 +63,51 @@ abstract class AbstractPropertyStorage implements FiltrableStorageInterface
     public function __construct($storageId)
     {
         $this->storageId = intval($storageId);
+    }
+
+    /**
+     * Helper method
+     * @param $returnType
+     * @param $tmpQuery
+     * @param $result
+     *
+     * @return array
+     */
+    protected static function valueByReturnType($returnType, $tmpQuery, $result)
+    {
+        switch ($returnType) {
+            case FiltrableStorageInterface::RETURN_COUNT:
+                $result += $tmpQuery->count();
+                break;
+            case FiltrableStorageInterface::RETURN_QUERY:
+                $result[] = $tmpQuery;
+                break;
+            default:
+                if (!empty($tmpQuery)) {
+                    $result = ArrayHelper::merge($result, $tmpQuery->all());
+                }                
+        }
+        return $result;
+    }
+
+    /**
+     * @param $params
+     * @param $column
+     *
+     * @return mixed
+     * @throws Exception
+     */
+    protected static function prepareParams($params, $column)
+    {
+        if (is_string($params)) {
+            $params = str_replace('[column]', $column, $params);
+            return $params;
+        } elseif (is_array($params)) {
+            $params = Json::decode(str_replace('[column]', $column, Json::encode($params)));
+            return $params;
+        } else {
+            throw new Exception('bad params');
+        }
     }
 
     /**
@@ -227,7 +274,7 @@ abstract class AbstractPropertyStorage implements FiltrableStorageInterface
     /**
      * @inheritdoc
      */
-    public static function getModelsByPropertyValuesParams(
+    public static function getModelsByPropertyValues(
         $propertyId,
         $values = [],
         $returnType = self::RETURN_ALL
@@ -235,13 +282,7 @@ abstract class AbstractPropertyStorage implements FiltrableStorageInterface
         switch ($returnType) {
             case self::RETURN_COUNT:
                 return 0;
-            case self::RETURN_QUERY:
-                $result = [];
-                $classNames = static::getApplicablePropertyModelClassNames($propertyId);
-                foreach ($classNames as $className) {
-                    $result[] = $className::find()->limit(0);
-                }
-                return $result;
+                break;
             default:
                 return [];
         }
