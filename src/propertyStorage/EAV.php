@@ -305,21 +305,25 @@ class EAV extends AbstractPropertyStorage
             $query->union(array_pop($queries));
         };
 
+
         return $query->column();
     }
 
     /**
      * @inheritdoc
      */
-    public static function getModelsByPropertyValuesParams($propertyId, $values = [])
-    {
-        $result = [];
+    public static function getModelsByPropertyValuesParams(
+        $propertyId,
+        $values = [],
+        $returnType = self::RETURN_ALL
+    ) {
+        $result = $returnType === self::RETURN_COUNT ? 0 : [];
         $property = Property::findById($propertyId);
         $classNames = static::getApplicablePropertyModelClassNames($propertyId);
         $column = static::dataTypeToEavColumn($property->data_type);
         foreach ($classNames as $className) {
             $eavTable = $className::eavTable();
-            $tmp = $className::find()->innerJoin(
+            $tmpQuery = $className::find()->innerJoin(
                 "$eavTable  EAV",
                 $className::tableName() . '.id= EAV.model_id'
             )->andWhere(
@@ -327,10 +331,20 @@ class EAV extends AbstractPropertyStorage
                     'EAV.property_id' => $propertyId,
                     'EAV.' . $column => $values,
                 ]
-            )->all();
-            if (!empty($tmp)) {
-                $result = ArrayHelper::merge($result, $tmp);
+            )->addGroupBy($className::primaryKey());
+            switch ($returnType) {
+                case self::RETURN_COUNT:
+                    $result += $tmpQuery->count();
+                    break;
+                case self::RETURN_QUERY:
+                    $result[] = $tmpQuery;
+                    break;
+                default:
+                    if (!empty($tmpQuery)) {
+                        $result = ArrayHelper::merge($result, $tmpQuery->all());
+                    }
             }
+
         }
         return $result;
     }

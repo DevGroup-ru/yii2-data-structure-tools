@@ -342,7 +342,7 @@ class TableInheritance extends AbstractPropertyStorage
         $query = array_pop($queries);
         while (!empty($queries)) {
             $query->union(array_pop($queries));
-        };
+        }
         
         return $query->column();
     }
@@ -350,19 +350,31 @@ class TableInheritance extends AbstractPropertyStorage
     /**
      * @inheritdoc
      */
-    public static function getModelsByPropertyValuesParams($propertyId, $values = [])
-    {
-        $result = [];
+    public static function getModelsByPropertyValuesParams(
+        $propertyId,
+        $values = [],
+        $returnType = self::RETURN_ALL
+    ) {
+        $result = $returnType === self::RETURN_COUNT ? 0 : [];
         $property = Property::findById($propertyId);
         $column = $property->key;
         $classNames = static::getApplicablePropertyModelClassNames($propertyId);
         foreach ($classNames as $className) {
-            $tmp = $className::find()->innerJoin(
+            $tmpQuery = $className::find()->innerJoin(
                 $className::tableInheritanceTable() . ' MP',
                 'MP.model_id=' . $className::tableName() . '.id'
-            )->where(["MP.$column" => $values])->all();
-            if (!empty($tmp)) {
-                $result = ArrayHelper::merge($result, $tmp);
+            )->where(["MP.$column" => $values]);
+            switch ($returnType) {
+                case self::RETURN_COUNT:
+                    $result += $tmpQuery->count();
+                    break;
+                case self::RETURN_QUERY:
+                    $result[] = $tmpQuery;
+                    break;
+                default:
+                    if (!empty($tmpQuery)) {
+                        $result = ArrayHelper::merge($result, $tmpQuery->all());
+                    }
             }
         }
 

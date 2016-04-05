@@ -219,13 +219,16 @@ class StaticValues extends AbstractPropertyStorage
     /**
      * @inheritdoc
      */
-    public static function getModelsByPropertyValuesParams($propertyId, $values = [])
-    {
-        $result = [];
+    public static function getModelsByPropertyValuesParams(
+        $propertyId,
+        $values = [],
+        $returnType = self::RETURN_ALL
+    ) {
+        $result = $returnType === self::RETURN_COUNT ? 0 : [];
         $classNames = static::getApplicablePropertyModelClassNames($propertyId);
         $column = 'description';
         foreach ($classNames as $className) {
-            $tmp = $className::find()->innerJoin(
+            $tmpQuery = $className::find()->innerJoin(
                 $className::staticValuesBindingsTable() . ' MSV',
                 'MSV.model_id=' . $className::tableName() . '.id'
             )->innerJoin(StaticValue::tableName() . ' SV', 'SV.id=MSV.static_value_id')->innerJoin(
@@ -237,10 +240,19 @@ class StaticValues extends AbstractPropertyStorage
                     "SVT.$column" => $values,
                     'SVT.language_id' => Yii::$app->multilingual->language_id,
                 ]
-            )->all();
-
-            $result = ArrayHelper::merge($result, $tmp);
-
+            )->addGroupBy($className::primaryKey());
+            switch ($returnType) {
+                case self::RETURN_COUNT:
+                    $result += $tmpQuery->count();
+                    break;
+                case self::RETURN_QUERY:
+                    $result[] = $tmpQuery;
+                    break;
+                default:
+                    if (!empty($tmpQuery)) {
+                        $result = ArrayHelper::merge($result, $tmpQuery->all());
+                    }
+            }
         }
         return $result;
     }

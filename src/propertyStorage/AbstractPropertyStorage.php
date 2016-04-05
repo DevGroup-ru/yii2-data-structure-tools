@@ -227,8 +227,23 @@ abstract class AbstractPropertyStorage implements FiltrableStorageInterface
     /**
      * @inheritdoc
      */
-    public static function getModelsByPropertyValuesParams($propertyId, $values = [])
-    {
-        return [];
+    public static function getModelsByPropertyValuesParams(
+        $propertyId,
+        $values = [],
+        $returnType = self::RETURN_ALL
+    ) {
+        switch ($returnType) {
+            case self::RETURN_COUNT:
+                return 0;
+            case self::RETURN_QUERY:
+                $result = [];
+                $classNames = static::getApplicablePropertyModelClassNames($propertyId);
+                foreach ($classNames as $className) {
+                    $result[] = $className::find()->limit(0);
+                }
+                return $result;
+            default:
+                return [];
+        }
     }
 }
