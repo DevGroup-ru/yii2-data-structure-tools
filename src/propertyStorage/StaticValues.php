@@ -8,7 +8,6 @@ use DevGroup\DataStructure\models\StaticValue;
 use DevGroup\DataStructure\models\StaticValueTranslation;
 use Yii;
 use yii\db\Query;
-use yii\helpers\ArrayHelper;
 use yii\helpers\Json;
 
 class StaticValues extends AbstractPropertyStorage
@@ -241,7 +240,7 @@ class StaticValues extends AbstractPropertyStorage
                     'SVT.language_id' => Yii::$app->multilingual->language_id,
                 ]
             )->addGroupBy($className::primaryKey());
-            $result = static::valueByReturnType($returnType, $tmpQuery, $result);
+            $result = static::valueByReturnType($returnType, $tmpQuery, $result, $className);
         }
         return $result;
     }

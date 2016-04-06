@@ -15,7 +15,6 @@ use yii\db\Expression;
 use yii\db\Query;
 use yii\db\Schema;
 use yii\helpers\ArrayHelper;
-use yii\helpers\Json;
 
 class TableInheritance extends AbstractPropertyStorage
 {
@@ -358,7 +357,7 @@ class TableInheritance extends AbstractPropertyStorage
                 $className::tableInheritanceTable() . ' MP',
                 'MP.model_id=' . $className::tableName() . '.id'
             )->where(["MP.$column" => $values]);
-            $result = static::valueByReturnType($returnType, $tmpQuery, $result);
+            $result = static::valueByReturnType($returnType, $tmpQuery, $result, $className);
         }
 
         return $result;

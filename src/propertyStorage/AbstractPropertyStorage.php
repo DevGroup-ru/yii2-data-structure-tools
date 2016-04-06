@@ -10,6 +10,7 @@ use DevGroup\DataStructure\models\PropertyPropertyGroup;
 use DevGroup\DataStructure\traits\PropertiesTrait;
 use Yii;
 use yii\base\Exception;
+use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
 use yii\db\Query;
 use yii\helpers\ArrayHelper;
@@ -67,25 +68,27 @@ abstract class AbstractPropertyStorage implements FiltrableStorageInterface
 
     /**
      * Helper method
+     *
      * @param $returnType
-     * @param $tmpQuery
+     * @param ActiveQuery $tmpQuery
      * @param $result
+     * @param $className
      *
      * @return array
      */
-    protected static function valueByReturnType($returnType, $tmpQuery, $result)
+    protected static function valueByReturnType($returnType, $tmpQuery, $result, $className)
     {
         switch ($returnType) {
             case FiltrableStorageInterface::RETURN_COUNT:
                 $result += $tmpQuery->count();
                 break;
             case FiltrableStorageInterface::RETURN_QUERY:
-                $result[] = $tmpQuery;
+                $result[$className] = $tmpQuery;
                 break;
             default:
                 if (!empty($tmpQuery)) {
                     $result = ArrayHelper::merge($result, $tmpQuery->all());
-                }                
+                }
         }
         return $result;
     }

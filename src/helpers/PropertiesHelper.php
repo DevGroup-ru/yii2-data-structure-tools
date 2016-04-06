@@ -6,6 +6,7 @@ use DevGroup\DataStructure\models\ApplicablePropertyModels;
 use DevGroup\DataStructure\models\Property;
 use DevGroup\DataStructure\models\PropertyGroup;
 use DevGroup\DataStructure\models\PropertyPropertyGroup;
+use DevGroup\DataStructure\propertyStorage\AbstractPropertyStorage;
 use phpDocumentor\Reflection\DocBlock\Tag\PropertyReadTag;
 use Yii;
 use yii\base\Exception;
@@ -428,7 +429,7 @@ class PropertiesHelper
         return $storageClass::getPropertyValuesByParams($property->id, $params);
     }
 
-    public static function getModelsByPropertyValues(Property $property, $values = [], $returnType = 0)
+    public static function getModelsByPropertyValues(Property $property, $values = [], $returnType = AbstractPropertyStorage::RETURN_ALL)
     {
         $storageClass = $property->storage->class_name;
         return $storageClass::getModelsByPropertyValues($property->id, $values, $returnType);

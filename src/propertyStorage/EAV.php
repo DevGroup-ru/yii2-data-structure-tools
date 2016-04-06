@@ -3,13 +3,10 @@
 namespace DevGroup\DataStructure\propertyStorage;
 
 use DevGroup\DataStructure\helpers\PropertiesHelper;
-use DevGroup\DataStructure\models\ApplicablePropertyModels;
 use DevGroup\DataStructure\models\Property;
-use yii\base\Exception;
 use yii\db\ActiveRecord;
 use yii\db\Query;
 use yii\helpers\ArrayHelper;
-use yii\helpers\Json;
 
 class EAV extends AbstractPropertyStorage
 {
@@ -329,7 +326,7 @@ class EAV extends AbstractPropertyStorage
                     'EAV.' . $column => $values,
                 ]
             )->addGroupBy($className::primaryKey());
-            $result = static::valueByReturnType($returnType, $tmpQuery, $result);
+            $result = static::valueByReturnType($returnType, $tmpQuery, $result, $className);
 
         }
         return $result;
