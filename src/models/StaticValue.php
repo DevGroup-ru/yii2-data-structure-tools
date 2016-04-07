@@ -213,11 +213,10 @@ class StaticValue extends ActiveRecord
     }
 
     /**
-     * @param null $propertyId
+     * @param int|null $propertyId
      * @param array $params
      *
      * @return ActiveDataProvider
-     * @internal param $propertyGroupId
      * @codeCoverageIgnore
      */
     public function search($propertyId = null, $params = [])

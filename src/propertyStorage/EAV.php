@@ -4,9 +4,12 @@ namespace DevGroup\DataStructure\propertyStorage;
 
 use DevGroup\DataStructure\helpers\PropertiesHelper;
 use DevGroup\DataStructure\models\Property;
+use Yii;
+use yii\caching\TagDependency;
 use yii\db\ActiveRecord;
 use yii\db\Query;
 use yii\helpers\ArrayHelper;
+use yii\helpers\Json;
 
 class EAV extends AbstractPropertyStorage
 {
@@ -277,30 +280,29 @@ class EAV extends AbstractPropertyStorage
     {
         $property = Property::findById($propertyId);
         $column = static::dataTypeToEavColumn($property->data_type);
-
         $params = static::prepareParams($params, $column);
-
         $classNames = static::getApplicablePropertyModelClassNames($propertyId);
         $queries = [];
+        $keys = ['PropertyValues', 'Property', $propertyId, Json::encode($params)];
+        $tags = [$property->objectTag()];
         foreach ($classNames as $className) {
             $query = new Query();
             $query->select($column)->from($className::eavTable())->where($params);
             $queries[] = $query;
+            $keys[] = $className;
+            $tags[] = $className::commonTag();
         }
+        $query = self::unionQueriesToOne($queries);
 
-        if (empty($queries)) {
-            return [];
-        }
-        /**
-         * @var $query Query
-         */
-        $query = array_pop($queries);
-        while (!empty($queries)) {
-            $query->union(array_pop($queries));
-        };
+        return Yii::$app->cache->lazy(
+            function () use ($query) {
+                return $query->column();
+            },
+            md5($keys),
+            86400,
+            new TagDependency(['tags' => $tags])
+        );
 
-
-        return $query->column();
     }
 
     /**
@@ -313,6 +315,7 @@ class EAV extends AbstractPropertyStorage
     ) {
         $result = $returnType === self::RETURN_COUNT ? 0 : [];
         $property = Property::findById($propertyId);
+        $tags = [$property->objectTag()];
         $classNames = static::getApplicablePropertyModelClassNames($propertyId);
         $column = static::dataTypeToEavColumn($property->data_type);
         foreach ($classNames as $className) {
@@ -326,8 +329,13 @@ class EAV extends AbstractPropertyStorage
                     'EAV.' . $column => $values,
                 ]
             )->addGroupBy($className::primaryKey());
-            $result = static::valueByReturnType($returnType, $tmpQuery, $result, $className);
-
+            $result = static::valueByReturnType(
+                $returnType,
+                $tmpQuery,
+                $result,
+                $className,
+                ArrayHelper::merge($tags, (array)$className::commonTag())
+            );
         }
         return $result;
     }

@@ -6,8 +6,11 @@ use DevGroup\DataStructure\helpers\PropertiesHelper;
 use DevGroup\DataStructure\models\Property;
 use DevGroup\DataStructure\models\StaticValue;
 use DevGroup\DataStructure\models\StaticValueTranslation;
+use DevGroup\TagDependencyHelper\NamingHelper;
 use Yii;
+use yii\caching\TagDependency;
 use yii\db\Query;
+use yii\helpers\ArrayHelper;
 use yii\helpers\Json;
 
 class StaticValues extends AbstractPropertyStorage
@@ -203,16 +206,19 @@ class StaticValues extends AbstractPropertyStorage
     public static function getPropertyValuesByParams($propertyId, $params = '')
     {
         $column = 'description';
-        if (is_string($params)) {
-            $params = str_replace('[column]', $column, $params);
-        } elseif (is_array($params)) {
-            $params = Json::decode(str_replace('[column]', $column, Json::encode($params)));
-        } else {
-            return [];
-        }
-        return (new Query())->select($column)->from(StaticValueTranslation::tableName())->distinct()->where(
-            $params
-        )->innerJoin(StaticValue::tableName())->andWhere(['property_id' => $propertyId])->column();
+        $params = static::prepareParams($params, $column);
+        $keys = ['PropertyValues', 'Property', $propertyId, Json::encode($params)];
+        $tags = [NamingHelper::getObjectTag(Property::className(), $propertyId)];
+        return Yii::$app->cache->lazy(
+            function () use ($column, $params, $propertyId) {
+                return (new Query())->select($column)->from(StaticValueTranslation::tableName())->distinct()->where(
+                    $params
+                )->innerJoin(StaticValue::tableName())->andWhere(['property_id' => $propertyId])->column();
+            },
+            md5($keys),
+            86400,
+            new TagDependency(['tags' => $tags])
+        );
     }
 
     /**
@@ -225,6 +231,7 @@ class StaticValues extends AbstractPropertyStorage
     ) {
         $result = $returnType === self::RETURN_COUNT ? 0 : [];
         $classNames = static::getApplicablePropertyModelClassNames($propertyId);
+        $tags = [NamingHelper::getObjectTag(Property::className(), $propertyId)];
         $column = 'description';
         foreach ($classNames as $className) {
             $tmpQuery = $className::find()->innerJoin(
@@ -240,7 +247,13 @@ class StaticValues extends AbstractPropertyStorage
                     'SVT.language_id' => Yii::$app->multilingual->language_id,
                 ]
             )->addGroupBy($className::primaryKey());
-            $result = static::valueByReturnType($returnType, $tmpQuery, $result, $className);
+            $result = static::valueByReturnType(
+                $returnType,
+                $tmpQuery,
+                $result,
+                $className,
+                ArrayHelper::merge($tags, (array)$className::commonTag())
+            );
         }
         return $result;
     }

@@ -10,6 +10,7 @@ use DevGroup\DataStructure\models\PropertyPropertyGroup;
 use DevGroup\DataStructure\traits\PropertiesTrait;
 use Yii;
 use yii\base\Exception;
+use yii\caching\TagDependency;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
 use yii\db\Query;
@@ -73,21 +74,38 @@ abstract class AbstractPropertyStorage implements FiltrableStorageInterface
      * @param ActiveQuery $tmpQuery
      * @param $result
      * @param $className
+     * @param array $tags Cache tags
      *
-     * @return array
+     * @return array|int
      */
-    protected static function valueByReturnType($returnType, $tmpQuery, $result, $className)
+    protected static function valueByReturnType($returnType, $tmpQuery, $result, $className, $tags = [])
     {
         switch ($returnType) {
             case FiltrableStorageInterface::RETURN_COUNT:
-                $result += $tmpQuery->count();
+                $result += $className::getDb()->cache(
+                    function ($db) use ($tmpQuery) {
+                        return $tmpQuery->count('*', $db);
+                    },
+                    86400,
+                    new TagDependency(['tags' => $tags])
+                );
+
                 break;
             case FiltrableStorageInterface::RETURN_QUERY:
                 $result[$className] = $tmpQuery;
                 break;
             default:
                 if (!empty($tmpQuery)) {
-                    $result = ArrayHelper::merge($result, $tmpQuery->all());
+                    $result = ArrayHelper::merge(
+                        $result,
+                        $className::getDb()->cache(
+                            function ($db) use ($tmpQuery) {
+                                return $tmpQuery->all($db);
+                            },
+                            86400,
+                            new TagDependency(['tags' => $tags])
+                        )
+                    );
                 }
         }
         return $result;
@@ -109,8 +127,29 @@ abstract class AbstractPropertyStorage implements FiltrableStorageInterface
             $params = Json::decode(str_replace('[column]', $column, Json::encode($params)));
             return $params;
         } else {
-            throw new Exception('bad params');
+            throw new Exception(Yii::t('app', 'Params should be string or array'));
         }
+    }
+
+    /**
+     * @param Query[] $queries
+     *
+     * @return Query
+     * @throws Exception
+     */
+    protected static function unionQueriesToOne($queries)
+    {
+        if (empty($queries)) {
+            throw new Exception(Yii::t('app', 'Nothing to union'));
+        }
+        /**
+         * @var $query Query
+         */
+        $query = array_pop($queries);
+        while (!empty($queries)) {
+            $query->union(array_pop($queries));
+        };
+        return $query;
     }
 
     /**

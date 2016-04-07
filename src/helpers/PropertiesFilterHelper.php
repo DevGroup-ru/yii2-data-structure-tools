@@ -6,7 +6,9 @@ namespace DevGroup\DataStructure\helpers;
 use DevGroup\DataStructure\models\Property;
 use DevGroup\DataStructure\propertyStorage\AbstractPropertyStorage;
 use yii\base\Object;
+use yii\caching\TagDependency;
 use yii\db\ActiveQuery;
+use yii\helpers\ArrayHelper;
 
 class PropertiesFilterHelper extends Object
 {
@@ -15,14 +17,17 @@ class PropertiesFilterHelper extends Object
     {
         $selections = [];
         $selectionsCount = count($propertySelections);
+        $tags = [];
         foreach ($propertySelections as $propertyId => $propertySelection) {
+            $property = Property::findById($propertyId);
+            $tags[] = $property->objectTag();
             $selections[] = PropertiesHelper::getModelsByPropertyValues(
-                Property::findById($propertyId),
+                $property,
                 $propertySelection,
                 AbstractPropertyStorage::RETURN_QUERY
             );
         }
-        
+
         $firstElement = array_shift($selections);
         $prepareState = array_reduce(
             $selections,
@@ -47,12 +52,24 @@ class PropertiesFilterHelper extends Object
         switch ($returnType) {
             case AbstractPropertyStorage::RETURN_COUNT:
                 foreach ($prepareState as $className => $item) {
-                    $prepareState[$className] = $item->count();
+                    $prepareState[$className] = $className::getDb()->cache(
+                        function ($db) use ($item) {
+                            return $item->count('*', $db);
+                        },
+                        86400,
+                        new TagDependency(['tags' => ArrayHelper::merge($tags, (array)$className::commonTag())])
+                    );
                 }
                 break;
             case AbstractPropertyStorage::RETURN_ALL:
                 foreach ($prepareState as $className => $item) {
-                    $prepareState[$className] = $item->all();
+                    $prepareState[$className] = $className::getDb()->cache(
+                        function ($db) use ($item) {
+                            return $item->all($db);
+                        },
+                        86400,
+                        new TagDependency(['tags' => ArrayHelper::merge($tags, (array)$className::commonTag())])
+                    );
                 }
                 break;
         }

@@ -10,11 +10,13 @@ use DevGroup\DataStructure\models\PropertyGroup;
 use DevGroup\DataStructure\Properties\Module;
 use DevGroup\DataStructure\traits\PropertiesTrait;
 use Yii;
+use yii\caching\TagDependency;
 use yii\db\ActiveRecord;
 use yii\db\Expression;
 use yii\db\Query;
 use yii\db\Schema;
 use yii\helpers\ArrayHelper;
+use yii\helpers\Json;
 
 class TableInheritance extends AbstractPropertyStorage
 {
@@ -316,6 +318,8 @@ class TableInheritance extends AbstractPropertyStorage
 
         $classNames = static::getApplicablePropertyModelClassNames($propertyId);
         $queries = [];
+        $keys = ['PropertyValues', 'Property', $propertyId, Json::encode($params)];
+        $tags = [$property->objectTag()];
         foreach ($classNames as $className) {
             $columns = self::getColumns($className);
 
@@ -323,21 +327,21 @@ class TableInheritance extends AbstractPropertyStorage
                 $query = new Query();
                 $query->select($column)->from($className::tableInheritanceTable())->where($params);
                 $queries[] = $query;
+                $keys[] = $className;
+                $tags[] = $className::commonTag();
             }
         }
 
-        if (empty($queries)) {
-            return [];
-        }
-        /**
-         * @var $query Query
-         */
-        $query = array_pop($queries);
-        while (!empty($queries)) {
-            $query->union(array_pop($queries));
-        }
-        
-        return $query->column();
+        $query = self::unionQueriesToOne($queries);
+
+        return Yii::$app->cache->lazy(
+            function () use ($query) {
+                return $query->column();
+            },
+            md5($keys),
+            86400,
+            new TagDependency(['tags' => $tags])
+        );
     }
 
     /**
@@ -350,6 +354,7 @@ class TableInheritance extends AbstractPropertyStorage
     ) {
         $result = $returnType === self::RETURN_COUNT ? 0 : [];
         $property = Property::findById($propertyId);
+        $tags = [$property->objectTag()];
         $column = $property->key;
         $classNames = static::getApplicablePropertyModelClassNames($propertyId);
         foreach ($classNames as $className) {
@@ -357,7 +362,13 @@ class TableInheritance extends AbstractPropertyStorage
                 $className::tableInheritanceTable() . ' MP',
                 'MP.model_id=' . $className::tableName() . '.id'
             )->where(["MP.$column" => $values]);
-            $result = static::valueByReturnType($returnType, $tmpQuery, $result, $className);
+            $result = static::valueByReturnType(
+                $returnType,
+                $tmpQuery,
+                $result,
+                $className,
+                ArrayHelper::merge($tags, (array)$className::commonTag())
+            );
         }
 
         return $result;
