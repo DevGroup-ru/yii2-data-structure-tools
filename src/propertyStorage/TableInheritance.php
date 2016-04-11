@@ -10,6 +10,7 @@ use DevGroup\DataStructure\models\PropertyGroup;
 use DevGroup\DataStructure\Properties\Module;
 use DevGroup\DataStructure\traits\PropertiesTrait;
 use Yii;
+use yii\caching\ChainedDependency;
 use yii\caching\TagDependency;
 use yii\db\ActiveRecord;
 use yii\db\Expression;
@@ -309,8 +310,12 @@ class TableInheritance extends AbstractPropertyStorage
     /**
      * @inheritdoc
      */
-    public static function getPropertyValuesByParams($propertyId, $params = '')
-    {
+    public static function getPropertyValuesByParams(
+        $propertyId,
+        $params = '',
+        $customDependency = null,
+        $customKey = ''
+    ) {
         $property = Property::findById($propertyId);
         $column = $property->key;
 
@@ -318,7 +323,7 @@ class TableInheritance extends AbstractPropertyStorage
 
         $classNames = static::getApplicablePropertyModelClassNames($propertyId);
         $queries = [];
-        $keys = ['PropertyValues', 'Property', $propertyId, Json::encode($params)];
+        $keys = [$customKey, 'PropertyValues', 'Property', $propertyId, Json::encode($params)];
         $tags = [$property->objectTag()];
         foreach ($classNames as $className) {
             $columns = self::getColumns($className);
@@ -332,6 +337,17 @@ class TableInheritance extends AbstractPropertyStorage
             }
         }
 
+        if (is_null($customDependency)) {
+            $dependency = new TagDependency(['tags' => $tags]);
+        } elseif (is_string($customDependency)) {
+            $tags[] = $customDependency;
+            $dependency = new TagDependency(['tags' => $tags]);
+        } else {
+            $dependency = new ChainedDependency(
+                ['dependencies' => [$customDependency, new TagDependency(['tags' => $tags])]]
+            );
+        }
+
         $query = self::unionQueriesToOne($queries);
         sort($keys);
         return Yii::$app->cache->lazy(
@@ -340,7 +356,7 @@ class TableInheritance extends AbstractPropertyStorage
             },
             'TIPV_' . md5(Json::encode($keys)),
             86400,
-            new TagDependency(['tags' => $tags])
+            $dependency
         );
     }
 
@@ -350,7 +366,8 @@ class TableInheritance extends AbstractPropertyStorage
     public static function getModelsByPropertyValues(
         $propertyId,
         $values = [],
-        $returnType = self::RETURN_ALL
+        $returnType = self::RETURN_ALL,
+        $customDependency = null
     ) {
         $result = $returnType === self::RETURN_COUNT ? 0 : [];
         $property = Property::findById($propertyId);
@@ -362,13 +379,23 @@ class TableInheritance extends AbstractPropertyStorage
                 $className::tableInheritanceTable() . ' MP',
                 'MP.model_id=' . $className::tableName() . '.id'
             )->where(["MP.$column" => $values]);
-            $result = static::valueByReturnType(
-                $returnType,
-                $tmpQuery,
-                $result,
-                $className,
-                ArrayHelper::merge($tags, (array)$className::commonTag())
-            );
+            if (is_null($customDependency)) {
+                $dependency = new TagDependency(['tags' => ArrayHelper::merge($tags, (array)$className::commonTag())]);
+            } elseif (is_string($customDependency)) {
+                $dependency = new TagDependency(
+                    ['tags' => ArrayHelper::merge($tags, (array)$className::commonTag(), (array)$customDependency)]
+                );
+            } else {
+                $dependency = new ChainedDependency(
+                    [
+                        'dependencies' => [
+                            $customDependency,
+                            new TagDependency(['tags' => ArrayHelper::merge($tags, (array)$className::commonTag())]),
+                        ],
+                    ]
+                );
+            }
+            $result = static::valueByReturnType($returnType, $tmpQuery, $result, $className, $dependency);
         }
 
         return $result;

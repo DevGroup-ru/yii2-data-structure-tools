@@ -11,6 +11,7 @@ use DevGroup\DataStructure\Properties\Module;
 use DevGroup\DataStructure\traits\PropertiesTrait;
 use Yii;
 use yii\base\Exception;
+use yii\caching\Dependency;
 use yii\caching\TagDependency;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
@@ -75,11 +76,11 @@ abstract class AbstractPropertyStorage implements FiltrableStorageInterface
      * @param ActiveQuery $tmpQuery
      * @param $result
      * @param $className
-     * @param array $tags Cache tags
+     * @param Dependency $dependency
      *
      * @return array|int
      */
-    protected static function valueByReturnType($returnType, $tmpQuery, $result, $className, $tags = [])
+    protected static function valueByReturnType($returnType, $tmpQuery, $result, $className, $dependency)
     {
         switch ($returnType) {
             case FiltrableStorageInterface::RETURN_COUNT:
@@ -88,7 +89,7 @@ abstract class AbstractPropertyStorage implements FiltrableStorageInterface
                         return $tmpQuery->count('*', $db);
                     },
                     86400,
-                    new TagDependency(['tags' => $tags])
+                    $dependency
                 );
 
                 break;
@@ -104,7 +105,7 @@ abstract class AbstractPropertyStorage implements FiltrableStorageInterface
                                 return $tmpQuery->all($db);
                             },
                             86400,
-                            new TagDependency(['tags' => $tags])
+                            $dependency
                         )
                     );
                 }
@@ -318,8 +319,12 @@ abstract class AbstractPropertyStorage implements FiltrableStorageInterface
     /**
      * @inheritdoc
      */
-    public static function getPropertyValuesByParams($propertyId, $params = '')
-    {
+    public static function getPropertyValuesByParams(
+        $propertyId,
+        $params = '',
+        $customDependency = null,
+        $customKey = ''
+    ) {
         return [];
     }
 
@@ -329,7 +334,8 @@ abstract class AbstractPropertyStorage implements FiltrableStorageInterface
     public static function getModelsByPropertyValues(
         $propertyId,
         $values = [],
-        $returnType = self::RETURN_ALL
+        $returnType = self::RETURN_ALL,
+        $customDependency = null
     ) {
         switch ($returnType) {
             case self::RETURN_COUNT:

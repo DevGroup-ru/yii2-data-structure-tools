@@ -8,6 +8,7 @@ use DevGroup\DataStructure\models\StaticValue;
 use DevGroup\DataStructure\models\StaticValueTranslation;
 use DevGroup\TagDependencyHelper\NamingHelper;
 use Yii;
+use yii\caching\ChainedDependency;
 use yii\caching\TagDependency;
 use yii\db\Query;
 use yii\helpers\ArrayHelper;
@@ -203,12 +204,27 @@ class StaticValues extends AbstractPropertyStorage
     /**
      * @inheritdoc
      */
-    public static function getPropertyValuesByParams($propertyId, $params = '')
-    {
+    public static function getPropertyValuesByParams(
+        $propertyId,
+        $params = '',
+        $customDependency = null,
+        $customKey = ''
+    ) {
         $column = 'description';
         $params = static::prepareParams($params, $column);
-        $keys = ['PropertyValues', 'Property', $propertyId, Json::encode($params)];
+        $keys = [$customKey, 'PropertyValues', 'Property', $propertyId, Json::encode($params)];
         $tags = [NamingHelper::getObjectTag(Property::className(), $propertyId)];
+        if (is_null($customDependency)) {
+            $dependency = new TagDependency(['tags' => $tags]);
+        } elseif (is_string($customDependency)) {
+            $tags[] = $customDependency;
+            $dependency = new TagDependency(['tags' => $tags]);
+        } else {
+            $dependency = new ChainedDependency(
+                ['dependencies' => [$customDependency, new TagDependency(['tags' => $tags])]]
+            );
+        }
+
         sort($keys);
         return Yii::$app->cache->lazy(
             function () use ($column, $params, $propertyId) {
@@ -218,7 +234,7 @@ class StaticValues extends AbstractPropertyStorage
             },
             'SVPV_' . md5(Json::encode($keys)),
             86400,
-            new TagDependency(['tags' => $tags])
+            $dependency
         );
     }
 
@@ -228,7 +244,8 @@ class StaticValues extends AbstractPropertyStorage
     public static function getModelsByPropertyValues(
         $propertyId,
         $values = [],
-        $returnType = self::RETURN_ALL
+        $returnType = self::RETURN_ALL,
+        $customDependency = null
     ) {
         $result = $returnType === self::RETURN_COUNT ? 0 : [];
         $classNames = static::getApplicablePropertyModelClassNames($propertyId);
@@ -248,13 +265,23 @@ class StaticValues extends AbstractPropertyStorage
                     'SVT.language_id' => Yii::$app->multilingual->language_id,
                 ]
             )->addGroupBy($className::primaryKey());
-            $result = static::valueByReturnType(
-                $returnType,
-                $tmpQuery,
-                $result,
-                $className,
-                ArrayHelper::merge($tags, (array)$className::commonTag())
-            );
+            if (is_null($customDependency)) {
+                $dependency = new TagDependency(['tags' => ArrayHelper::merge($tags, (array)$className::commonTag())]);
+            } elseif (is_string($customDependency)) {
+                $dependency = new TagDependency(
+                    ['tags' => ArrayHelper::merge($tags, (array)$className::commonTag(), (array)$customDependency)]
+                );
+            } else {
+                $dependency = new ChainedDependency(
+                    [
+                        'dependencies' => [
+                            $customDependency,
+                            new TagDependency(['tags' => ArrayHelper::merge($tags, (array)$className::commonTag())]),
+                        ],
+                    ]
+                );
+            }
+            $result = static::valueByReturnType($returnType, $tmpQuery, $result, $className, $dependency);
         }
         return $result;
     }

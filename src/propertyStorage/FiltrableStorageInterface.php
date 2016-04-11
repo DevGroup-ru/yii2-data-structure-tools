@@ -14,9 +14,17 @@ interface FiltrableStorageInterface
      * @param array|string $params see [[\yii\db\QueryInterface::where()]] on how to specify this parameter
      * [column] is alias to column name used in query
      *
+     * @param null|string|\yii\caching\Dependency $customDependency
+     * @param string $customKey
+     *
      * @return array of values
      */
-    public static function getPropertyValuesByParams($propertyId, $params = '');
+    public static function getPropertyValuesByParams(
+        $propertyId,
+        $params = '',
+        $customDependency = null,
+        $customKey = ''
+    );
 
     /**
      * @param int $propertyId
@@ -27,11 +35,14 @@ interface FiltrableStorageInterface
      * if eq FiltrableStorageInterface::RETURN_COUNT return count of records
      * if eq FiltrableStorageInterface::RETURN_QUERY return array of queries
      *
-     * @return \yii\db\ActiveRecord[]|\yii\db\ActiveQuery[]|int
+     * @param null|string|\yii\caching\Dependency $customDependency
+     *
+     * @return int|\yii\db\ActiveQuery[]|\yii\db\ActiveRecord[]
      */
     public static function getModelsByPropertyValues(
         $propertyId,
         $values = [],
-        $returnType = self::RETURN_ALL
+        $returnType = self::RETURN_ALL,
+        $customDependency = null
     );
 }

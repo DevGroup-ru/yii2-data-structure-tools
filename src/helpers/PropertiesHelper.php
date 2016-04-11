@@ -423,14 +423,21 @@ class PropertiesHelper
         return $availableGroups;
     }
 
-    public static function getPropertyValuesByParams(Property $property, $params = '')
-    {
+    public static function getPropertyValuesByParams(
+        Property $property,
+        $params = '',
+        $customDependency = null,
+        $customKey = ''
+    ) {
         $storageClass = $property->storage->class_name;
-        return $storageClass::getPropertyValuesByParams($property->id, $params);
+        return $storageClass::getPropertyValuesByParams($property->id, $params, $customDependency, $customKey);
     }
 
-    public static function getModelsByPropertyValues(Property $property, $values = [], $returnType = AbstractPropertyStorage::RETURN_ALL)
-    {
+    public static function getModelsByPropertyValues(
+        Property $property,
+        $values = [],
+        $returnType = AbstractPropertyStorage::RETURN_ALL
+    ) {
         $storageClass = $property->storage->class_name;
         return $storageClass::getModelsByPropertyValues($property->id, $values, $returnType);
     }

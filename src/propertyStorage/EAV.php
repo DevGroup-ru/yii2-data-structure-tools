@@ -5,6 +5,7 @@ namespace DevGroup\DataStructure\propertyStorage;
 use DevGroup\DataStructure\helpers\PropertiesHelper;
 use DevGroup\DataStructure\models\Property;
 use Yii;
+use yii\caching\ChainedDependency;
 use yii\caching\TagDependency;
 use yii\db\ActiveRecord;
 use yii\db\Query;
@@ -276,14 +277,18 @@ class EAV extends AbstractPropertyStorage
     /**
      * @inheritdoc
      */
-    public static function getPropertyValuesByParams($propertyId, $params = '')
-    {
+    public static function getPropertyValuesByParams(
+        $propertyId,
+        $params = '',
+        $customDependency = null,
+        $customKey = ''
+    ) {
         $property = Property::findById($propertyId);
         $column = static::dataTypeToEavColumn($property->data_type);
         $params = static::prepareParams($params, $column);
         $classNames = static::getApplicablePropertyModelClassNames($propertyId);
         $queries = [];
-        $keys = ['PropertyValues', 'Property', $propertyId, Json::encode($params)];
+        $keys = [$customKey, 'PropertyValues', 'Property', $propertyId, Json::encode($params)];
         $tags = [$property->objectTag()];
         foreach ($classNames as $className) {
             $query = new Query();
@@ -291,6 +296,16 @@ class EAV extends AbstractPropertyStorage
             $queries[] = $query;
             $keys[] = $className;
             $tags[] = $className::commonTag();
+        }
+        if (is_null($customDependency)) {
+            $dependency = new TagDependency(['tags' => $tags]);
+        } elseif (is_string($customDependency)) {
+            $tags[] = $customDependency;
+            $dependency = new TagDependency(['tags' => $tags]);
+        } else {
+            $dependency = new ChainedDependency(
+                ['dependencies' => [$customDependency, new TagDependency(['tags' => $tags])]]
+            );
         }
         $query = self::unionQueriesToOne($queries);
         sort($keys);
@@ -300,7 +315,7 @@ class EAV extends AbstractPropertyStorage
             },
             'EAVPV_' . md5(Json::encode($keys)),
             86400,
-            new TagDependency(['tags' => $tags])
+            $dependency
         );
 
     }
@@ -311,7 +326,8 @@ class EAV extends AbstractPropertyStorage
     public static function getModelsByPropertyValues(
         $propertyId,
         $values = [],
-        $returnType = self::RETURN_ALL
+        $returnType = self::RETURN_ALL,
+        $customDependency = null
     ) {
         $result = $returnType === self::RETURN_COUNT ? 0 : [];
         $property = Property::findById($propertyId);
@@ -329,13 +345,23 @@ class EAV extends AbstractPropertyStorage
                     'EAV.' . $column => $values,
                 ]
             )->addGroupBy($className::primaryKey());
-            $result = static::valueByReturnType(
-                $returnType,
-                $tmpQuery,
-                $result,
-                $className,
-                ArrayHelper::merge($tags, (array)$className::commonTag())
-            );
+            if (is_null($customDependency)) {
+                $dependency = new TagDependency(['tags' => ArrayHelper::merge($tags, (array)$className::commonTag())]);
+            } elseif (is_string($customDependency)) {
+                $dependency = new TagDependency(
+                    ['tags' => ArrayHelper::merge($tags, (array)$className::commonTag(), (array)$customDependency)]
+                );
+            } else {
+                $dependency = new ChainedDependency(
+                    [
+                        'dependencies' => [
+                            $customDependency,
+                            new TagDependency(['tags' => ArrayHelper::merge($tags, (array)$className::commonTag())]),
+                        ],
+                    ]
+                );
+            }
+            $result = static::valueByReturnType($returnType, $tmpQuery, $result, $className, $dependency);
         }
         return $result;
     }
