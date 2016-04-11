@@ -209,13 +209,14 @@ class StaticValues extends AbstractPropertyStorage
         $params = static::prepareParams($params, $column);
         $keys = ['PropertyValues', 'Property', $propertyId, Json::encode($params)];
         $tags = [NamingHelper::getObjectTag(Property::className(), $propertyId)];
+        sort($keys);
         return Yii::$app->cache->lazy(
             function () use ($column, $params, $propertyId) {
                 return (new Query())->select($column)->from(StaticValueTranslation::tableName())->distinct()->where(
                     $params
                 )->innerJoin(StaticValue::tableName())->andWhere(['property_id' => $propertyId])->column();
             },
-            md5($keys),
+            'SVPV_' . md5(Json::encode($keys)),
             86400,
             new TagDependency(['tags' => $tags])
         );

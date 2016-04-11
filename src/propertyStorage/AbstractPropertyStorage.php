@@ -7,6 +7,7 @@ use DevGroup\DataStructure\models\ApplicablePropertyModels;
 use DevGroup\DataStructure\models\Property;
 use DevGroup\DataStructure\models\PropertyGroup;
 use DevGroup\DataStructure\models\PropertyPropertyGroup;
+use DevGroup\DataStructure\Properties\Module;
 use DevGroup\DataStructure\traits\PropertiesTrait;
 use Yii;
 use yii\base\Exception;
@@ -127,7 +128,7 @@ abstract class AbstractPropertyStorage implements FiltrableStorageInterface
             $params = Json::decode(str_replace('[column]', $column, Json::encode($params)));
             return $params;
         } else {
-            throw new Exception(Yii::t('app', 'Params should be string or array'));
+            throw new Exception(Module::t('app', 'Params should be string or array'));
         }
     }
 
@@ -139,16 +140,25 @@ abstract class AbstractPropertyStorage implements FiltrableStorageInterface
      */
     protected static function unionQueriesToOne($queries)
     {
-        if (empty($queries)) {
-            throw new Exception(Yii::t('app', 'Nothing to union'));
+        if (count($queries) === 0) {
+            throw new Exception(Module::t('app', 'Nothing to union'));
         }
-        /**
-         * @var $query Query
-         */
-        $query = array_pop($queries);
-        while (!empty($queries)) {
-            $query->union(array_pop($queries));
-        };
+
+        $query = array_reduce(
+            $queries,
+            function ($query, $item) {
+                /**
+                 * @var $query Query
+                 */
+                if ($item === null) {
+                    $query = $item;
+                } else {
+                    $query->union($item);
+                }
+                return $query;
+            }
+        );
+
         return $query;
     }
 

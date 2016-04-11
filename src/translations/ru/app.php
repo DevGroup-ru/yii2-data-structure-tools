@@ -26,4 +26,6 @@ return [
     'Allow Multiple Values' => 'Разрешенно мультизначения',
     'Storage ID' => 'Хранилище',
     'Property Handler ID' => 'Обработчик свойств',
+    'Params should be string or array' => 'Параметры должны быть строкой или массивом',
+    'Nothing to union' => 'Нечего объедитять',
 ];

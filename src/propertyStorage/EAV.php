@@ -293,12 +293,12 @@ class EAV extends AbstractPropertyStorage
             $tags[] = $className::commonTag();
         }
         $query = self::unionQueriesToOne($queries);
-
+        sort($keys);
         return Yii::$app->cache->lazy(
             function () use ($query) {
                 return $query->column();
             },
-            md5($keys),
+            'EAVPV_' . md5(Json::encode($keys)),
             86400,
             new TagDependency(['tags' => $tags])
         );

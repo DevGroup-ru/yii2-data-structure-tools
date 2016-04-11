@@ -333,12 +333,12 @@ class TableInheritance extends AbstractPropertyStorage
         }
 
         $query = self::unionQueriesToOne($queries);
-
+        sort($keys);
         return Yii::$app->cache->lazy(
             function () use ($query) {
                 return $query->column();
             },
-            md5($keys),
+            'TIPV_' . md5(Json::encode($keys)),
             86400,
             new TagDependency(['tags' => $tags])
         );
