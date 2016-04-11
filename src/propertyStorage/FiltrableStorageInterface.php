@@ -16,6 +16,7 @@ interface FiltrableStorageInterface
      *
      * @param null|string|\yii\caching\Dependency $customDependency
      * @param string $customKey
+     * @param int $cacheLifetime
      *
      * @return array of values
      */
@@ -23,7 +24,8 @@ interface FiltrableStorageInterface
         $propertyId,
         $params = '',
         $customDependency = null,
-        $customKey = ''
+        $customKey = '',
+        $cacheLifetime = 86400
     );
 
     /**
@@ -37,12 +39,15 @@ interface FiltrableStorageInterface
      *
      * @param null|string|\yii\caching\Dependency $customDependency
      *
+     * @param int $cacheLifetime
+     *
      * @return int|\yii\db\ActiveQuery[]|\yii\db\ActiveRecord[]
      */
     public static function getModelsByPropertyValues(
         $propertyId,
         $values = [],
         $returnType = self::RETURN_ALL,
-        $customDependency = null
+        $customDependency = null,
+        $cacheLifetime = 86400
     );
 }

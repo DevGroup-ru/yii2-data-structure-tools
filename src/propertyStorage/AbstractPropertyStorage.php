@@ -11,6 +11,7 @@ use DevGroup\DataStructure\Properties\Module;
 use DevGroup\DataStructure\traits\PropertiesTrait;
 use Yii;
 use yii\base\Exception;
+use yii\caching\ChainedDependency;
 use yii\caching\Dependency;
 use yii\caching\TagDependency;
 use yii\db\ActiveQuery;
@@ -77,18 +78,25 @@ abstract class AbstractPropertyStorage implements FiltrableStorageInterface
      * @param $result
      * @param $className
      * @param Dependency $dependency
+     * @param int $cacheLifetime
      *
      * @return array|int
      */
-    protected static function valueByReturnType($returnType, $tmpQuery, $result, $className, $dependency)
-    {
+    protected static function valueByReturnType(
+        $returnType,
+        $tmpQuery,
+        $result,
+        $className,
+        $dependency,
+        $cacheLifetime = 86400
+    ) {
         switch ($returnType) {
             case FiltrableStorageInterface::RETURN_COUNT:
                 $result += $className::getDb()->cache(
                     function ($db) use ($tmpQuery) {
                         return $tmpQuery->count('*', $db);
                     },
-                    86400,
+                    $cacheLifetime,
                     $dependency
                 );
 
@@ -104,7 +112,7 @@ abstract class AbstractPropertyStorage implements FiltrableStorageInterface
                             function ($db) use ($tmpQuery) {
                                 return $tmpQuery->all($db);
                             },
-                            86400,
+                            $cacheLifetime,
                             $dependency
                         )
                     );
@@ -161,6 +169,29 @@ abstract class AbstractPropertyStorage implements FiltrableStorageInterface
         );
 
         return $query;
+    }
+
+    /**
+     * @param $customDependency
+     * @param $tags
+     *
+     * @return ChainedDependency|TagDependency
+     */
+    protected static function dependencyHelper($customDependency, $tags)
+    {
+        if (is_null($customDependency)) {
+            $dependency = new TagDependency(['tags' => $tags]);
+            return $dependency;
+        } elseif (is_string($customDependency)) {
+            $tags[] = $customDependency;
+            $dependency = new TagDependency(['tags' => $tags]);
+            return $dependency;
+        } else {
+            $dependency = new ChainedDependency(
+                ['dependencies' => [$customDependency, new TagDependency(['tags' => $tags])]]
+            );
+            return $dependency;
+        }
     }
 
     /**
@@ -323,7 +354,8 @@ abstract class AbstractPropertyStorage implements FiltrableStorageInterface
         $propertyId,
         $params = '',
         $customDependency = null,
-        $customKey = ''
+        $customKey = '',
+        $cacheLifetime = 86400
     ) {
         return [];
     }
@@ -335,7 +367,8 @@ abstract class AbstractPropertyStorage implements FiltrableStorageInterface
         $propertyId,
         $values = [],
         $returnType = self::RETURN_ALL,
-        $customDependency = null
+        $customDependency = null,
+        $cacheLifetime = 86400
     ) {
         switch ($returnType) {
             case self::RETURN_COUNT:

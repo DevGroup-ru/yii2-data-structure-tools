@@ -314,7 +314,8 @@ class TableInheritance extends AbstractPropertyStorage
         $propertyId,
         $params = '',
         $customDependency = null,
-        $customKey = ''
+        $customKey = '',
+        $cacheLifetime = 86400
     ) {
         $property = Property::findById($propertyId);
         $column = $property->key;
@@ -336,18 +337,7 @@ class TableInheritance extends AbstractPropertyStorage
                 $tags[] = $className::commonTag();
             }
         }
-
-        if (is_null($customDependency)) {
-            $dependency = new TagDependency(['tags' => $tags]);
-        } elseif (is_string($customDependency)) {
-            $tags[] = $customDependency;
-            $dependency = new TagDependency(['tags' => $tags]);
-        } else {
-            $dependency = new ChainedDependency(
-                ['dependencies' => [$customDependency, new TagDependency(['tags' => $tags])]]
-            );
-        }
-
+        $dependency = self::dependencyHelper($customDependency, $tags);
         $query = self::unionQueriesToOne($queries);
         sort($keys);
         return Yii::$app->cache->lazy(
@@ -355,7 +345,7 @@ class TableInheritance extends AbstractPropertyStorage
                 return $query->column();
             },
             'TIPV_' . md5(Json::encode($keys)),
-            86400,
+            $cacheLifetime,
             $dependency
         );
     }
@@ -367,7 +357,8 @@ class TableInheritance extends AbstractPropertyStorage
         $propertyId,
         $values = [],
         $returnType = self::RETURN_ALL,
-        $customDependency = null
+        $customDependency = null,
+        $cacheLifetime = 86400
     ) {
         $result = $returnType === self::RETURN_COUNT ? 0 : [];
         $property = Property::findById($propertyId);
@@ -379,23 +370,18 @@ class TableInheritance extends AbstractPropertyStorage
                 $className::tableInheritanceTable() . ' MP',
                 'MP.model_id=' . $className::tableName() . '.id'
             )->where(["MP.$column" => $values]);
-            if (is_null($customDependency)) {
-                $dependency = new TagDependency(['tags' => ArrayHelper::merge($tags, (array)$className::commonTag())]);
-            } elseif (is_string($customDependency)) {
-                $dependency = new TagDependency(
-                    ['tags' => ArrayHelper::merge($tags, (array)$className::commonTag(), (array)$customDependency)]
-                );
-            } else {
-                $dependency = new ChainedDependency(
-                    [
-                        'dependencies' => [
-                            $customDependency,
-                            new TagDependency(['tags' => ArrayHelper::merge($tags, (array)$className::commonTag())]),
-                        ],
-                    ]
-                );
-            }
-            $result = static::valueByReturnType($returnType, $tmpQuery, $result, $className, $dependency);
+            $dependency = static::dependencyHelper(
+                $customDependency,
+                ArrayHelper::merge($tags, (array)$className::commonTag())
+            );
+            $result = static::valueByReturnType(
+                $returnType,
+                $tmpQuery,
+                $result,
+                $className,
+                $dependency,
+                $cacheLifetime
+            );
         }
 
         return $result;

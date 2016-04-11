@@ -427,10 +427,17 @@ class PropertiesHelper
         Property $property,
         $params = '',
         $customDependency = null,
-        $customKey = ''
+        $customKey = '',
+        $cacheLifetime = 86400
     ) {
         $storageClass = $property->storage->class_name;
-        return $storageClass::getPropertyValuesByParams($property->id, $params, $customDependency, $customKey);
+        return $storageClass::getPropertyValuesByParams(
+            $property->id,
+            $params,
+            $customDependency,
+            $customKey,
+            $cacheLifetime
+        );
     }
 
     public static function getModelsByPropertyValues(

@@ -208,7 +208,8 @@ class StaticValues extends AbstractPropertyStorage
         $propertyId,
         $params = '',
         $customDependency = null,
-        $customKey = ''
+        $customKey = '',
+        $cacheLifetime = 86400
     ) {
         $column = 'description';
         $params = static::prepareParams($params, $column);
@@ -233,7 +234,7 @@ class StaticValues extends AbstractPropertyStorage
                 )->innerJoin(StaticValue::tableName())->andWhere(['property_id' => $propertyId])->column();
             },
             'SVPV_' . md5(Json::encode($keys)),
-            86400,
+            $cacheLifetime,
             $dependency
         );
     }
@@ -245,7 +246,8 @@ class StaticValues extends AbstractPropertyStorage
         $propertyId,
         $values = [],
         $returnType = self::RETURN_ALL,
-        $customDependency = null
+        $customDependency = null,
+        $cacheLifetime = 86400
     ) {
         $result = $returnType === self::RETURN_COUNT ? 0 : [];
         $classNames = static::getApplicablePropertyModelClassNames($propertyId);
@@ -265,23 +267,18 @@ class StaticValues extends AbstractPropertyStorage
                     'SVT.language_id' => Yii::$app->multilingual->language_id,
                 ]
             )->addGroupBy($className::primaryKey());
-            if (is_null($customDependency)) {
-                $dependency = new TagDependency(['tags' => ArrayHelper::merge($tags, (array)$className::commonTag())]);
-            } elseif (is_string($customDependency)) {
-                $dependency = new TagDependency(
-                    ['tags' => ArrayHelper::merge($tags, (array)$className::commonTag(), (array)$customDependency)]
-                );
-            } else {
-                $dependency = new ChainedDependency(
-                    [
-                        'dependencies' => [
-                            $customDependency,
-                            new TagDependency(['tags' => ArrayHelper::merge($tags, (array)$className::commonTag())]),
-                        ],
-                    ]
-                );
-            }
-            $result = static::valueByReturnType($returnType, $tmpQuery, $result, $className, $dependency);
+            $dependency = static::dependencyHelper(
+                $customDependency,
+                ArrayHelper::merge($tags, (array)$className::commonTag())
+            );
+            $result = static::valueByReturnType(
+                $returnType,
+                $tmpQuery,
+                $result,
+                $className,
+                $dependency,
+                $cacheLifetime
+            );
         }
         return $result;
     }
