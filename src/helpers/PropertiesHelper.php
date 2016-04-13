@@ -6,6 +6,7 @@ use DevGroup\DataStructure\models\ApplicablePropertyModels;
 use DevGroup\DataStructure\models\Property;
 use DevGroup\DataStructure\models\PropertyGroup;
 use DevGroup\DataStructure\models\PropertyPropertyGroup;
+use DevGroup\DataStructure\Properties\Module;
 use DevGroup\DataStructure\propertyStorage\AbstractPropertyStorage;
 use phpDocumentor\Reflection\DocBlock\Tag\PropertyReadTag;
 use Yii;
@@ -175,15 +176,19 @@ class PropertiesHelper
      * @param \yii\db\ActiveRecord[]|\DevGroup\DataStructure\traits\PropertiesTrait[] $models
      *
      * @return \yii\db\ActiveRecord[]
+     * @throws Exception
      */
     public static function fillPropertyGroups(&$models)
     {
+        if(count($models) === 0){
+            throw new Exception(Module::t('app', 'No empty array expected'));
+        }
         /** @var \yii\db\ActiveRecord|\DevGroup\DataStructure\traits\PropertiesTrait|\DevGroup\TagDependencyHelper\TagDependencyTrait $firstModel */
         $firstModel = reset($models);
-        if ($firstModel->propertyGroupIds !== null) {
-            // assume that we have already got them
-            return;
-        }
+//        if ($firstModel->propertyGroupIds !== null) {
+//            // assume that we have already got them
+//            return;
+//        }
 
         $tags = [
             PropertyGroup::commonTag(),

@@ -28,4 +28,5 @@ return [
     'Property Handler ID' => 'Обработчик свойств',
     'Params should be string or array' => 'Параметры должны быть строкой или массивом',
     'Nothing to union' => 'Нечего объедитять',
+    'No empty array expected' => 'Ожидался не пустой массив',
 ];

@@ -159,7 +159,7 @@ abstract class AbstractPropertyStorage implements FiltrableStorageInterface
                 /**
                  * @var $query Query
                  */
-                if ($item === null) {
+                if ($query === null) {
                     $query = $item;
                 } else {
                     $query->union($item);

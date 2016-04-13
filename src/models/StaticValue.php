@@ -153,6 +153,7 @@ class StaticValue extends ActiveRecord
                             'svt.slug',
                         ])
                         ->from($table . ' sv')
+                        ->where(['sv.property_id' => $propertyId])
                         ->innerJoin(
                             $translationsTable . 'svt',
                             'svt.model_id = sv.id AND svt.language_id=:language_id',
