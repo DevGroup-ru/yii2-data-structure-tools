@@ -105,6 +105,9 @@ class PropertiesHelper
      */
     public static function fillProperties(&$models)
     {
+        if (count($models) === 0) {
+            return [];
+        }
         static::fillPropertyGroups($models);
         static::ensurePropertiesAttributes($models);
 
@@ -177,6 +180,9 @@ class PropertiesHelper
      */
     public static function fillPropertyGroups(&$models)
     {
+        if (count($models) === 0) {
+            return [];
+        }
         /** @var \yii\db\ActiveRecord|\DevGroup\DataStructure\traits\PropertiesTrait|\DevGroup\TagDependencyHelper\TagDependencyTrait $firstModel */
         $firstModel = reset($models);
         if ($firstModel->propertyGroupIds !== null) {
