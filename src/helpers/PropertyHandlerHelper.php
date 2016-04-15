@@ -77,7 +77,7 @@ class PropertyHandlerHelper
         if (isset($this->_handlers[$id])) {
             return $this->_handlers[$id];
         }
-        throw new \Exception("Property handler with id $id not found");
+        throw new \Exception("Property handler with id {$id} not found");
     }
 
     /**
@@ -85,7 +85,8 @@ class PropertyHandlerHelper
      *
      * @param string $className
      *
-     * @return integer
+     * @return int
+     * @throws Exception
      */
     public function handlerIdByClassName($className)
     {
@@ -95,6 +96,6 @@ class PropertyHandlerHelper
             }
         }
 
-        throw new Exception("Handler with classname $className not found.");
+        throw new Exception("Handler with classname {$className} not found.");
     }
 }

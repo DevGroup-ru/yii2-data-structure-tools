@@ -12,7 +12,6 @@ use yii\helpers\ArrayHelper;
 
 class PropertiesFilterHelper extends Object
 {
-
     public static function filterObjects($propertySelections = [], $returnType = AbstractPropertyStorage::RETURN_ALL)
     {
         $selections = [];
@@ -45,7 +44,7 @@ class PropertiesFilterHelper extends Object
         /** @var ActiveQuery[] $prepareState */
         foreach ($prepareState as $className => $query) {
             $prepareState[$className] = $className::find()->from(['t' => $query])->addGroupBy('t.id')->having(
-                "count(t.id)=$selectionsCount"
+                "count(t.id)=" . (int) $selectionsCount
             );
         }
 
@@ -57,7 +56,7 @@ class PropertiesFilterHelper extends Object
                             return $item->count('*', $db);
                         },
                         86400,
-                        new TagDependency(['tags' => ArrayHelper::merge($tags, (array)$className::commonTag())])
+                        new TagDependency(['tags' => ArrayHelper::merge($tags, (array) $className::commonTag())])
                     );
                 }
                 break;
@@ -68,7 +67,7 @@ class PropertiesFilterHelper extends Object
                             return $item->all($db);
                         },
                         86400,
-                        new TagDependency(['tags' => ArrayHelper::merge($tags, (array)$className::commonTag())])
+                        new TagDependency(['tags' => ArrayHelper::merge($tags, (array) $className::commonTag())])
                     );
                 }
                 break;

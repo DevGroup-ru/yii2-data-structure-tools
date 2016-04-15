@@ -187,7 +187,7 @@ class HasProperties extends Behavior
         $groups = $owner->propertyGroupIds;
         $owner->propertyGroupIds = null;
 
-        if ($groups) {
+        if (is_null($groups)) {
             foreach ($groups as $group_id) {
                 /** @var PropertyGroup $group */
                 $group = PropertyGroup::findOne(['id' => $group_id]);
