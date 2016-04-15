@@ -18,6 +18,7 @@ use DevGroup\DataStructure\tests\models\Category;
 use DevGroup\DataStructure\tests\models\Product;
 use Yii;
 use yii\base\UnknownPropertyException;
+use yii\console\Application;
 use yii\db\Connection;
 use yii\web\ServerErrorHttpException;
 
@@ -47,42 +48,13 @@ class DatabaseTest extends \PHPUnit_Extensions_Database_TestCase
      */
     protected function setUp()
     {
-        (new \yii\console\Application([
-            'id' => 'unit',
-            'basePath' => __DIR__,
-            'bootstrap' => ['log'],
-            'components' => [
-                'log' => [
-                    'traceLevel' => 10,
-                    'targets' => [
-                        [
-                            'class' => 'yii\log\FileTarget',
-                            'levels' => ['info'],
-                        ],
-                    ],
-                ],
-                'cache' => [
-                    'class' => '\yii\caching\ArrayCache',
-                    'as lazy' => [
-                        'class' => 'DevGroup\TagDependencyHelper\LazyCache',
-                    ],
-                ],
-                'multilingual' => [
-                    'class' => 'DevGroup\Multilingual\Multilingual',
-                    'default_language_id' => 1,
-                ],
-            ],
-        ]));
+        // all identity map should be cleared
+        Property::$identityMap = [];
+
+        $config = require(Yii::getAlias('@DevGroup/DataStructure/tests/config/console.php'));
+
+        Yii::$app = new Application($config);
         try {
-            Yii::$app->set('db', [
-                'class' => Connection::className(),
-                'dsn' => 'mysql:host=localhost;dbname=yii2_datastructure',
-                'username' => 'root',
-                'password' => '',
-            ]);
-
-            Yii::$app->getDb()->open();
-
             Yii::$app->runAction('migrate/down', [99999, 'interactive'=>0, 'migrationPath' => __DIR__ . '/../src/migrations/']);
             Yii::$app->runAction('migrate/up', ['interactive'=>0, 'migrationPath' => __DIR__ . '/../src/migrations/']);
 
@@ -132,8 +104,7 @@ class DatabaseTest extends \PHPUnit_Extensions_Database_TestCase
 
         $generator->drop(Product::className());
         $generator->drop(Category::className());
-        // all identity map should be cleared
-        Property::$identityMap = [];
+
 
         Yii::$app->cache->flush();
         $this->destroyApplication();
@@ -273,6 +244,7 @@ class DatabaseTest extends \PHPUnit_Extensions_Database_TestCase
 
     public function testActiveRecord()
     {
+
         $this->assertSame(2, PropertiesHelper::applicablePropertyModelId(Category::className()));
         $this->assertSame(1, PropertiesHelper::applicablePropertyModelId(Product::className(), true));
         // property group for all products
@@ -369,13 +341,12 @@ class DatabaseTest extends \PHPUnit_Extensions_Database_TestCase
         $product->weight = 127.001;
 
         $this->assertSame(127.001, $product->weight);
-        $this->assertSame([1], $product->changedProperties);
+        $this->assertSame([$weight->id], $product->changedProperties);
         $this->assertTrue($product->propertiesValuesChanged);
 
         // static values test
         $this->assertTrue($product->addPropertyGroup($smartphone_general));
         $this->assertFalse($product->addPropertyGroup($smartphone_general), 'Should not allow adding one group twice');
-
         $this->assertSame([], StaticValue::valuesForProperty($os));
 
         $windows = new StaticValue($os);
@@ -384,7 +355,7 @@ class DatabaseTest extends \PHPUnit_Extensions_Database_TestCase
         $this->assertTrue($windows->save());
 
         $this->assertSame([
-            1 => [
+            $windows->id => [
                 'name' => 'Windows',
                 'description' => '',
                 'slug' => 'win',
@@ -399,39 +370,41 @@ class DatabaseTest extends \PHPUnit_Extensions_Database_TestCase
         $this->assertTrue($linux->save());
 
         $this->assertSame([
-            1 => [
+            $windows->id => [
                 'name' => 'Windows',
                 'description' => '',
                 'slug' => 'win',
             ],
-            2 => [
+            $linux->id => [
                 'name' => 'Linux',
                 'description' => '',
                 'slug' => '',
             ],
         ], StaticValue::valuesForProperty($os));
 
-        $product->os = 1;
+        $product->os = $windows->id;
 
         $validationResult = $product->validate();
+
         $this->assertTrue($validationResult);
 
         // save
         $models = [&$product];
         $this->assertTrue(PropertiesHelper::storeValues($models));
         $product->invalidateTags();
-
+        
         // test fill
         /** @var Product $productFromDatabase */
         $productFromDatabase = Product::findOne(1);
 
         $models = [&$productFromDatabase];
+
         PropertiesHelper::fillProperties($models);
         // this should not call again and covers special line "if ($firstModel->propertyGroupIds !== null)"
         PropertiesHelper::fillProperties($models);
 
         $this->assertSame(127.001, $productFromDatabase->weight);
-        $this->assertSame(1, $productFromDatabase->os);
+        $this->assertSame($windows->id, $productFromDatabase->os);
 
         $productFromDatabase->os = 65535;
         $validationResult = $productFromDatabase->validate();
@@ -461,4 +434,5 @@ class DatabaseTest extends \PHPUnit_Extensions_Database_TestCase
 
 
     }
+
 }

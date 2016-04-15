@@ -145,13 +145,17 @@ class m160322_075751_foreign_keys extends Migration
                     PropertiesTableGenerator::getForeignKeyName($class::eavTable(), Property::tableName(), $this->db),
                     $class::eavTable()
                 );
-            } catch (Exception $e) {}
+            } catch (Exception $e) {
+
+            }
             try {
                 $this->dropForeignKey(
                     PropertiesTableGenerator::getForeignKeyName($class::staticValuesBindingsTable(), StaticValue::tableName(), $this->db),
                     $class::staticValuesBindingsTable()
                 );
-            } catch (Exception $e) {}
+            } catch (Exception $e) {
+
+            }
         }
     }
 }

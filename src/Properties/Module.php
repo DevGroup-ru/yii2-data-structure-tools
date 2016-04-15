@@ -84,5 +84,4 @@ class Module extends BaseModule implements BootstrapInterface
     {
         return Yii::t('@vendor/devgroup/yii2-data-structure-tools/' . $category, $message, $params, $language);
     }
-
 }

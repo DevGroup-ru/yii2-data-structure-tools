@@ -26,5 +26,4 @@ class DeleteStaticValue extends BaseAdminAction
         }
         return $this->controller->redirect($return_url);
     }
-
 }

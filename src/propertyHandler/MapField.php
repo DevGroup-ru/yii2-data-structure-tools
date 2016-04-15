@@ -4,7 +4,7 @@ namespace DevGroup\DataStructure\propertyHandler;
 
 use DevGroup\DataStructure\models\Property;
 
-class MapField  extends AbstractPropertyHandler
+class MapField extends AbstractPropertyHandler
 {
 
     public $key;

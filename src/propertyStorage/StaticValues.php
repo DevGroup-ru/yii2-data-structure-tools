@@ -5,8 +5,14 @@ namespace DevGroup\DataStructure\propertyStorage;
 use DevGroup\DataStructure\helpers\PropertiesHelper;
 use DevGroup\DataStructure\models\Property;
 use DevGroup\DataStructure\models\StaticValue;
+use DevGroup\DataStructure\models\StaticValueTranslation;
+use DevGroup\TagDependencyHelper\NamingHelper;
 use Yii;
+use yii\caching\ChainedDependency;
+use yii\caching\TagDependency;
 use yii\db\Query;
+use yii\helpers\ArrayHelper;
+use yii\helpers\Json;
 
 class StaticValues extends AbstractPropertyStorage
 {
@@ -193,6 +199,88 @@ class StaticValues extends AbstractPropertyStorage
         }
 
         return true;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public static function getPropertyValuesByParams(
+        $propertyId,
+        $params = '',
+        $customDependency = null,
+        $customKey = '',
+        $cacheLifetime = 86400
+    ) {
+        $column = 'description';
+        $params = static::prepareParams($params, $column);
+        $keys = [$customKey, 'PropertyValues', 'Property', $propertyId, Json::encode($params)];
+        $tags = [NamingHelper::getObjectTag(Property::className(), $propertyId)];
+        if (is_null($customDependency)) {
+            $dependency = new TagDependency(['tags' => $tags]);
+        } elseif (is_string($customDependency)) {
+            $tags[] = $customDependency;
+            $dependency = new TagDependency(['tags' => $tags]);
+        } else {
+            $dependency = new ChainedDependency(
+                ['dependencies' => [$customDependency, new TagDependency(['tags' => $tags])]]
+            );
+        }
+
+        sort($keys);
+        return Yii::$app->cache->lazy(
+            function () use ($column, $params, $propertyId) {
+                return (new Query())->select($column)->from(StaticValueTranslation::tableName())->distinct()->where(
+                    $params
+                )->innerJoin(StaticValue::tableName())->andWhere(['property_id' => $propertyId])->column();
+            },
+            'SVPV_' . md5(Json::encode($keys)),
+            $cacheLifetime,
+            $dependency
+        );
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public static function getModelsByPropertyValues(
+        $propertyId,
+        $values = [],
+        $returnType = self::RETURN_ALL,
+        $customDependency = null,
+        $cacheLifetime = 86400
+    ) {
+        $result = $returnType === self::RETURN_COUNT ? 0 : [];
+        $classNames = static::getApplicablePropertyModelClassNames($propertyId);
+        $tags = [NamingHelper::getObjectTag(Property::className(), $propertyId)];
+        $column = 'description';
+        foreach ($classNames as $className) {
+            $tmpQuery = $className::find()->innerJoin(
+                $className::staticValuesBindingsTable() . ' MSV',
+                'MSV.model_id=' . $className::tableName() . '.id'
+            )->innerJoin(StaticValue::tableName() . ' SV', 'SV.id=MSV.static_value_id')->innerJoin(
+                StaticValueTranslation::tableName() . ' SVT',
+                'SVT.model_id=SV.id'
+            )->andWhere(
+                [
+                    'SV.property_id' => $propertyId,
+                    "SVT.$column" => $values,
+                    'SVT.language_id' => Yii::$app->multilingual->language_id,
+                ]
+            )->addGroupBy($className::primaryKey());
+            $dependency = static::dependencyHelper(
+                $customDependency,
+                ArrayHelper::merge($tags, (array)$className::commonTag())
+            );
+            $result = static::valueByReturnType(
+                $returnType,
+                $tmpQuery,
+                $result,
+                $className,
+                $dependency,
+                $cacheLifetime
+            );
+        }
+        return $result;
     }
 
     /**

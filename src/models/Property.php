@@ -475,6 +475,21 @@ class Property extends ActiveRecord
     }
 
     /**
+     * @return array of all data types
+     */
+    public static function getDataTypes()
+    {
+        return [
+            self::DATA_TYPE_STRING,
+            self::DATA_TYPE_INTEGER,
+            self::DATA_TYPE_FLOAT,
+            self::DATA_TYPE_TEXT,
+            self::DATA_TYPE_PACKED_JSON,
+            self::DATA_TYPE_BOOLEAN,
+        ];
+    }
+
+    /**
      * @return \yii\db\ActiveQuery
      */
     public function getPropertyGroups()

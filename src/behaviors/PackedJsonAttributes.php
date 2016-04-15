@@ -10,9 +10,9 @@ use yii\helpers\Json;
 class PackedJsonAttributes extends Behavior
 {
     /** @var string[] name of packed attributes without prefix */
-    private $packedAttributes = null;
+    private $_packedAttributes = null;
     public $prefix = 'packed_json_';
-    private $unpackedValues = [];
+    private $_unpackedValues = [];
 
     /**
      * @var bool Set real value to empty array on null
@@ -35,11 +35,11 @@ class PackedJsonAttributes extends Behavior
      */
     private function getPackedAttributes()
     {
-        if ($this->packedAttributes === null) {
+        if ($this->_packedAttributes === null) {
             /** @var ActiveRecord $owner */
             $owner = $this->owner;
             $allAttributes = array_keys($owner->getAttributes());
-            $this->packedAttributes = array_reduce(
+            $this->_packedAttributes = array_reduce(
                 $allAttributes,
                 function ($carry, $item) {
                     if (strpos($item, $this->prefix) === 0) {
@@ -50,7 +50,7 @@ class PackedJsonAttributes extends Behavior
                 []
             );
         }
-        return $this->packedAttributes;
+        return $this->_packedAttributes;
     }
 
     /**
@@ -79,16 +79,16 @@ class PackedJsonAttributes extends Behavior
         /** @var ActiveRecord $owner */
         $owner = $this->owner;
 
-        $this->unpackedValues = [];
+        $this->_unpackedValues = [];
 
-        foreach ($this->packedAttributes as $attribute) {
+        foreach ($this->_packedAttributes as $attribute) {
             $json = $owner->getAttribute($this->addPrefix($attribute));
             if (empty($json)) {
                 $json = null;
             } else {
                 $json = Json::decode($json);
             }
-            $this->unpackedValues[$attribute] = $json;
+            $this->_unpackedValues[$attribute] = $json;
         }
     }
 
@@ -97,7 +97,7 @@ class PackedJsonAttributes extends Behavior
      */
     public function canGetProperty($name, $checkVars = true)
     {
-        return in_array($name, $this->packedAttributes) ?: parent::canGetProperty($name, $checkVars);
+        return in_array($name, $this->_packedAttributes) ?: parent::canGetProperty($name, $checkVars);
     }
 
     /**
@@ -105,21 +105,21 @@ class PackedJsonAttributes extends Behavior
      */
     public function canSetProperty($name, $checkVars = true)
     {
-        return in_array($name, $this->packedAttributes) ?: parent::canSetProperty($name, $checkVars);
+        return in_array($name, $this->_packedAttributes) ?: parent::canSetProperty($name, $checkVars);
     }
 
     public function __get($name)
     {
-        if (in_array($name, $this->packedAttributes)) {
-            return $this->unpackedValues[$name];
+        if (in_array($name, $this->_packedAttributes)) {
+            return $this->_unpackedValues[$name];
         }
         return parent::__get($name);
     }
 
     public function __set($name, $value)
     {
-        if (in_array($name, $this->packedAttributes)) {
-            $this->unpackedValues[$name] = $value;
+        if (in_array($name, $this->_packedAttributes)) {
+            $this->_unpackedValues[$name] = $value;
             return;
         }
         parent::__set($name, $value);
@@ -133,15 +133,15 @@ class PackedJsonAttributes extends Behavior
 
         if ($this->forceEmptyArray === true) {
             // set unset attributes to empty array
-            foreach ($this->packedAttributes as $attribute) {
-                if (!isset($this->unpackedValues[$attribute])) {
-                    $this->unpackedValues[$attribute] = [];
+            foreach ($this->_packedAttributes as $attribute) {
+                if (!isset($this->_unpackedValues[$attribute])) {
+                    $this->_unpackedValues[$attribute] = [];
                 }
             }
         }
 
         // pack all attributes to JSON string
-        foreach ($this->unpackedValues as $attribute => $value) {
+        foreach ($this->_unpackedValues as $attribute => $value) {
             if (empty($value) && $this->forceEmptyArray === true) {
                 $value = [];
             }

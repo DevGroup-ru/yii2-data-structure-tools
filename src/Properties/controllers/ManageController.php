@@ -77,7 +77,7 @@ class ManageController extends BaseController
     {
         Yii::$app->response->format = Response::FORMAT_JSON;
 
-        if(!$groupId = Yii::$app->request->post('groupId')) {
+        if (!$groupId = Yii::$app->request->post('groupId')) {
             throw new BadRequestHttpException();
         }
 
@@ -99,7 +99,7 @@ class ManageController extends BaseController
      */
     public function actionDeleteModelPropertyGroup($className, $modelId)
     {
-        if(!$groupId = Yii::$app->request->post('groupId')) {
+        if (!$groupId = Yii::$app->request->post('groupId')) {
             throw new BadRequestHttpException();
         }
         /** @var PropertiesTrait $model */
