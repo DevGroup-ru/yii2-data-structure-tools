@@ -3,6 +3,7 @@
 $params = require(__DIR__ . '/params.php');
 
 $config = [
+    'vendorPath' => '@app/../vendor',
     'id' => 'minimal',
     'basePath' => dirname(__DIR__),
     'bootstrap' => ['log','multilingual','debug'],
