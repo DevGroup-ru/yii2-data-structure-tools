@@ -4,7 +4,7 @@ use yii\db\Connection;
 
 return [
     'id' => 'unit',
-    'basePath' => __DIR__,
+    'basePath' => dirname(__DIR__),
     'bootstrap' => ['log'],
     'components' => [
         'log' => [
@@ -17,7 +17,7 @@ return [
             ],
         ],
         'cache' => [
-            'class' => '\yii\caching\DummyCache',
+            'class' => '\yii\caching\FileCache',
             'as lazy' => [
                 'class' => 'DevGroup\TagDependencyHelper\LazyCache',
             ],

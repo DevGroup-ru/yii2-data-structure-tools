@@ -28,7 +28,6 @@ class Product extends \yii\db\ActiveRecord
     {
         return ArrayHelper::merge(
             [
-                [['name'], 'string',],
                 ['packed_json_data', 'safe'],
                 [['price'], 'number'],
                 ['sort_order', 'integer'],
