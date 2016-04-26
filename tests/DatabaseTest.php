@@ -54,6 +54,11 @@ class DatabaseTest extends \PHPUnit_Extensions_Database_TestCase
 
         Yii::$app = new Application($config);
         try {
+            Yii::$app->db->createCommand("SET foreign_key_checks = 0")->execute();
+            foreach (\Yii::$app->db->schema->tableNames as $tableName) {
+                Yii::$app->db->createCommand()->dropTable($tableName)->execute();
+            }
+            Yii::$app->db->createCommand("SET foreign_key_checks = 1")->execute();
             Yii::$app->runAction('migrate/down', [99999, 'interactive'=>0, 'migrationPath' => __DIR__ . '/../src/migrations/']);
             Yii::$app->runAction('migrate/up', ['interactive'=>0, 'migrationPath' => __DIR__ . '/../src/migrations/']);
 
