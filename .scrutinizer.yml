@@ -124,3 +124,4 @@ filter:
     excluded_paths:
         - tests/*
         - vendor/*
+        - src/translations/*

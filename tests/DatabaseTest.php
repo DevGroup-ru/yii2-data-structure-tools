@@ -11,6 +11,7 @@ use DevGroup\DataStructure\helpers\PropertyHandlerHelper;
 use DevGroup\DataStructure\helpers\PropertyStorageHelper;
 use DevGroup\DataStructure\models\Property;
 use DevGroup\DataStructure\models\PropertyGroup;
+use DevGroup\DataStructure\models\PropertyStorage;
 use DevGroup\DataStructure\models\StaticValue;
 use DevGroup\DataStructure\propertyStorage\EAV;
 use DevGroup\DataStructure\propertyStorage\StaticValues;
@@ -19,8 +20,6 @@ use DevGroup\DataStructure\tests\models\Product;
 use Yii;
 use yii\base\UnknownPropertyException;
 use yii\console\Application;
-use yii\db\Connection;
-use yii\web\ServerErrorHttpException;
 
 /**
  * DatabaseTestCase
@@ -413,6 +412,120 @@ class DatabaseTest extends \PHPUnit_Extensions_Database_TestCase
         PropertiesHelper::deleteAllProperties($models);
         $this->assertSame('0', Yii::$app->db->createCommand("SELECT COUNT(*) FROM {{product_eav}}")->queryScalar());
 //        $this->markTestSkipped('TBD');
+    }
+
+    public function testMultiple()
+    {
+        // Static values
+        $propertyGroup = new PropertyGroup(Product::className());
+        $propertyGroup->is_auto_added = true;
+        $propertyGroup->internal_name = 'Multi';
+        $propertyGroup->translate(1)->name = 'Multi';
+        $propertyGroup->translate(2)->name = 'Multi';
+        $propertyGroup->save();
+        $interface = new Property();
+        $interface->key = 'interface';
+        $interface->translate(1)->name = 'Interface';
+        $interface->translate(2)->name = 'Interface';
+        $interface->data_type = Property::DATA_TYPE_INTEGER;
+        $interface->storage_id = PropertyStorage::find()
+            ->select('id')
+            ->where(['class_name' => StaticValues::className()])
+            ->scalar();
+        $interface->property_handler_id = PropertyHandlerHelper::getInstance()->handlerIdByClassName(
+            \DevGroup\DataStructure\propertyHandler\StaticValues::className()
+        );
+        $interface->allow_multiple_values = true;
+        $interface->save();
+        $propertyGroup->link(
+            'properties',
+            $interface
+        );
+        $usb2 = new StaticValue($interface);
+        $usb2->name = 'USB 2.0';
+        $usb2->save();
+        $usb3 = new StaticValue($interface);
+        $usb3->name = 'USB 3.0';
+        $usb3->save();
+        $hdmi = new StaticValue($interface);
+        $hdmi->name = 'HDMI';
+        $hdmi->save();
+        $newProduct = new Product;
+        $newProduct->name = 'New product';
+        $newProduct->save();
+        // tests 1
+        $interfaces = [$usb2->id, $hdmi->id];
+        $newProduct->interface = $interfaces;
+        $newProduct->autoSaveProperties = true;
+        $this->assertTrue($newProduct->save());
+        $this->assertSame($interfaces, $newProduct->interface);
+        $newProductId = $newProduct->id;
+        $newProduct = Product::findOne($newProductId);
+        $products = [$newProduct];
+        PropertiesHelper::fillProperties($products);
+        $this->assertSame($interfaces, $newProduct->interface);
+        // tests 2
+        $interfaces = [$usb3->id];
+        $newProduct->interface = $interfaces;
+        $newProduct->autoSaveProperties = true;
+        $this->assertTrue($newProduct->save());
+        $this->assertSame($interfaces, $newProduct->interface);
+        $newProductId = $newProduct->id;
+        $newProduct = Product::findOne($newProductId);
+        $products = [$newProduct];
+        PropertiesHelper::fillProperties($products);
+        $this->assertSame($interfaces, $newProduct->interface);
+        $propertyGroup->delete();
+        // EAV
+        $propertyGroup = new PropertyGroup(Product::className());
+        $propertyGroup->is_auto_added = true;
+        $propertyGroup->internal_name = 'Multi eav';
+        $propertyGroup->translate(1)->name = 'Multi eav';
+        $propertyGroup->translate(2)->name = 'Multi eav';
+        $this->assertTrue($propertyGroup->save());
+        $advise = new Property();
+        $advise->key = 'advise';
+        $advise->translate(1)->name = 'Advise';
+        $advise->translate(2)->name = 'Advise';
+        $advise->data_type = Property::DATA_TYPE_TEXT;
+        $advise->storage_id = PropertyStorage::find()
+            ->select('id')
+            ->where(['class_name' => EAV::className()])
+            ->scalar();
+        $advise->property_handler_id = PropertyHandlerHelper::getInstance()->handlerIdByClassName(
+            \DevGroup\DataStructure\propertyHandler\TextArea::className()
+        );
+        $advise->allow_multiple_values = true;
+        $advise->save();
+        $propertyGroup->link(
+            'properties',
+            $advise
+        );
+        $newProduct = new Product;
+        $newProduct->name = 'Newest product';
+        $newProduct->save();
+        // tests 1
+        $advises = ['The only one'];
+        $newProduct->advise = $advises;
+        $newProduct->autoSaveProperties = true;
+        $this->assertTrue($newProduct->save());
+        $this->assertSame($advises, $newProduct->advise);
+        $newProductId = $newProduct->id;
+        $newProduct = Product::findOne($newProductId);
+        $products = [$newProduct];
+        PropertiesHelper::fillProperties($products);
+        $this->assertSame($advises, $newProduct->advise);
+        // tests 2
+        $advises = ['one', 'tWo', '4'];
+        $newProduct->advise = $advises;
+        $newProduct->autoSaveProperties = true;
+        $this->assertTrue($newProduct->save());
+        $this->assertSame($advises, $newProduct->advise);
+        $newProductId = $newProduct->id;
+        $newProduct = Product::findOne($newProductId);
+        $products = [$newProduct];
+        PropertiesHelper::fillProperties($products);
+        $this->assertSame($advises, $newProduct->advise);
     }
 
     public function testPackedJsonFields()
