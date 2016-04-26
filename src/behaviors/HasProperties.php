@@ -167,7 +167,9 @@ class HasProperties extends Behavior
         }
         if ($changed === true) {
             $owner->propertiesValuesChanged = true;
-            $owner->changedProperties[] = $id;
+            if (in_array($id, $owner->changedProperties) === false) {
+                $owner->changedProperties[] = $id;
+            }
         }
         $owner->propertiesValues[$id] = $value;
     }

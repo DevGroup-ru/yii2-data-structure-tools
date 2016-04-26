@@ -457,7 +457,7 @@ class DatabaseTest extends \PHPUnit_Extensions_Database_TestCase
         $interfaces = [$usb2->id, $hdmi->id];
         $newProduct->interface = $interfaces;
         $newProduct->autoSaveProperties = true;
-        $this->assertTrue($newProduct->save());
+        $newProduct->save();
         $this->assertSame($interfaces, $newProduct->interface);
         $newProductId = $newProduct->id;
         $newProduct = Product::findOne($newProductId);
@@ -468,7 +468,7 @@ class DatabaseTest extends \PHPUnit_Extensions_Database_TestCase
         $interfaces = [$usb3->id];
         $newProduct->interface = $interfaces;
         $newProduct->autoSaveProperties = true;
-        $this->assertTrue($newProduct->save());
+        $newProduct->save();
         $this->assertSame($interfaces, $newProduct->interface);
         $newProductId = $newProduct->id;
         $newProduct = Product::findOne($newProductId);
@@ -508,7 +508,7 @@ class DatabaseTest extends \PHPUnit_Extensions_Database_TestCase
         $advises = ['The only one'];
         $newProduct->advise = $advises;
         $newProduct->autoSaveProperties = true;
-        $this->assertTrue($newProduct->save());
+        $newProduct->save();
         $this->assertSame($advises, $newProduct->advise);
         $newProductId = $newProduct->id;
         $newProduct = Product::findOne($newProductId);
@@ -519,7 +519,7 @@ class DatabaseTest extends \PHPUnit_Extensions_Database_TestCase
         $advises = ['one', 'tWo', '4'];
         $newProduct->advise = $advises;
         $newProduct->autoSaveProperties = true;
-        $this->assertTrue($newProduct->save());
+        $newProduct->save();
         $this->assertSame($advises, $newProduct->advise);
         $newProductId = $newProduct->id;
         $newProduct = Product::findOne($newProductId);
