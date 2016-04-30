@@ -80,7 +80,7 @@ class EditProperty extends BaseAdminAction
 
 
 
-            if ($event->isValid === true && $model->save() && !Yii::$app->request->isPjax ) {
+            if ($event->isValid === true && $model->save() && !Yii::$app->request->isPjax) {
                 \yii\caching\TagDependency::invalidate(
                     $propertyGroup->getTagDependencyCacheComponent(),
                     [

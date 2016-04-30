@@ -143,18 +143,13 @@ class HasProperties extends Behavior
         if ($id === false) {
             throw new Exception("Property id for key $name not found");
         }
-        if (is_array($value) === false && empty($value) === false) {
-            /** @var Property $property */
-            $property = Property::findById($id);
-            if ($property->allow_multiple_values === true) {
-                // convert value to array for multiple property!
-                $value = [$value];
-            }
-        }
 
         $changed = true;
         if (isset($owner->propertiesValues[$id])) {
             if (is_array($value) === true) {
+                if (is_array($owner->propertiesValues[$id]) === false) {
+                    $owner->propertiesValues[$id] = (array) $owner->propertiesValues[$id];
+                }
                 $first = reset($owner->propertiesValues[$id]);
                 $firstValue = reset($value);
                 if (true === is_array($first) && true === is_array($firstValue)) {
@@ -172,7 +167,9 @@ class HasProperties extends Behavior
         }
         if ($changed === true) {
             $owner->propertiesValuesChanged = true;
-            $owner->changedProperties[] = $id;
+            if (in_array($id, $owner->changedProperties) === false) {
+                $owner->changedProperties[] = $id;
+            }
         }
         $owner->propertiesValues[$id] = $value;
     }
@@ -187,11 +184,11 @@ class HasProperties extends Behavior
         $groups = $owner->propertyGroupIds;
         $owner->propertyGroupIds = null;
 
-        if ($groups) {
+        if (count($groups) > 0) {
             foreach ($groups as $group_id) {
                 /** @var PropertyGroup $group */
                 $group = PropertyGroup::findOne(['id' => $group_id]);
-                if($group) {
+                if ($group) {
                     $owner->addPropertyGroup($group);
                 }
             }

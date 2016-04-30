@@ -2,7 +2,6 @@
 
 namespace DevGroup\DataStructure\assets;
 
-
 use arogachev\sortable\assets\SortableColumnAsset;
 use kartik\select2\Select2Asset;
 use yii\web\AssetBundle;
@@ -27,5 +26,4 @@ class Select2SortableBundle extends AssetBundle
         Select2Asset::class,
         SortableColumnAsset::class
     ];
-
 }

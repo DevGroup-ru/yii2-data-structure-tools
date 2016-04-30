@@ -3,9 +3,10 @@
 $params = require(__DIR__ . '/params.php');
 
 $config = [
+    'vendorPath' => '@app/../vendor',
     'id' => 'minimal',
     'basePath' => dirname(__DIR__),
-    'bootstrap' => ['log','multilingual','debug'],
+    'bootstrap' => ['log', 'multilingual', 'debug', 'properties'],
     'modules' => [
         'gii' => [
             'class' => 'yii\gii\Module',

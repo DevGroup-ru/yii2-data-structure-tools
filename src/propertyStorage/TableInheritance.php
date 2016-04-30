@@ -10,11 +10,14 @@ use DevGroup\DataStructure\models\PropertyGroup;
 use DevGroup\DataStructure\Properties\Module;
 use DevGroup\DataStructure\traits\PropertiesTrait;
 use Yii;
+use yii\caching\ChainedDependency;
+use yii\caching\TagDependency;
 use yii\db\ActiveRecord;
 use yii\db\Expression;
 use yii\db\Query;
 use yii\db\Schema;
 use yii\helpers\ArrayHelper;
+use yii\helpers\Json;
 
 class TableInheritance extends AbstractPropertyStorage
 {
@@ -302,6 +305,86 @@ class TableInheritance extends AbstractPropertyStorage
                     ->execute();
             }
         }
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public static function getPropertyValuesByParams(
+        $propertyId,
+        $params = '',
+        $customDependency = null,
+        $customKey = '',
+        $cacheLifetime = 86400
+    ) {
+        $property = Property::findById($propertyId);
+        $column = $property->key;
+
+        $params = static::prepareParams($params, $column);
+
+        $classNames = static::getApplicablePropertyModelClassNames($propertyId);
+        $queries = [];
+        $keys = [$customKey, 'PropertyValues', 'Property', $propertyId, Json::encode($params)];
+        $tags = [$property->objectTag()];
+        foreach ($classNames as $className) {
+            $columns = self::getColumns($className);
+
+            if (array_search($column, $columns) !== false) {
+                $query = new Query();
+                $query->select($column)->from($className::tableInheritanceTable())->where($params);
+                $queries[] = $query;
+                $keys[] = $className;
+                $tags[] = $className::commonTag();
+            }
+        }
+        $dependency = self::dependencyHelper($customDependency, $tags);
+        $query = self::unionQueriesToOne($queries);
+        sort($keys);
+        return Yii::$app->cache->lazy(
+            function () use ($query) {
+                return $query->column();
+            },
+            'TIPV_' . md5(Json::encode($keys)),
+            $cacheLifetime,
+            $dependency
+        );
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public static function getModelsByPropertyValues(
+        $propertyId,
+        $values = [],
+        $returnType = self::RETURN_ALL,
+        $customDependency = null,
+        $cacheLifetime = 86400
+    ) {
+        $result = $returnType === self::RETURN_COUNT ? 0 : [];
+        $property = Property::findById($propertyId);
+        $tags = [$property->objectTag()];
+        $column = $property->key;
+        $classNames = static::getApplicablePropertyModelClassNames($propertyId);
+        foreach ($classNames as $className) {
+            $tmpQuery = $className::find()->innerJoin(
+                $className::tableInheritanceTable() . ' MP',
+                'MP.model_id=' . $className::tableName() . '.id'
+            )->where(["MP.$column" => $values]);
+            $dependency = static::dependencyHelper(
+                $customDependency,
+                ArrayHelper::merge($tags, (array)$className::commonTag())
+            );
+            $result = static::valueByReturnType(
+                $returnType,
+                $tmpQuery,
+                $result,
+                $className,
+                $dependency,
+                $cacheLifetime
+            );
+        }
+
+        return $result;
     }
 
     /**

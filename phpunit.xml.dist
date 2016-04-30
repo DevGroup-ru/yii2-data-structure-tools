@@ -1,21 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
 <phpunit bootstrap="./tests/bootstrap.php"
-		colors="true"
-		convertErrorsToExceptions="true"
-		convertNoticesToExceptions="true"
-		convertWarningsToExceptions="true"
-		stopOnFailure="false">
-		<testsuites>
-			<testsuite>
-				<directory>./tests</directory>
-			</testsuite>
-		</testsuites>
-		<filter>
-			<whitelist>
-				<directory suffix=".php">src</directory>
+        colors="true"
+        convertErrorsToExceptions="true"
+        convertNoticesToExceptions="true"
+        convertWarningsToExceptions="true"
+        stopOnFailure="false"
+        backupStaticAttributes="true">
+        <testsuites>
+            <testsuite>
+                <directory>./tests</directory>
+            </testsuite>
+        </testsuites>
+        <filter>
+            <whitelist>
+                <directory suffix=".php">src</directory>
                 <exclude>
+                    <directory suffix=".php">src/assets</directory>
                     <directory suffix=".php">src/Properties</directory>
+                    <directory suffix=".php">src/propertyHandler/views</directory>
+                    <directory suffix=".php">src/translations</directory>
+                    <directory suffix=".php">src/widgets</directory>
                 </exclude>
-			</whitelist>
-		</filter>
+            </whitelist>
+        </filter>
 </phpunit>

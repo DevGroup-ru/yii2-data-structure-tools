@@ -153,6 +153,7 @@ class StaticValue extends ActiveRecord
                             'svt.slug',
                         ])
                         ->from($table . ' sv')
+                        ->where(['sv.property_id' => $propertyId])
                         ->innerJoin(
                             $translationsTable . 'svt',
                             'svt.model_id = sv.id AND svt.language_id=:language_id',
@@ -213,14 +214,13 @@ class StaticValue extends ActiveRecord
     }
 
     /**
-     * @param $propertyGroupId
-     * @param $params
+     * @param int|null $propertyId
+     * @param array $params
      *
-     * @return \yii\data\ActiveDataProvider
-     *
+     * @return ActiveDataProvider
      * @codeCoverageIgnore
      */
-    public function search($propertyId = null, $params)
+    public function search($propertyId = null, $params = [])
     {
         $query = self::find();
         if ($propertyId !== null) {

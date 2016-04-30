@@ -7,11 +7,18 @@ use DevGroup\DataStructure\models\ApplicablePropertyModels;
 use DevGroup\DataStructure\models\Property;
 use DevGroup\DataStructure\models\PropertyGroup;
 use DevGroup\DataStructure\models\PropertyPropertyGroup;
+use DevGroup\DataStructure\Properties\Module;
 use DevGroup\DataStructure\traits\PropertiesTrait;
 use Yii;
+use yii\base\Exception;
+use yii\caching\ChainedDependency;
+use yii\caching\Dependency;
+use yii\caching\TagDependency;
+use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
 use yii\db\Query;
 use yii\helpers\ArrayHelper;
+use yii\helpers\Json;
 
 /**
  * Class AbstractPropertyStorage
@@ -21,7 +28,7 @@ use yii\helpers\ArrayHelper;
  *
  * @package DevGroup\DataStructure\propertyStorage
  */
-abstract class AbstractPropertyStorage
+abstract class AbstractPropertyStorage implements FiltrableStorageInterface
 {
     /**
      * @var ActiveRecord[] | HasProperties[] | PropertiesTrait[] Applicable property model class names identity map by property id
@@ -61,6 +68,130 @@ abstract class AbstractPropertyStorage
     public function __construct($storageId)
     {
         $this->storageId = intval($storageId);
+    }
+
+    /**
+     * Helper method
+     *
+     * @param $returnType
+     * @param ActiveQuery $tmpQuery
+     * @param $result
+     * @param $className
+     * @param Dependency $dependency
+     * @param int $cacheLifetime
+     *
+     * @return array|int
+     */
+    protected static function valueByReturnType(
+        $returnType,
+        $tmpQuery,
+        $result,
+        $className,
+        $dependency,
+        $cacheLifetime = 86400
+    ) {
+        switch ($returnType) {
+            case FiltrableStorageInterface::RETURN_COUNT:
+                $result += $className::getDb()->cache(
+                    function ($db) use ($tmpQuery) {
+                        return $tmpQuery->count('*', $db);
+                    },
+                    $cacheLifetime,
+                    $dependency
+                );
+
+                break;
+            case FiltrableStorageInterface::RETURN_QUERY:
+                $result[$className] = $tmpQuery;
+                break;
+            default:
+                if (!empty($tmpQuery)) {
+                    $result = ArrayHelper::merge(
+                        $result,
+                        $className::getDb()->cache(
+                            function ($db) use ($tmpQuery) {
+                                return $tmpQuery->all($db);
+                            },
+                            $cacheLifetime,
+                            $dependency
+                        )
+                    );
+                }
+        }
+        return $result;
+    }
+
+    /**
+     * @param $params
+     * @param $column
+     *
+     * @return mixed
+     * @throws Exception
+     */
+    protected static function prepareParams($params, $column)
+    {
+        if (is_string($params)) {
+            $params = str_replace('[column]', $column, $params);
+            return $params;
+        } elseif (is_array($params)) {
+            $params = Json::decode(str_replace('[column]', $column, Json::encode($params)));
+            return $params;
+        } else {
+            throw new Exception(Module::t('app', 'Params should be string or array'));
+        }
+    }
+
+    /**
+     * @param Query[] $queries
+     *
+     * @return Query
+     * @throws Exception
+     */
+    protected static function unionQueriesToOne($queries)
+    {
+        if (count($queries) === 0) {
+            throw new Exception(Module::t('app', 'Nothing to union'));
+        }
+
+        $query = array_reduce(
+            $queries,
+            function ($query, $item) {
+                /**
+                 * @var $query Query
+                 */
+                if ($query === null) {
+                    $query = $item;
+                } else {
+                    $query->union($item);
+                }
+                return $query;
+            }
+        );
+
+        return $query;
+    }
+
+    /**
+     * @param $customDependency
+     * @param $tags
+     *
+     * @return ChainedDependency|TagDependency
+     */
+    protected static function dependencyHelper($customDependency, $tags)
+    {
+        if (is_null($customDependency)) {
+            $dependency = new TagDependency(['tags' => $tags]);
+            return $dependency;
+        } elseif (is_string($customDependency)) {
+            $tags[] = $customDependency;
+            $dependency = new TagDependency(['tags' => $tags]);
+            return $dependency;
+        } else {
+            $dependency = new ChainedDependency(
+                ['dependencies' => [$customDependency, new TagDependency(['tags' => $tags])]]
+            );
+            return $dependency;
+        }
     }
 
     /**
@@ -214,5 +345,37 @@ abstract class AbstractPropertyStorage
     public static function afterUnbind($property, $propertyGroup)
     {
 
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public static function getPropertyValuesByParams(
+        $propertyId,
+        $params = '',
+        $customDependency = null,
+        $customKey = '',
+        $cacheLifetime = 86400
+    ) {
+        return [];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public static function getModelsByPropertyValues(
+        $propertyId,
+        $values = [],
+        $returnType = self::RETURN_ALL,
+        $customDependency = null,
+        $cacheLifetime = 86400
+    ) {
+        switch ($returnType) {
+            case self::RETURN_COUNT:
+                return 0;
+                break;
+            default:
+                return [];
+        }
     }
 }

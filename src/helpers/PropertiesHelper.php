@@ -6,6 +6,8 @@ use DevGroup\DataStructure\models\ApplicablePropertyModels;
 use DevGroup\DataStructure\models\Property;
 use DevGroup\DataStructure\models\PropertyGroup;
 use DevGroup\DataStructure\models\PropertyPropertyGroup;
+use DevGroup\DataStructure\Properties\Module;
+use DevGroup\DataStructure\propertyStorage\AbstractPropertyStorage;
 use phpDocumentor\Reflection\DocBlock\Tag\PropertyReadTag;
 use Yii;
 use yii\base\Exception;
@@ -177,18 +179,20 @@ class PropertiesHelper
      * @param \yii\db\ActiveRecord[]|\DevGroup\DataStructure\traits\PropertiesTrait[] $models
      *
      * @return \yii\db\ActiveRecord[]
+     * @throws Exception
      */
     public static function fillPropertyGroups(&$models)
     {
+
         if (count($models) === 0) {
-            return;
+            return [];
         }
         /** @var \yii\db\ActiveRecord|\DevGroup\DataStructure\traits\PropertiesTrait|\DevGroup\TagDependencyHelper\TagDependencyTrait $firstModel */
         $firstModel = reset($models);
-        if ($firstModel->propertyGroupIds !== null) {
-            // assume that we have already got them
-            return;
-        }
+//        if ($firstModel->propertyGroupIds !== null) {
+//            // assume that we have already got them
+//            return;
+//        }
 
         $tags = [
             PropertyGroup::commonTag(),
@@ -426,5 +430,31 @@ class PropertiesHelper
             PropertyGroup::commonTag()
         );
         return $availableGroups;
+    }
+
+    public static function getPropertyValuesByParams(
+        Property $property,
+        $params = '',
+        $customDependency = null,
+        $customKey = '',
+        $cacheLifetime = 86400
+    ) {
+        $storageClass = $property->storage->class_name;
+        return $storageClass::getPropertyValuesByParams(
+            $property->id,
+            $params,
+            $customDependency,
+            $customKey,
+            $cacheLifetime
+        );
+    }
+
+    public static function getModelsByPropertyValues(
+        Property $property,
+        $values = [],
+        $returnType = AbstractPropertyStorage::RETURN_ALL
+    ) {
+        $storageClass = $property->storage->class_name;
+        return $storageClass::getModelsByPropertyValues($property->id, $values, $returnType);
     }
 }

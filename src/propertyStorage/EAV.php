@@ -4,12 +4,17 @@ namespace DevGroup\DataStructure\propertyStorage;
 
 use DevGroup\DataStructure\helpers\PropertiesHelper;
 use DevGroup\DataStructure\models\Property;
+use Yii;
+use yii\caching\ChainedDependency;
+use yii\caching\TagDependency;
 use yii\db\ActiveRecord;
 use yii\db\Query;
 use yii\helpers\ArrayHelper;
+use yii\helpers\Json;
 
 class EAV extends AbstractPropertyStorage
 {
+
     /**
      * @inheritdoc
      */
@@ -266,5 +271,85 @@ class EAV extends AbstractPropertyStorage
                 )
                 ->execute();
         }
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public static function getPropertyValuesByParams(
+        $propertyId,
+        $params = '',
+        $customDependency = null,
+        $customKey = '',
+        $cacheLifetime = 86400
+    ) {
+        $property = Property::findById($propertyId);
+        $column = static::dataTypeToEavColumn($property->data_type);
+        $params = static::prepareParams($params, $column);
+        $classNames = static::getApplicablePropertyModelClassNames($propertyId);
+        $queries = [];
+        $keys = [$customKey, 'PropertyValues', 'Property', $propertyId, Json::encode($params)];
+        $tags = [$property->objectTag()];
+        foreach ($classNames as $className) {
+            $query = new Query();
+            $query->select($column)->from($className::eavTable())->where($params);
+            $queries[] = $query;
+            $keys[] = $className;
+            $tags[] = $className::commonTag();
+        }
+        $dependency = self::dependencyHelper($customDependency, $tags);
+        $query = self::unionQueriesToOne($queries);
+        sort($keys);
+        return Yii::$app->cache->lazy(
+            function () use ($query) {
+                return $query->column();
+            },
+            'EAVPV_' . md5(Json::encode($keys)),
+            $cacheLifetime,
+            $dependency
+        );
+
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public static function getModelsByPropertyValues(
+        $propertyId,
+        $values = [],
+        $returnType = self::RETURN_ALL,
+        $customDependency = null,
+        $cacheLifetime = 86400
+    ) {
+        $result = $returnType === self::RETURN_COUNT ? 0 : [];
+        $property = Property::findById($propertyId);
+        $tags = [$property->objectTag()];
+        $classNames = static::getApplicablePropertyModelClassNames($propertyId);
+        $column = static::dataTypeToEavColumn($property->data_type);
+        foreach ($classNames as $className) {
+            $eavTable = $className::eavTable();
+            $tmpQuery = $className::find()->innerJoin(
+                "$eavTable  EAV",
+                $className::tableName() . '.id= EAV.model_id'
+            )->andWhere(
+                [
+                    'EAV.property_id' => $propertyId,
+                    'EAV.' . $column => $values,
+                ]
+            )->addGroupBy($className::primaryKey());
+            $dependency = static::dependencyHelper(
+                $customDependency,
+                ArrayHelper::merge($tags, (array)$className::commonTag())
+            );
+            $result = static::valueByReturnType(
+                $returnType,
+                $tmpQuery,
+                $result,
+                $className,
+                $dependency,
+                $cacheLifetime
+            );
+        }
+        return $result;
     }
 }

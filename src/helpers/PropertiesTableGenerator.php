@@ -250,5 +250,4 @@ class PropertiesTableGenerator extends Migration
     {
         return $this->db;
     }
-
 }

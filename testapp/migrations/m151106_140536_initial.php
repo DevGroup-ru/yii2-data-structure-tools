@@ -63,15 +63,11 @@ class m151106_140536_initial extends Migration
                 'name' => 'айФон 5',
             ]
         );
+
+        Yii::$app->runAction('migrate/up', ['interactive'=>0, 'migrationPath' => __DIR__ . '/../../src/migrations/']);
+
         \DevGroup\DataStructure\helpers\PropertiesTableGenerator::getInstance()->generate(app\models\Product::className());
 
-        $this->insert(
-            '{{%applicable_property_models}}',
-            [
-                'class_name' => app\models\Product::className(),
-                'name' => 'Product',
-            ]
-        );
     }
 
     public function down()
