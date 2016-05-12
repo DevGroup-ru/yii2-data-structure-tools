@@ -190,7 +190,7 @@ class EAV extends AbstractPropertyStorage
         $key = $propertyModel->key;
         $values = (array) $model->$key;
         if (count($values) === 0) {
-            return true;
+            return [];
         }
 
         $valueField = static::dataTypeToEavColumn($propertyModel->data_type);
