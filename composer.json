@@ -20,7 +20,8 @@
         "devgroup/yii2-multilingual": "*",
         "arogachev/yii2-sortable": "^0.1.5",
         "kartik-v/yii2-widget-select2": "^2.0.0",
-        "hector68/yii2-map-input-widget": "^2.0"
+        "hector68/yii2-map-input-widget": "^2.0",
+        "rmrevin/yii2-fontawesome": "~2.14"
     },
     "require-dev": {
         "yiisoft/yii2-bootstrap": "^2.0@dev",
