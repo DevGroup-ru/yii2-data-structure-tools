@@ -8,6 +8,7 @@ use DevGroup\DataStructure\models\Property;
 use DevGroup\DataStructure\models\PropertyGroup;
 use DevGroup\DataStructure\models\PropertyPropertyGroup;
 use DevGroup\DataStructure\Properties\Module;
+use DevGroup\DataStructure\search\interfaces\Filter;
 use DevGroup\DataStructure\traits\PropertiesTrait;
 use Yii;
 use yii\base\Exception;
@@ -28,7 +29,7 @@ use yii\helpers\Json;
  *
  * @package DevGroup\DataStructure\propertyStorage
  */
-abstract class AbstractPropertyStorage implements FiltrableStorageInterface
+abstract class AbstractPropertyStorage implements Filter
 {
     /**
      * @var ActiveRecord[] | HasProperties[] | PropertiesTrait[] Applicable property model class names identity map by property id
@@ -56,7 +57,7 @@ abstract class AbstractPropertyStorage implements FiltrableStorageInterface
         }
         return static::$applicablePropertyModelClassNames[$id];
     }
-    
+
     /**
      * @var int ID of storage in property_storage table
      */
@@ -89,9 +90,10 @@ abstract class AbstractPropertyStorage implements FiltrableStorageInterface
         $className,
         $dependency,
         $cacheLifetime = 86400
-    ) {
+    )
+    {
         switch ($returnType) {
-            case FiltrableStorageInterface::RETURN_COUNT:
+            case Filter::RETURN_COUNT:
                 $result += $className::getDb()->cache(
                     function ($db) use ($tmpQuery) {
                         return $tmpQuery->count('*', $db);
@@ -101,7 +103,7 @@ abstract class AbstractPropertyStorage implements FiltrableStorageInterface
                 );
 
                 break;
-            case FiltrableStorageInterface::RETURN_QUERY:
+            case Filter::RETURN_QUERY:
                 $result[$className] = $tmpQuery;
                 break;
             default:
@@ -356,7 +358,8 @@ abstract class AbstractPropertyStorage implements FiltrableStorageInterface
         $customDependency = null,
         $customKey = '',
         $cacheLifetime = 86400
-    ) {
+    )
+    {
         return [];
     }
 
@@ -369,7 +372,8 @@ abstract class AbstractPropertyStorage implements FiltrableStorageInterface
         $returnType = self::RETURN_ALL,
         $customDependency = null,
         $cacheLifetime = 86400
-    ) {
+    )
+    {
         switch ($returnType) {
             case self::RETURN_COUNT:
                 return 0;
@@ -377,5 +381,30 @@ abstract class AbstractPropertyStorage implements FiltrableStorageInterface
             default:
                 return [];
         }
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public static function filterFormSet(
+        $modelClass,
+        $props,
+        $customDependency = null,
+        $cacheLifetime = 86400)
+    {
+        return [];
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public static function getModelsByValueIds(
+        $modelClass,
+        $selections,
+        $customDependency = null,
+        $cacheLifetime = 86400
+    )
+    {
+        return [];
     }
 }

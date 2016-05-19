@@ -11,7 +11,7 @@
 
 
 
-	<property id="1" key="material" data_type="0" is_internal="0" allow_multiple_values="0" storage_id="1" packed_json_default_value="{}" property_handler_id="1" />
+	<property id="1" key="material" data_type="0" in_search="1" is_internal="0" allow_multiple_values="0" storage_id="1" packed_json_default_value="{}" property_handler_id="1" />
 		<static_value id="1" property_id="1" sort_order="1" />
 			<static_value_translation model_id="1" language_id="1" name="metal" description="metal" slug="metal" />
 			<static_value_translation model_id="1" language_id="2" name="metal" description="металл" slug="metal" />
@@ -21,6 +21,18 @@
 		<static_value id="3" property_id="1" sort_order="1" />
 			<static_value_translation model_id="3" language_id="1" name="glass" description="glass" slug="glass" />
 			<static_value_translation model_id="3" language_id="2" name="glass" description="стекло" slug="glass" />
+
+    <property id="11" key="count" data_type="0" in_search="1" is_internal="0" allow_multiple_values="0" storage_id="1" packed_json_default_value="{}" property_handler_id="1" />
+        <static_value id="11" property_id="11" sort_order="1" />
+            <static_value_translation model_id="11" language_id="1" name="15" description="" slug="15" />
+            <static_value_translation model_id="11" language_id="2" name="15" description="" slug="15" />
+        <static_value id="12" property_id="11" sort_order="1" />
+            <static_value_translation model_id="12" language_id="1" name="17" description="" slug="17" />
+            <static_value_translation model_id="12" language_id="2" name="17" description="" slug="17" />
+        <static_value id="13" property_id="11" sort_order="1" />
+            <static_value_translation model_id="13" language_id="1" name="19" description="" slug="19" />
+            <static_value_translation model_id="13" language_id="2" name="19" description="" slug="19" />
+
 	<property id="2" key="color" data_type="0" is_internal="0" allow_multiple_values="1" storage_id="1" packed_json_default_value="{}" property_handler_id="1" />
 		<static_value id="4" property_id="2" sort_order="1" />
 			<static_value_translation model_id="4" language_id="1" name="white" description="white" slug="white" />
@@ -50,6 +62,8 @@
 	<property_translation model_id="5" language_id="2" name="diagonal" description="диагональ" />
 	<property_translation model_id="6" language_id="1" name="processor" description="processor" />
 	<property_translation model_id="6" language_id="2" name="processor" description="процессор" />
+    <property_translation model_id="11" language_id="1" name="Count" description="" />
+    <property_translation model_id="11" language_id="2" name="Количество" description="" />
 
 	<property_group id="1" internal_name="product_props" sort_order="1" applicable_property_model_id="1" is_auto_added="0" />
 	<property_group_translation model_id="1" language_id="1" name="product properties" />
@@ -60,24 +74,37 @@
 	<property_property_group property_id="4" property_group_id="1" sort_order_property_groups="0" sort_order_group_properties="0" />
 	<property_property_group property_id="5" property_group_id="1" sort_order_property_groups="0" sort_order_group_properties="0" />
 	<property_property_group property_id="6" property_group_id="1" sort_order_property_groups="0" sort_order_group_properties="0" />
+    <property_property_group property_id="11" property_group_id="1" sort_order_property_groups="0" sort_order_group_properties="0" />
 
 	<product_property_groups model_id="1" property_group_id="1" sort_order="0" />
 	<product_property_groups model_id="2" property_group_id="1" sort_order="0" />
 
-	<product_static_values model_id="1" static_value_id="1" sort_order="0" />
-	<product_static_values model_id="1" static_value_id="4" sort_order="0" />
-	<product_static_values model_id="1" static_value_id="5" sort_order="0" />
 	<product_eav id="1" model_id="1" property_id="3" sort_order="0" value_integer="0" value_float="0" value_string="138*67*7" value_text="" />
 	<product_eav id="2" model_id="1" property_id="4" sort_order="0" value_integer="2" value_float="0" value_string="" value_text="" />
 	<product_eav id="3" model_id="1" property_id="5" sort_order="0" value_integer="0" value_float="4.7" value_string="" value_text="" />
 	<product_eav id="4" model_id="1" property_id="6" sort_order="0" value_integer="0" value_float="0" value_string="" value_text="A8 (64bit)+M8" />
 
-	<product_static_values model_id="2" static_value_id="2" sort_order="0" />
-	<product_static_values model_id="2" static_value_id="4" sort_order="0" />
-	<product_static_values model_id="2" static_value_id="6" sort_order="0" />
 	<product_eav id="5" model_id="2" property_id="3" sort_order="0" value_integer="0" value_float="0" value_string="144*71*7" value_text="" />
 	<product_eav id="6" model_id="2" property_id="4" sort_order="0" value_integer="1" value_float="0" value_string="" value_text="" />
 	<product_eav id="7" model_id="2" property_id="5" sort_order="0" value_integer="0" value_float="5.1" value_string="" value_text="" />
 	<product_eav id="8" model_id="2" property_id="6" sort_order="0" value_integer="0" value_float="0" value_string="" value_text="Exynos 7 Octa" />
+
+    <product_static_values model_id="1" static_value_id="1" sort_order="0" />
+    <product_static_values model_id="1" static_value_id="4" sort_order="0" />
+    <product_static_values model_id="1" static_value_id="5" sort_order="0" />
+
+    <product_static_values model_id="2" static_value_id="2" sort_order="0" />
+    <product_static_values model_id="2" static_value_id="4" sort_order="0" />
+    <product_static_values model_id="2" static_value_id="6" sort_order="0" />
+
+    <product_static_values model_id="3" static_value_id="12" sort_order="0" />
+
+    <product_static_values model_id="4" static_value_id="13" sort_order="0" />
+    <product_static_values model_id="4" static_value_id="11" sort_order="0" />
+    <product_static_values model_id="4" static_value_id="2" sort_order="0" />
+
+    <product_static_values model_id="5" static_value_id="12" sort_order="0" />
+    <product_static_values model_id="5" static_value_id="13" sort_order="0" />
+    <product_static_values model_id="5" static_value_id="2" sort_order="0" />
 
 </dataset>

@@ -23,14 +23,24 @@ return [
             ],
         ],
         'multilingual' => [
-            'class' => 'DevGroup\Multilingual\Multilingual',
+            'class' => \DevGroup\Multilingual\Multilingual::class,
             'default_language_id' => 1,
+            'handlers' => [
+                [
+                    'class' => \DevGroup\Multilingual\DefaultGeoProvider::class,
+                    'default' => [
+                        'country' => [
+                            'name' => 'English',
+                            'iso' => 'en',
+                        ],
+                    ],
+                ],
+            ],
         ],
-        'db' => [
-            'class' => Connection::className(),
-            'dsn' => 'mysql:host=localhost;dbname=yii2_datastructure',
-            'username' => 'root',
-            'password' => '',
+        'db' => include 'db.php',
+        'filedb' => [
+            'class' => 'yii2tech\filedb\Connection',
+            'path' =>  dirname(dirname(__DIR__)) . '/testapp/config/data',
         ],
     ],
 ];

@@ -39,6 +39,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
         <?= $form->field($model, 'key') ?>
         <?= $form->field($model, 'is_internal')->checkbox() ?>
+        <?= $form->field($model, 'in_search')->checkbox() ?>
         <?= $form->field($model, 'allow_multiple_values')->checkbox() ?>
         <?= $form->field($model, 'data_type')->dropDownList(FrontendPropertiesHelper::dataTypeSelectOptions()) ?>
         <?= $form->field($model, 'property_handler_id')->dropDownList(FrontendPropertiesHelper::handlersSelectOptions()) ?>

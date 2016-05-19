@@ -2,6 +2,7 @@
 
 namespace DevGroup\DataStructure\behaviors;
 
+use DevGroup\DataStructure\events\HasPropertiesEvent;
 use DevGroup\DataStructure\helpers\PropertiesHelper;
 use DevGroup\DataStructure\helpers\PropertyStorageHelper;
 use DevGroup\DataStructure\models\Property;
@@ -15,6 +16,11 @@ use yii\web\ServerErrorHttpException;
 
 class HasProperties extends Behavior
 {
+    /** Events list to proceed search indexes actualization */
+    const EVENT_AFTER_SAVE = 'afterSave';
+    const EVENT_AFTER_UPDATE = 'afterUpdate';
+    const EVENT_BEFORE_DELETE = 'beforeDelete';
+
     /** @var bool Should properties be automatically fetched after find */
     public $autoFetchProperties = false;
 
@@ -70,10 +76,12 @@ class HasProperties extends Behavior
      */
     public function beforeDelete()
     {
-
         // properties assigned to this record
         /** @var \yii\db\ActiveRecord|\DevGroup\DataStructure\traits\PropertiesTrait $owner */
         $owner = $this->owner;
+        $event = new HasPropertiesEvent();
+        $event->model = $owner;
+        HasPropertiesEvent::trigger(self::class, self::EVENT_BEFORE_DELETE, $event);
         //! @todo add check if this object doesn't has related properties that we wish to delete(lower db queries)
         $array = [&$owner];
         PropertiesHelper::deleteAllProperties($array);
@@ -183,7 +191,9 @@ class HasProperties extends Behavior
         $owner = $this->owner;
         $groups = $owner->propertyGroupIds;
         $owner->propertyGroupIds = null;
-
+        $event = new HasPropertiesEvent();
+        $event->model = $owner;
+        HasPropertiesEvent::trigger(self::class, self::EVENT_AFTER_SAVE, $event);
         if (count($groups) > 0) {
             foreach ($groups as $group_id) {
                 /** @var PropertyGroup $group */
@@ -212,7 +222,9 @@ class HasProperties extends Behavior
     {
         /** @var \yii\db\ActiveRecord|\DevGroup\DataStructure\traits\PropertiesTrait $owner */
         $owner = $this->owner;
-
+        $event = new HasPropertiesEvent();
+        $event->model = $owner;
+        HasPropertiesEvent::trigger(self::class, self::EVENT_AFTER_UPDATE, $event);
         if ($this->autoSaveProperties === true) {
             $models = [&$owner];
             PropertiesHelper::storeValues($models);

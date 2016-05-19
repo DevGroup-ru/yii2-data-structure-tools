@@ -2,7 +2,7 @@
 
 namespace DevGroup\DataStructure\tests;
 
-use DevGroup\DataStructure\helpers\PropertiesFilterHelper;
+use DevGroup\DataStructure\search\helpers\PropertiesFilterHelper;
 use DevGroup\DataStructure\helpers\PropertiesHelper;
 use DevGroup\DataStructure\helpers\PropertiesTableGenerator;
 use DevGroup\DataStructure\helpers\PropertyHandlerHelper;
@@ -123,9 +123,10 @@ class FilterTest extends \PHPUnit_Extensions_Database_TestCase
         //single selections
         //  static values
         $this->assertFilter(['1' => ['metal'],], 1, [1]);
-        $this->assertFilter(['1' => ['plastic'],], 1, [2]);
+        $this->assertFilter(['1' => ['plastic'],], 3, [2, 4, 5]);
         $this->assertFilter(['1' => ['glass']]);
         $this->assertFilter(['1' => ['stone']]);
+
         //  eav
         $this->assertFilter(['3' => ['138*67*7'],], 1, [1]);
         $this->assertFilter(['4' => ['2'],], 1, [1]);
@@ -188,6 +189,9 @@ class FilterTest extends \PHPUnit_Extensions_Database_TestCase
             1,
             [1]
         );
+        //empty request
+        $this->assertEquals([], PropertiesFilterHelper::filterObjects([]));
+
         $exception = false;
         try {
             PropertiesHelper::getPropertyValuesByParams(

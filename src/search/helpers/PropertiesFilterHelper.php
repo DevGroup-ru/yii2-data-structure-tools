@@ -1,21 +1,36 @@
 <?php
 
+namespace DevGroup\DataStructure\search\helpers;
 
-namespace DevGroup\DataStructure\helpers;
-
+use DevGroup\DataStructure\helpers\PropertiesHelper;
 use DevGroup\DataStructure\models\Property;
-use DevGroup\DataStructure\propertyStorage\AbstractPropertyStorage;
+use DevGroup\DataStructure\search\interfaces\Filter;
 use yii\base\Object;
 use yii\caching\TagDependency;
 use yii\db\ActiveQuery;
 use yii\helpers\ArrayHelper;
 
+/**
+ * Class PropertiesFilterHelper
+ *
+ * @package DevGroup\DataStructure\search\helpers
+ */
 class PropertiesFilterHelper extends Object
 {
-    public static function filterObjects($propertySelections = [], $returnType = AbstractPropertyStorage::RETURN_ALL)
+    /**
+     * TODO check for correct behavior with empty $propertySelections
+     *
+     * @param array $propertySelections
+     * @param int $returnType
+     * @return mixed|\yii\db\ActiveQuery[]
+     */
+    public static function filterObjects($propertySelections = [], $returnType = Filter::RETURN_ALL)
     {
         $selections = [];
         $selectionsCount = count($propertySelections);
+        if ($selectionsCount == 0) {
+            return [];
+        }
         $tags = [];
         foreach ($propertySelections as $propertyId => $propertySelection) {
             $property = Property::findById($propertyId);
@@ -23,7 +38,7 @@ class PropertiesFilterHelper extends Object
             $selections[] = PropertiesHelper::getModelsByPropertyValues(
                 $property,
                 $propertySelection,
-                AbstractPropertyStorage::RETURN_QUERY
+                Filter::RETURN_QUERY
             );
         }
 
@@ -44,30 +59,30 @@ class PropertiesFilterHelper extends Object
         /** @var ActiveQuery[] $prepareState */
         foreach ($prepareState as $className => $query) {
             $prepareState[$className] = $className::find()->from(['t' => $query])->addGroupBy('t.id')->having(
-                "count(t.id)=" . (int) $selectionsCount
+                "count(t.id)=" . (int)$selectionsCount
             );
         }
 
         switch ($returnType) {
-            case AbstractPropertyStorage::RETURN_COUNT:
+            case Filter::RETURN_COUNT:
                 foreach ($prepareState as $className => $item) {
                     $prepareState[$className] = $className::getDb()->cache(
                         function ($db) use ($item) {
                             return $item->count('*', $db);
                         },
                         86400,
-                        new TagDependency(['tags' => ArrayHelper::merge($tags, (array) $className::commonTag())])
+                        new TagDependency(['tags' => ArrayHelper::merge($tags, (array)$className::commonTag())])
                     );
                 }
                 break;
-            case AbstractPropertyStorage::RETURN_ALL:
+            case Filter::RETURN_ALL:
                 foreach ($prepareState as $className => $item) {
                     $prepareState[$className] = $className::getDb()->cache(
                         function ($db) use ($item) {
                             return $item->all($db);
                         },
                         86400,
-                        new TagDependency(['tags' => ArrayHelper::merge($tags, (array) $className::commonTag())])
+                        new TagDependency(['tags' => ArrayHelper::merge($tags, (array)$className::commonTag())])
                     );
                 }
                 break;

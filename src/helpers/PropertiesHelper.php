@@ -15,7 +15,6 @@ use yii\base\UnknownPropertyException;
 use yii\caching\TagDependency;
 use yii\db\Query;
 use yii\helpers\ArrayHelper;
-use yii\helpers\VarDumper;
 use yii\web\ServerErrorHttpException;
 
 class PropertiesHelper

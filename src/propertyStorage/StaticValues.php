@@ -2,14 +2,17 @@
 
 namespace DevGroup\DataStructure\propertyStorage;
 
+use DevGroup\DataStructure\behaviors\HasProperties;
 use DevGroup\DataStructure\helpers\PropertiesHelper;
 use DevGroup\DataStructure\models\Property;
 use DevGroup\DataStructure\models\StaticValue;
 use DevGroup\DataStructure\models\StaticValueTranslation;
+use DevGroup\DataStructure\traits\PropertiesTrait;
 use DevGroup\TagDependencyHelper\NamingHelper;
 use Yii;
 use yii\caching\ChainedDependency;
 use yii\caching\TagDependency;
+use yii\db\ActiveRecord;
 use yii\db\Query;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Json;
@@ -210,10 +213,11 @@ class StaticValues extends AbstractPropertyStorage
         $customDependency = null,
         $customKey = '',
         $cacheLifetime = 86400
-    ) {
-        $column = 'description';
+    )
+    {
+        $column = 'name';
         $params = static::prepareParams($params, $column);
-        $keys = [$customKey, 'PropertyValues', 'Property', $propertyId, Json::encode($params)];
+        $keys = [$customKey, 'PropertyValues', 'Property', $propertyId, Json::encode($params), Yii::$app->language];
         $tags = [NamingHelper::getObjectTag(Property::className(), $propertyId)];
         if (is_null($customDependency)) {
             $dependency = new TagDependency(['tags' => $tags]);
@@ -248,11 +252,12 @@ class StaticValues extends AbstractPropertyStorage
         $returnType = self::RETURN_ALL,
         $customDependency = null,
         $cacheLifetime = 86400
-    ) {
+    )
+    {
         $result = $returnType === self::RETURN_COUNT ? 0 : [];
         $classNames = static::getApplicablePropertyModelClassNames($propertyId);
         $tags = [NamingHelper::getObjectTag(Property::className(), $propertyId)];
-        $column = 'description';
+        $column = 'name';
         foreach ($classNames as $className) {
             $tmpQuery = $className::find()->innerJoin(
                 $className::staticValuesBindingsTable() . ' MSV',
@@ -330,5 +335,116 @@ class StaticValues extends AbstractPropertyStorage
         foreach ($staticValues as $staticValue) {
             $staticValue->delete();
         }
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public static function getModelsByValueIds(
+        $modelClass,
+        $selections,
+        $customDependency = null,
+        $cacheLifetime = 86400
+    )
+    {
+        if(count($selections) == 0) {
+            return $modelClass::find()->select('id')->column();
+        }
+        $keys = [$modelClass, 'Property', Json::encode($selections), Yii::$app->language];
+        $tags = [NamingHelper::getCommonTag($modelClass)];
+        foreach ($selections as $propertyId) {
+            $tags[] = NamingHelper::getObjectTag(Property::class, $propertyId);
+        }
+        if (is_null($customDependency)) {
+            $dependency = new TagDependency(['tags' => $tags]);
+        } elseif (is_string($customDependency)) {
+            $tags[] = $customDependency;
+            $dependency = new TagDependency(['tags' => $tags]);
+        } else {
+            $dependency = new ChainedDependency(
+                ['dependencies' => [$customDependency, new TagDependency(['tags' => $tags])]]
+            );
+        }
+        /** @var ActiveRecord | HasProperties | PropertiesTrait $model */
+        $model = new $modelClass;
+        $table = $model->staticValuesBindingsTable();
+        $all = Yii::$app->cache->lazy(
+            function () use ($table, $selections) {
+                $all = [];
+                $q = (new Query())->from($table)->select('model_id')->distinct(true);
+                $start = true;
+                foreach ($selections as $propertyId => $values) {
+                    $res = $q->where(['static_value_id' => $values])->column();
+                    if (true === $start) {
+                        $all = $res;
+                    } else {
+                        $all = array_intersect($all, $res);
+                    }
+                    $start = false;
+                }
+                return $all;
+            },
+            __METHOD__ . md5(implode(':', $keys)),
+            $cacheLifetime,
+            $dependency
+        );
+        return $all;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public static function filterFormSet($modelClass, $props, $customDependency = null, $cacheLifetime = 86400)
+    {
+        $keys = [$modelClass, 'Property', Json::encode($props), Yii::$app->language];
+        $tags = [NamingHelper::getCommonTag($modelClass)];
+        foreach ($props as $propertyId) {
+            $tags[] = NamingHelper::getObjectTag(Property::className(), $propertyId);
+        }
+        if (is_null($customDependency)) {
+            $dependency = new TagDependency(['tags' => $tags]);
+        } elseif (is_string($customDependency)) {
+            $tags[] = $customDependency;
+            $dependency = new TagDependency(['tags' => $tags]);
+        } else {
+            $dependency = new ChainedDependency(
+                ['dependencies' => [$customDependency, new TagDependency(['tags' => $tags])]]
+            );
+        }
+        /** @var ActiveRecord | HasProperties | PropertiesTrait $model */
+        $model = new $modelClass;
+        $table = $model->staticValuesBindingsTable();
+        $data = Yii::$app->cache->lazy(
+            function () use ($props, $table) {
+                $values = StaticValue::find()
+                    ->select(['property_id', 'id'])
+                    ->where(['property_id' => $props])
+                    ->asArray(true)
+                    ->all();
+                $availIds = array_column($values, 'id');
+                $set = (new Query())
+                    ->from($table)
+                    ->select('static_value_id')
+                    ->where(['static_value_id' => $availIds])
+                    ->distinct(true)
+                    ->column();
+                $data = [];
+                foreach ($values as $row) {
+                    if (false === in_array($row['id'], $set)) {
+                        continue;
+                    }
+                    if (false === isset($data[$row['property_id']])) {
+                        $data[$row['property_id']] = [$row['id'] => $row['defaultTranslation']['name']];
+                    } else {
+                        $data[$row['property_id']][$row['id']] = $row['defaultTranslation']['name'];
+                    }
+                }
+                return $data;
+            },
+            __METHOD__ . md5(implode(':', $keys)),
+            $cacheLifetime,
+            $dependency
+        );
+        return $data;
     }
 }

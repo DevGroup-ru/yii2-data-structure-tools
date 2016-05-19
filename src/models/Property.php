@@ -29,6 +29,7 @@ use yii\web\ServerErrorHttpException;
  * @property boolean $allow_multiple_values
  * @property integer $storage_id
  * @property integer $property_handler_id
+ * @property integer $in_search
  * @property array $default_value
  * @property array $handler_config
  * @property string $name
@@ -92,7 +93,7 @@ class Property extends ActiveRecord
             ['key', 'required'],
             ['key', 'string', 'max' => 80],
             [['is_internal', 'allow_multiple_values'], 'filter', 'filter' => 'boolval'],
-            [['data_type'], 'integer',],
+            [['data_type', 'in_search'], 'integer',],
             [['data_type'], 'required',],
             [
                 'storage_id',
@@ -131,6 +132,7 @@ class Property extends ActiveRecord
             'storage_id',
             'property_handler_id',
             'name',
+            'in_search',
         ];
         return $scenarios;
     }
@@ -150,6 +152,7 @@ class Property extends ActiveRecord
             'packed_json_default_value' => Module::t('app', 'Packed Json Default Value'),
             'property_handler_id' => Module::t('app', 'Property Handler ID'),
             'name' => Module::t('app', 'Name'),
+            'in_search' => Module::t('app', 'Use in search'),
         ];
     }
 
