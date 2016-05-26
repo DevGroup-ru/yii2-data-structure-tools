@@ -268,9 +268,9 @@ abstract class AbstractPropertyStorage implements Filter
      * Action that should be done by property storage after property change.
      * Property storage can override this function to add specific actions like schema manipulation.
      * @param Property $property Reference to property model
-     * @return void
+     * @param array $changedAttributes
      */
-    public function afterPropertyChange(Property &$property)
+    public function afterPropertyChange(Property &$property, $changedAttributes)
     {
 
     }

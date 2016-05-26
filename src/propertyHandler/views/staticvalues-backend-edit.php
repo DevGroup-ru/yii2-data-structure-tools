@@ -24,19 +24,20 @@ if ((int)$property->allow_multiple_values === 1 && !empty($model->{$property->ke
 echo Html::tag(
     'div',
     $form->field($model, $property->key)
-    ->widget(
-        Select2::className(),
-        [
-            'data' => ArrayHelper::map($dataQuery->all(), 'id', 'name'),
-            'options' => [
-                'placeholder' => 'Select a value ...',
-            ],
-            'pluginOptions' => [
-                'allowClear' => true,
-                'multiple' => (int)$property->allow_multiple_values === 1
-            ],
-        ]
-    ),
+        ->label($property->name)
+        ->widget(
+            Select2::className(),
+            [
+                'data' => ArrayHelper::map($dataQuery->all(), 'id', 'name'),
+                'options' => [
+                    'placeholder' => 'Select a value ...',
+                ],
+                'pluginOptions' => [
+                    'allowClear' => true,
+                    'multiple' => (int)$property->allow_multiple_values === 1
+                ],
+            ]
+        ),
     [
         'style' => 'overflow: auto;'
     ]

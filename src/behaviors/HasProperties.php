@@ -5,7 +5,6 @@ namespace DevGroup\DataStructure\behaviors;
 use DevGroup\DataStructure\events\HasPropertiesEvent;
 use DevGroup\DataStructure\helpers\PropertiesHelper;
 use DevGroup\DataStructure\helpers\PropertyStorageHelper;
-use DevGroup\DataStructure\models\Property;
 use DevGroup\DataStructure\models\PropertyGroup;
 use Yii;
 use yii\base\Behavior;
@@ -209,7 +208,6 @@ class HasProperties extends Behavior
         foreach ($handlers as $handler) {
             $handler->modelsInserted($models);
         }
-
         $this->afterSave();
     }
 

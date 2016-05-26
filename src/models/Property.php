@@ -55,6 +55,7 @@ class Property extends ActiveRecord
     const DATA_TYPE_TEXT = 3;
     const DATA_TYPE_PACKED_JSON = 4;
     const DATA_TYPE_BOOLEAN = 5;
+    const DATA_TYPE_INVARIANT_STRING = 6;
 
     /**
      * @inheritdoc
@@ -254,7 +255,7 @@ class Property extends ActiveRecord
         if ($insert) {
             $storage->afterPropertyAdd($this);
         } else {
-            $storage->afterPropertyChange($this);
+            $storage->afterPropertyChange($this, $changedAttributes);
         }
         if (in_array('storage_id', $changedAttributes) === true) {
             $apmIds = ArrayHelper::getColumn($this->propertyGroups, 'applicable_property_model_id');
@@ -323,6 +324,16 @@ class Property extends ActiveRecord
         $this->is_internal = boolval($this->is_internal);
         $this->data_type = intval($this->data_type);
         $this->property_handler_id = intval($this->property_handler_id);
+    }
+
+    /**
+     * Checks should this property values to be translated or not
+     *
+     * @return bool
+     */
+    public function canTranslate()
+    {
+        return in_array($this->data_type, [self::DATA_TYPE_STRING, self::DATA_TYPE_TEXT]);
     }
 
     /**
@@ -419,6 +430,7 @@ class Property extends ActiveRecord
 
             case Property::DATA_TYPE_STRING:
             case Property::DATA_TYPE_TEXT:
+            case self::DATA_TYPE_INVARIANT_STRING:
                 return 'strval';
                 break;
 
@@ -449,6 +461,7 @@ class Property extends ActiveRecord
 
             case Property::DATA_TYPE_STRING:
             case Property::DATA_TYPE_TEXT:
+            case self::DATA_TYPE_INVARIANT_STRING:
                 return 'string';
                 break;
             default:
@@ -489,6 +502,7 @@ class Property extends ActiveRecord
             self::DATA_TYPE_TEXT,
             self::DATA_TYPE_PACKED_JSON,
             self::DATA_TYPE_BOOLEAN,
+            self::DATA_TYPE_INVARIANT_STRING,
         ];
     }
 
@@ -517,7 +531,7 @@ class Property extends ActiveRecord
                 [
                     'property_id' => 'id'
                 ]
-            )->orderBy([PropertyGroup::tableName().'.sort_order' => SORT_ASC]);
+            )->orderBy([PropertyGroup::tableName() . '.sort_order' => SORT_ASC]);
     }
 
     /**
@@ -526,7 +540,7 @@ class Property extends ActiveRecord
     public function getStaticValues()
     {
         return $this->hasMany(StaticValue::className(), ['property_id' => 'id'])
-            ->orderBy([StaticValue::tableName().'.sort_order' => SORT_ASC]);
+            ->orderBy([StaticValue::tableName() . '.sort_order' => SORT_ASC]);
     }
 
     /**

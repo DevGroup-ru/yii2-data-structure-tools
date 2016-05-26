@@ -157,6 +157,7 @@ trait PropertiesTrait
         return static::buildTableName('_eav');
     }
 
+
     /**
      * Table inheritance table name. Override this in your model class if needed.
      *

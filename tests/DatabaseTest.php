@@ -510,7 +510,7 @@ class DatabaseTest extends \PHPUnit_Extensions_Database_TestCase
         $newProduct->name = 'Newest product';
         $newProduct->save();
         // tests 1
-        $advises = ['The only one'];
+        $advises = [1 => ['The only one'], 2 => ['The only one']];
         $newProduct->advise = $advises;
         $newProduct->autoSaveProperties = true;
         $newProduct->save();
@@ -521,7 +521,7 @@ class DatabaseTest extends \PHPUnit_Extensions_Database_TestCase
         PropertiesHelper::fillProperties($products);
         $this->assertSame($advises, $newProduct->advise);
         // tests 2
-        $advises = ['one', 'tWo', '4'];
+        $advises = [1 => ['one', 'tWo', '4'], 2 => ['one', 'tWo', '4']];
         $newProduct->advise = $advises;
         $newProduct->autoSaveProperties = true;
         $newProduct->save();

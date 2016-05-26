@@ -3,10 +3,14 @@
 namespace DevGroup\DataStructure\propertyHandler;
 
 use DevGroup\DataStructure\models\Property;
-use yii\bootstrap\ActiveForm;
-use yii\helpers\Html;
+use DevGroup\DataStructure\Properties\validators\ValuesValidator;
 use yii\jui\JuiAsset;
 
+/**
+ * Class TextField
+ *
+ * @package DevGroup\DataStructure\propertyHandler
+ */
 class TextField extends AbstractPropertyHandler
 {
     /**
@@ -15,17 +19,21 @@ class TextField extends AbstractPropertyHandler
     public function getValidationRules(Property $property)
     {
         $key = $property->key;
-
-        $rule = Property::dataTypeValidator($property->data_type) ?: 'safe';
-
-        if ($property->allow_multiple_values) {
+        if (true === $property->canTranslate()) {
             return [
-                [$key, 'each', 'rule' => [$rule]],
+                [$key, ValuesValidator::class, 'skipOnEmpty' => true],
             ];
         } else {
-            return [
-                [$key, $rule],
-            ];
+            $rule = Property::dataTypeValidator($property->data_type) ?: 'safe';
+            if ($property->allow_multiple_values) {
+                return [
+                    [$key, 'each', 'rule' => [$rule]],
+                ];
+            } else {
+                return [
+                    [$key, $rule],
+                ];
+            }
         }
     }
 

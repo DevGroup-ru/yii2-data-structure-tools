@@ -122,6 +122,7 @@ class PropertiesTableGenerator extends Migration
                 'value_float' => $this->float()->notNull()->defaultValue(0),
                 'value_string' => $this->string(),
                 'value_text' => $this->text(),
+                'language_id' => $this->integer()->notNull()->defaultValue(0),
             ],
             $tableOptions
         );

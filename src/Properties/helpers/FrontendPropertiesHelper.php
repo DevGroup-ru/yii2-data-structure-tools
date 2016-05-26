@@ -31,6 +31,7 @@ class FrontendPropertiesHelper
             Property::DATA_TYPE_FLOAT => Module::t('app', 'Float'),
             Property::DATA_TYPE_BOOLEAN => Module::t('app', 'Boolean'),
             Property::DATA_TYPE_PACKED_JSON => Module::t('app', 'Packed JSON'),
+            Property::DATA_TYPE_INVARIANT_STRING => Module::t('app', 'Untranslatable String'),
         ];
     }
 

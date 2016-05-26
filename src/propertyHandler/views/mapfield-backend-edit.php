@@ -1,7 +1,7 @@
 <?php
 /**
  * @var \yii\db\ActiveRecord $model
- * @var DevGroup\DataStructure\propertyHandler\MapField $this->context
+ * @var DevGroup\DataStructure\propertyHandler\MapField $this ->context
  * @var \DevGroup\DataStructure\models\Property $property
  * @var yii\web\View $this
  */
@@ -17,14 +17,15 @@ try {
 }
 
 echo $form->field($model, $property->key)
+    ->label($property->name)
     ->widget(
         MapInputWidget::className(),
         [
             'key' => $this->context->key,
             'latitude' => $this->context->latitude,
             'longitude' => $this->context->longitude,
-            'zoom' => (!empty($data['zoom']))  ? (int) $data['zoom'] : $this->context->zoom,
-            'description' =>  (!empty($data['description']))  ?  $data['description'] : $this->context->description,
+            'zoom' => (!empty($data['zoom'])) ? (int)$data['zoom'] : $this->context->zoom,
+            'description' => (!empty($data['description'])) ? $data['description'] : $this->context->description,
             'width' => $this->context->width,
             'height' => $this->context->height,
             'pattern' => $this->context->pattern,

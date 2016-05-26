@@ -30,4 +30,6 @@ return [
     'Nothing to union' => 'Нечего объединять',
     'No empty array expected' => 'Ожидался не пустой массив',
     'Use in search' => 'Использовать в поиске',
+    'Untranslatable String' => 'Непереводимая строка',
+    'Value must be a string!' => 'Значение должно быть строкой!',
 ];

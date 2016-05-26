@@ -3,7 +3,13 @@
 namespace DevGroup\DataStructure\propertyHandler;
 
 use DevGroup\DataStructure\models\Property;
+use DevGroup\DataStructure\Properties\validators\ValuesValidator;
 
+/**
+ * Class TextArea
+ *
+ * @package DevGroup\DataStructure\propertyHandler
+ */
 class TextArea extends AbstractPropertyHandler
 {
     /**
@@ -12,23 +18,15 @@ class TextArea extends AbstractPropertyHandler
     public function getValidationRules(Property $property)
     {
         $key = $property->key;
-        $rule = Property::dataTypeValidator($property->data_type) ?: 'safe';
-        if ($property->allow_multiple_values) {
+        if (true === $property->canTranslate()) {
             return [
-                [$key, 'each', 'rule' => [$rule]],
+                [$key, ValuesValidator::class, 'skipOnEmpty' => true],
             ];
         } else {
+            $rule = Property::dataTypeValidator($property->data_type) ?: 'safe';
             return [
                 [$key, $rule],
             ];
         }
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function renderProperty($model, $property, $view, $form = null)
-    {
-        return parent::renderProperty($model, $property, $view, $form);
     }
 }

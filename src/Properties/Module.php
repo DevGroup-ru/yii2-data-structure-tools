@@ -5,6 +5,7 @@ namespace DevGroup\DataStructure\Properties;
 use arogachev\sortable\controllers\SortController;
 use DevGroup\AdminUtils\events\ModelEditForm;
 use DevGroup\DataStructure\commands\ElasticIndexController;
+use DevGroup\DataStructure\commands\TranslateEavController;
 use DevGroup\DataStructure\Properties\actions\EditProperty;
 use DevGroup\DataStructure\propertyHandler\StaticValues;
 use DevGroup\DataStructure\search\base\AbstractSearch;
@@ -81,6 +82,9 @@ class Module extends BaseModule implements BootstrapInterface
                     'class' => ElasticIndexController::class,
                 ];
             }
+            $this->controllerMap['translate-eav'] = [
+                'class' => TranslateEavController::class,
+            ];
         }
         $app->on(Application::EVENT_BEFORE_REQUEST, function () {
             Yii::$app->setAliases([

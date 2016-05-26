@@ -8,6 +8,7 @@ use DevGroup\DataStructure\models\PropertyGroup;
 use DevGroup\DataStructure\models\PropertyPropertyGroup;
 use DevGroup\DataStructure\Properties\Module;
 use DevGroup\DataStructure\propertyStorage\AbstractPropertyStorage;
+use DevGroup\DataStructure\propertyStorage\EAV;
 use phpDocumentor\Reflection\DocBlock\Tag\PropertyReadTag;
 use Yii;
 use yii\base\Exception;
@@ -103,8 +104,10 @@ class PropertiesHelper
 
     /**
      * @param \yii\db\ActiveRecord[] $models
+     * @param bool $frontend
+     * @return array|\yii\db\ActiveRecord[]
      */
-    public static function fillProperties(&$models)
+    public static function fillProperties(&$models, $frontend = false)
     {
         if (count($models) === 0) {
             return [];
@@ -118,9 +121,11 @@ class PropertiesHelper
 
         foreach ($storageHandlers as $storage) {
             Yii::beginProfile('Fill properties: ' . $storage->className());
-
-            $storage->fillProperties($models);
-
+            if (true === $frontend && get_class($storage) == EAV::class) {
+                $storage->fillProperties($models, Yii::$app->multilingual->language_id);
+            } else {
+                $storage->fillProperties($models);
+            }
             Yii::endProfile('Fill properties: ' . $storage->className());
         }
         foreach ($models as $model) {

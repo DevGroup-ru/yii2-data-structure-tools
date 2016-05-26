@@ -46,4 +46,15 @@ class ApplicablePropertyModels extends \yii\db\ActiveRecord
             'name' => Module::t('app', 'Name'),
         ];
     }
+
+    /**
+     * Returns self id by given class name or false if not found
+     *
+     * @param string $className
+     * @return bool|string
+     */
+    public static function getIdForClass($className = '')
+    {
+        return self::find()->select('id')->where(['class_name' => $className])->scalar();
+    }
 }
