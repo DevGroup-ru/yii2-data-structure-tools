@@ -89,10 +89,10 @@ This command will create indices for all properties that you allowed to search.
 *For now only available to perform filtering against properties static values* 
 ## At any place you want
 ```
-<?= \DevGroup\DataStructure\search\elastic\widgets\FilterFormWidget::widget([
+<?= \DevGroup\DataStructure\search\widgets\FilterFormWidget::widget([
     'modelClass' => \app\models\Page::class,
     'filterRoute' => ['/url/to/filter'],
-    'options' => [
+    'config' => [
         'storage' => [
             EAV::class,
             StaticValues::class,
@@ -103,7 +103,7 @@ This command will create indices for all properties that you allowed to search.
 This will render basic filter form with all properties and values contained in the elasticsearch index
 - `'modelClass'` - required param, any model class name you have in your app with assigned properties and their static values,
 - `'filterRoute'` - required param, `action` attribute for rendered filter form,
-- `'options'` - optional, additional array of config. Special key `storage` will be used for definition against what property storage
+- `'config'` - optional, additional array of config. Special key `storage` will be used for definition against what property storage
 search will be proceed. If you omit it search will be work only against `StaticValues` storage by default 
 
 ## In your controller
@@ -167,7 +167,3 @@ If you are realizing custom index, you probably need to create own controller fo
 Define your own `Watch` class in your own `Search` class if necessary.
 
 Clearly created and defined `Watch` class will be automatically subscribed to according system events. 
-
-
- 
-
