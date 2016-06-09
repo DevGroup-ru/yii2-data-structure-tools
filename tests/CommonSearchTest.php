@@ -105,7 +105,6 @@ class CommonSearchTest extends DSTCommonTestCase
      */
     public function testFilterWithoutParams($search)
     {
-        Yii::$app->request->setQueryParams([]);
         $res = $search->findInProperties(Product::class, ['storage' => [StaticValues::class, EAV::class]]);
         $this->assertCount(5, $res);
     }
@@ -116,8 +115,7 @@ class CommonSearchTest extends DSTCommonTestCase
      */
     public function testFilterWithParamsNoResults($search)
     {
-        Yii::$app->request->setQueryParams(['filter' => [1 => [3], 11 => [11, 13]]]);
-        $res = $search->findInProperties(Product::class, ['storage' => [StaticValues::class, EAV::class]]);
+        $res = $search->findInProperties(Product::class, ['storage' => [StaticValues::class, EAV::class]], [1 => [3], 11 => [11, 13]]);
         $this->assertEmpty($res);
     }
 
@@ -127,8 +125,7 @@ class CommonSearchTest extends DSTCommonTestCase
      */
     public function testFilterWithParamsWithResults($search)
     {
-        Yii::$app->request->setQueryParams(['filter' => [1 => [2], 11 => [11, 13]]]);
-        $res = $search->findInProperties(Product::class, ['storage' => [StaticValues::class, EAV::class]]);
+        $res = $search->findInProperties(Product::class, ['storage' => [StaticValues::class, EAV::class]], [1 => [2], 11 => [11, 13]]);
         $this->assertArraySubset([4, 5], $res);
     }
 
@@ -138,7 +135,6 @@ class CommonSearchTest extends DSTCommonTestCase
      */
     public function testFilterWithNoModel($search)
     {
-        Yii::$app->request->setQueryParams([]);
         $res = $search->findInProperties([]);
         $this->assertEmpty($res);
     }
@@ -149,7 +145,6 @@ class CommonSearchTest extends DSTCommonTestCase
      */
     public function testFilterIncorrectModel($search)
     {
-        Yii::$app->request->setQueryParams([]);
         $res = $search->findInProperties(PropertyStorage::class);
         $this->assertEmpty($res);
     }

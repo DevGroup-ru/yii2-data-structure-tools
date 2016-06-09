@@ -92,9 +92,8 @@ class Search extends AbstractSearch
     /**
      * @inheritdoc
      */
-    public function findInProperties($modelClass = '', $config = [])
+    public function findInProperties($modelClass = '', $config = [], $params = [])
     {
-        $params = Yii::$app->request->get('filter', []);
         $index = IndexHelper::classToIndex($modelClass);
         if (true === empty($index)) {
             return [];

@@ -32,7 +32,7 @@ class Search extends AbstractSearch
     /**
      * @inheritdoc
      */
-    public function findInProperties($modelClass = '', $config = [])
+    public function findInProperties($modelClass = '', $config = [], $params = [])
     {
         if (false === is_string($modelClass) || false === class_exists($modelClass)) {
             return [];
@@ -43,7 +43,6 @@ class Search extends AbstractSearch
             return [];
         }
         $storage = self::prepareStorage($config);
-        $params = Yii::$app->request->get('filter', []);
         $data = [];
         /** @var AbstractPropertyStorage $one */
         foreach ($storage as $one) {

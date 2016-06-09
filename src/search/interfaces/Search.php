@@ -22,9 +22,10 @@ interface Search
      *
      * @param string $modelClass
      * @param array $config
+     * @param array $params
      * @return mixed
      */
-    public function findInProperties($modelClass= '', $config = []);
+    public function findInProperties($modelClass = '', $config = [], $params = []);
 
     /**
      * Prepares data for filter form render
