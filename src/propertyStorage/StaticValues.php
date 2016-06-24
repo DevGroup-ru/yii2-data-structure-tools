@@ -4,6 +4,7 @@ namespace DevGroup\DataStructure\propertyStorage;
 
 use DevGroup\DataStructure\behaviors\HasProperties;
 use DevGroup\DataStructure\helpers\PropertiesHelper;
+use DevGroup\DataStructure\helpers\PropertyStorageHelper;
 use DevGroup\DataStructure\models\Property;
 use DevGroup\DataStructure\models\StaticValue;
 use DevGroup\DataStructure\models\StaticValueTranslation;
@@ -340,7 +341,7 @@ class StaticValues extends AbstractPropertyStorage
     /**
      * @inheritdoc
      */
-    public static function getModelsByValueIds(
+    public static function getModelIdsByValues(
         $modelClass,
         $selections,
         $customDependency = null,
@@ -348,7 +349,7 @@ class StaticValues extends AbstractPropertyStorage
     )
     {
         if(count($selections) == 0) {
-            return $modelClass::find()->select('id')->column();
+            return false;
         }
         $keys = [$modelClass, 'Property', Json::encode($selections), Yii::$app->language];
         $tags = [NamingHelper::getCommonTag($modelClass)];
@@ -373,7 +374,12 @@ class StaticValues extends AbstractPropertyStorage
                 $all = [];
                 $q = (new Query())->from($table)->select('model_id')->distinct(true);
                 $start = true;
+                $storageId = PropertyStorageHelper::storageIdByClass(static::class);
                 foreach ($selections as $propertyId => $values) {
+                    $property = Property::findById($propertyId);
+                    if ($property->storage_id !== $storageId) {
+                        continue;
+                    }
                     $res = $q->where(['static_value_id' => $values])->column();
                     if (true === $start) {
                         $all = $res;
@@ -381,6 +387,9 @@ class StaticValues extends AbstractPropertyStorage
                         $all = array_intersect($all, $res);
                     }
                     $start = false;
+                }
+                if ($start) {
+                    return false;
                 }
                 return $all;
             },

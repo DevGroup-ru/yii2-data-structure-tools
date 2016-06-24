@@ -1,6 +1,10 @@
 <?php
 
 namespace DevGroup\DataStructure\search\interfaces;
+use DevGroup\TagDependencyHelper\TagDependencyTrait;
+use yii\db\ActiveRecord;
+use DevGroup\DataStructure\behaviors\HasProperties;
+use DevGroup\DataStructure\traits\PropertiesTrait;
 
 /**
  * Interface Filter
@@ -58,7 +62,7 @@ interface Filter
 
 
     /**
-     * @param string $modelClass
+     * @param string|ActiveRecord|HasProperties|PropertiesTrait|TagDependencyTrait $modelClass
      *
      * @param array $selections selected properties ids and theirs values to filter for like:
      *  [
@@ -77,9 +81,9 @@ interface Filter
      *  ]
      * @param null|string|\yii\caching\Dependency $customDependency
      * @param int $cacheLifetime
-     * @return array of all found model ids
+     * @return false|array of all found model ids
      */
-    public static function getModelsByValueIds(
+    public static function getModelIdsByValues(
         $modelClass,
         $selections,
         $customDependency = null,

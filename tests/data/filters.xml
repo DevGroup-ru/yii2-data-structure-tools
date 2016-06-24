@@ -48,6 +48,7 @@
 	<property id="4" key="sim" data_type="1" is_internal="0" allow_multiple_values="0" storage_id="2" packed_json_default_value="{}" property_handler_id="2" />
 	<property id="5" key="diagonal" data_type="2" is_internal="0" allow_multiple_values="0" storage_id="2" packed_json_default_value="{}" property_handler_id="2" />
 	<property id="6" key="processor" data_type="3" is_internal="0" allow_multiple_values="0" storage_id="2" packed_json_default_value="{}" property_handler_id="2" />
+	<property id="7" key="extra" data_type="3" is_internal="0" allow_multiple_values="1" storage_id="2" packed_json_default_value="{}" property_handler_id="2" />
 
 
 	<property_translation model_id="1" language_id="1" name="material" description="material" />
@@ -62,6 +63,8 @@
 	<property_translation model_id="5" language_id="2" name="diagonal" description="диагональ" />
 	<property_translation model_id="6" language_id="1" name="processor" description="processor" />
 	<property_translation model_id="6" language_id="2" name="processor" description="процессор" />
+	<property_translation model_id="7" language_id="1" name="extra" description="" />
+	<property_translation model_id="7" language_id="2" name="дополнительно" description="" />
     <property_translation model_id="11" language_id="1" name="Count" description="" />
     <property_translation model_id="11" language_id="2" name="Количество" description="" />
 
@@ -79,17 +82,20 @@
 	<product_property_groups model_id="1" property_group_id="1" sort_order="0" />
 	<product_property_groups model_id="2" property_group_id="1" sort_order="0" />
 
-	<product_eav id="1" model_id="1" property_id="3" sort_order="0" value_integer="0" value_float="0" value_string="138*67*7" value_text="" />
-	<product_eav id="2" model_id="1" property_id="4" sort_order="0" value_integer="2" value_float="0" value_string="" value_text="" />
-	<product_eav id="3" model_id="1" property_id="5" sort_order="0" value_integer="0" value_float="4.7" value_string="" value_text="" />
-	<product_eav id="4" model_id="1" property_id="6" sort_order="0" value_integer="0" value_float="0" value_string="" value_text="A8 (64bit)+M8" />
+	<product_eav id="1" model_id="1" property_id="3" sort_order="0" value_integer="0" value_float="0" value_string="138*67*7" value_text="" language_id="1" />
+	<product_eav id="2" model_id="1" property_id="4" sort_order="0" value_integer="2" value_float="0" value_string="" value_text="" language_id="0" />
+	<product_eav id="3" model_id="1" property_id="5" sort_order="0" value_integer="0" value_float="4.7" value_string="" value_text="" language_id="0" />
+	<product_eav id="4" model_id="1" property_id="6" sort_order="0" value_integer="0" value_float="0" value_string="" value_text="A8 (64bit)+M8" language_id="1" />
 
-	<product_eav id="5" model_id="2" property_id="3" sort_order="0" value_integer="0" value_float="0" value_string="144*71*7" value_text="" />
-	<product_eav id="6" model_id="2" property_id="4" sort_order="0" value_integer="1" value_float="0" value_string="" value_text="" />
-	<product_eav id="7" model_id="2" property_id="5" sort_order="0" value_integer="0" value_float="5.1" value_string="" value_text="" />
-	<product_eav id="8" model_id="2" property_id="6" sort_order="0" value_integer="0" value_float="0" value_string="" value_text="Exynos 7 Octa" />
+	<product_eav id="5" model_id="2" property_id="3" sort_order="0" value_integer="0" value_float="0" value_string="144*71*7" value_text="" language_id="1" />
+	<product_eav id="6" model_id="2" property_id="4" sort_order="0" value_integer="1" value_float="0" value_string="" value_text="" language_id="0" />
+	<product_eav id="7" model_id="2" property_id="5" sort_order="0" value_integer="0" value_float="5.1" value_string="" value_text="" language_id="0" />
+	<product_eav id="8" model_id="2" property_id="6" sort_order="0" value_integer="0" value_float="0" value_string="" value_text="Exynos 7 Octa" language_id="1" />
+	<product_eav id="9" model_id="2" property_id="7" sort_order="0" value_integer="0" value_float="0" value_string="" value_text="wi-fi" language_id="1" />
+	<product_eav id="10" model_id="2" property_id="7" sort_order="0" value_integer="0" value_float="0" value_string="" value_text="bluetooth" language_id="1" />
+	<product_eav id="11" model_id="2" property_id="7" sort_order="0" value_integer="0" value_float="0" value_string="" value_text="3G" language_id="1" />
 
-    <product_static_values model_id="1" static_value_id="1" sort_order="0" />
+    <product_static_values model_id="1" static_value_id="1" sort_order="0"  />
     <product_static_values model_id="1" static_value_id="4" sort_order="0" />
     <product_static_values model_id="1" static_value_id="5" sort_order="0" />
 

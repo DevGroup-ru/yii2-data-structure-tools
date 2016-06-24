@@ -107,4 +107,19 @@ class PropertyStorageHelper
             throw new ServerErrorHttpException("Storage handler with id $id not found.");
         }
     }
+
+    /**
+     * Return a property storage id by storage class name.
+     * @param string $className
+     * @return int|null|string
+     */
+    public static function storageIdByClass($className)
+    {
+        foreach (self::storageHandlers() as $id => $handler) {
+            if ($handler instanceof $className) {
+                return $id;
+            }
+        }
+        return null;
+    }
 }

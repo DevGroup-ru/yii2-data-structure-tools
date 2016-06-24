@@ -4,16 +4,20 @@ namespace DevGroup\DataStructure\propertyStorage;
 
 use DevGroup\DataStructure\behaviors\HasProperties;
 use DevGroup\DataStructure\helpers\PropertiesHelper;
+use DevGroup\DataStructure\helpers\PropertyStorageHelper;
 use DevGroup\DataStructure\models\Property;
 use DevGroup\DataStructure\models\PropertyHandlers;
 use DevGroup\DataStructure\propertyHandler\TextArea;
 use DevGroup\DataStructure\traits\PropertiesTrait;
+use DevGroup\TagDependencyHelper\NamingHelper;
 use Yii;
+use yii\caching\ChainedDependency;
+use yii\caching\TagDependency;
 use yii\db\ActiveRecord;
+use yii\db\Expression;
 use yii\db\Query;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Json;
-use yii\helpers\VarDumper;
 
 class EAV extends AbstractPropertyStorage
 {
@@ -543,6 +547,79 @@ class EAV extends AbstractPropertyStorage
                 $dependency,
                 $cacheLifetime
             );
+        }
+        return $result;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public static function getModelIdsByValues(
+        $modelClass,
+        $selections,
+        $customDependency = null,
+        $cacheLifetime = 86400
+    )
+    {
+        if (empty($selections)) {
+            return false;
+        }
+        $storageId = PropertyStorageHelper::storageIdByClass(static::class);
+        // build a cache key and make a available properties array
+        $availableProperties = [];
+        $cacheKey = 'GetModelIdsByValues:EAV:' . Yii::$app->language;
+        foreach ($selections as $propertyId => $values) {
+            if (
+                count($values) < 1
+                || ($property = Property::findById($propertyId)) === null
+                || $property->storage_id !== $storageId
+            ) {
+                continue;
+            }
+            sort($values);
+            $availableProperties[$propertyId] = $values;
+            $cacheKey .= ':' . $propertyId . ':' . implode('-', $values);
+        }
+        if (empty($availableProperties)) {
+            return false;
+        }
+        $result = Yii::$app->cache->get($cacheKey);
+        if ($result === false) {
+            $tags = [NamingHelper::getCommonTag($modelClass)];
+            // build a query
+            $query = (new Query())
+                ->select('model_id')
+                ->from($modelClass::eavTable())
+                ->groupBy('model_id');
+            $valuesCount = 0;
+            foreach ($availableProperties as $propertyId => $values) {
+                $property = Property::findById($propertyId);
+                $tags[] = $property->objectTag();
+                $columnName = static::dataTypeToEavColumn($property->data_type);
+                $valuesCount += count($values);
+                $query->orWhere(
+                    [
+                        'and',
+                        ['language_id' => $property->canTranslate() ? Yii::$app->multilingual->language_id : 0],
+                        [$columnName => $values]
+                    ]
+                );
+            }
+            $query->having(new Expression('COUNT(model_id) = ' . $valuesCount));
+            $result = $query->column();
+            if ($customDependency === null) {
+                $dependency = new TagDependency(['tags' => $tags]);
+            } else {
+                $dependency = new ChainedDependency(
+                    [
+                        'dependencies' => [
+                            $customDependency,
+                            new TagDependency(['tags' => $tags])
+                        ]
+                    ]
+                );
+            }
+            Yii::$app->cache->set($cacheKey, $result, $cacheLifetime, $dependency);
         }
         return $result;
     }

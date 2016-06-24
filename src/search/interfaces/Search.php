@@ -2,6 +2,11 @@
 
 namespace DevGroup\DataStructure\search\interfaces;
 
+use yii\db\ActiveRecord;
+use DevGroup\DataStructure\traits\PropertiesTrait;
+use DevGroup\DataStructure\behaviors\HasProperties;
+use DevGroup\TagDependencyHelper\TagDependencyTrait;
+
 /**
  * Interface Search
  *
@@ -20,10 +25,10 @@ interface Search
     /**
      * Performs search in assigned properties values
      *
-     * @param string $modelClass
+     * @param string|ActiveRecord|PropertiesTrait|HasProperties|TagDependencyTrait $modelClass
      * @param array $config
      * @param array $params
-     * @return mixed
+     * @return array
      */
     public function findInProperties($modelClass = '', $config = [], $params = []);
 

@@ -43,10 +43,23 @@ class Search extends AbstractSearch
             return [];
         }
         $storage = self::prepareStorage($config);
-        $data = [];
+        $data = false;
+        ksort($params);
         /** @var AbstractPropertyStorage $one */
         foreach ($storage as $one) {
-            $data = array_merge($data, $one::getModelsByValueIds($modelClass, $params));
+            $modelIds = $one::getModelIdsByValues($modelClass, $params);
+            if ($modelIds === false) {
+                continue;
+            } elseif (empty($modelIds)) {
+                return [];
+            }
+            $data = $data === false
+                ? $modelIds
+                : array_intersect($data, $modelIds);
+        }
+        // fallback. return all ids
+        if ($data === false) {
+            return $modelClass::find()->select($model->primaryKey())->column();
         }
         return $data;
     }
