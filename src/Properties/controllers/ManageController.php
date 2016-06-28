@@ -3,7 +3,8 @@
 namespace DevGroup\DataStructure\Properties\controllers;
 
 use DevGroup\AdminUtils\controllers\BaseController;
-use DevGroup\DataStructure\models\PropertyGroup;
+use DevGroup\DataStructure\Properties\actions\AddModelPropertyGroup;
+use DevGroup\DataStructure\Properties\actions\DeleteModelPropertyGroup;
 use DevGroup\DataStructure\Properties\actions\DeleteProperty;
 use DevGroup\DataStructure\Properties\actions\DeletePropertyGroup;
 use DevGroup\DataStructure\Properties\actions\DeleteStaticValue;
@@ -12,20 +13,16 @@ use DevGroup\DataStructure\Properties\actions\EditPropertyGroup;
 use DevGroup\DataStructure\Properties\actions\EditStaticValue;
 use DevGroup\DataStructure\Properties\actions\ListGroupProperties;
 use DevGroup\DataStructure\Properties\actions\ListPropertyGroups;
-use DevGroup\DataStructure\traits\PropertiesTrait;
 use Yii;
-use yii\db\ActiveRecord;
-use yii\web\BadRequestHttpException;
-use yii\web\Response;
+use yii\filters\VerbFilter;
 
 class ManageController extends BaseController
 {
-
     public function behaviors()
     {
         return [
             'verbs' => [
-                'class' => \yii\filters\VerbFilter::className(),
+                'class' => VerbFilter::class,
                 'actions' => [
                     'delete-model-property-group' => ['delete'],
                     'add-model-property-group' => ['post'],
@@ -41,71 +38,36 @@ class ManageController extends BaseController
     public function actions()
     {
         return [
+            'add-model-property-group' => [
+                'class' => AddModelPropertyGroup::class
+            ],
+            'delete-model-property-group' => [
+                'class' => DeleteModelPropertyGroup::class
+            ],
             'list-property-groups' => [
-                'class' => ListPropertyGroups::className(),
+                'class' => ListPropertyGroups::class,
             ],
             'edit-property-group' => [
-                'class' => EditPropertyGroup::className(),
+                'class' => EditPropertyGroup::class,
             ],
             'delete-property-group' => [
-                'class' => DeletePropertyGroup::className(),
+                'class' => DeletePropertyGroup::class,
             ],
             'list-group-properties' => [
-                'class' => ListGroupProperties::className(),
+                'class' => ListGroupProperties::class,
             ],
             'edit-property' => [
-                'class' => EditProperty::className(),
+                'class' => EditProperty::class,
             ],
             'edit-static-value' => [
-                'class' => EditStaticValue::className(),
+                'class' => EditStaticValue::class,
             ],
             'delete-static-value' => [
-                'class' => DeleteStaticValue::className(),
+                'class' => DeleteStaticValue::class,
             ],
             'delete-property' => [
-                'class' => DeleteProperty::className(),
+                'class' => DeleteProperty::class,
             ],
         ];
-    }
-
-    /**
-     * @param $className string | PropertiesTrait
-     * @param $modelId
-     * @param $groupId
-     */
-    public function actionAddModelPropertyGroup($className, $modelId)
-    {
-        Yii::$app->response->format = Response::FORMAT_JSON;
-
-        if (!$groupId = Yii::$app->request->post('groupId')) {
-            throw new BadRequestHttpException();
-        }
-
-        try {
-            /** @var PropertiesTrait $model */
-            $model = $className::findOne($modelId);
-            /** @var PropertyGroup $group */
-            $group = PropertyGroup::findOne($groupId);
-            return $model->addPropertyGroup($group);
-        } catch (\Exception $e) {
-            return false;
-        }
-    }
-
-    /**
-     * @param $className string | PropertiesTrait
-     * @param $modelId
-     * @param $groupId
-     */
-    public function actionDeleteModelPropertyGroup($className, $modelId)
-    {
-        if (!$groupId = Yii::$app->request->post('groupId')) {
-            throw new BadRequestHttpException();
-        }
-        /** @var PropertiesTrait $model */
-        $model = $className::findOne($modelId);
-        /** @var PropertyGroup $group */
-        $group = PropertyGroup::findOne($groupId);
-        return $model->deletePropertyGroup($group);
     }
 }
