@@ -18,6 +18,13 @@ use yii\widgets\ActiveForm;
 
     <?= $form->field($model, 'packed_json_data')->textarea(['rows' => 6]) ?>
 
+    <?= \DevGroup\DataStructure\widgets\PropertiesForm::widget(
+        [
+            'model' => $model,
+            'form' => $form,
+        ]
+    ) ?>
+
     <div class="form-group">
         <?= Html::submitButton($model->isNewRecord ? Yii::t('app', 'Create') : Yii::t('app', 'Update'), ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>
     </div>

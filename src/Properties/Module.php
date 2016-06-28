@@ -7,6 +7,7 @@ use DevGroup\AdminUtils\events\ModelEditForm;
 use DevGroup\DataStructure\commands\ElasticIndexController;
 use DevGroup\DataStructure\commands\TranslateEavController;
 use DevGroup\DataStructure\Properties\actions\EditProperty;
+use DevGroup\DataStructure\propertyHandler\MaskedInput;
 use DevGroup\DataStructure\propertyHandler\StaticValues;
 use DevGroup\DataStructure\search\base\AbstractSearch;
 use DevGroup\DataStructure\search\common\Search;
@@ -46,7 +47,12 @@ class Module extends BaseModule implements BootstrapInterface
         ModelEditForm::on(
             View::className(),
             EditProperty::EVENT_AFTER_FORM,
-            [StaticValues::className(), 'onPropertyEditForm']
+            [StaticValues::class, 'onPropertyEditForm']
+        );
+        ModelEditForm::on(
+            View::className(),
+            EditProperty::EVENT_AFTER_FORM,
+            [MaskedInput::class, 'onPropertyEditForm']
         );
     }
 
@@ -87,9 +93,11 @@ class Module extends BaseModule implements BootstrapInterface
             ];
         }
         $app->on(Application::EVENT_BEFORE_REQUEST, function () {
-            Yii::$app->setAliases([
-                '@dataStructure' => '@vendor/devgroup/yii2-data-structure-tools/src/',
-            ]);
+            if (Yii::getAlias('@dataStructure') === '@dataStructure') {
+                Yii::$app->setAliases([
+                    '@dataStructure' => '@vendor/devgroup/yii2-data-structure-tools/src/',
+                ]);
+            }
         });
 
         $this->registerTranslations();

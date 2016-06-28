@@ -21,7 +21,9 @@
         "kartik-v/yii2-widget-select2": "^2.0.0",
         "hector68/yii2-map-input-widget": "^2.0",
         "elasticsearch/elasticsearch": "^2.1",
-        "rmrevin/yii2-fontawesome": "~2.14"
+        "rmrevin/yii2-fontawesome": "~2.14",
+        "devgroup/yii2-jsoneditor": "*",
+        "vova07/yii2-imperavi-widget": "*"
     },
     "require-dev": {
         "yiisoft/yii2-bootstrap": "^2.0@dev",

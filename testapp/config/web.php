@@ -48,7 +48,6 @@ $config = [
         'db' => require(__DIR__ . '/db.php'),
         'multilingual' => [
             'class' => \DevGroup\Multilingual\Multilingual::className(),
-            'default_language_id' => 1,
             'handlers' => [
                 [
                     'class' => \DevGroup\Multilingual\DefaultGeoProvider::className(),

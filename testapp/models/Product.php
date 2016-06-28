@@ -53,7 +53,8 @@ class Product extends \yii\db\ActiveRecord
                 'class' => PackedJsonAttributes::className(),
             ],
             [
-                'class' => HasProperties::className(),
+                'class' => HasProperties::class,
+                'autoFetchProperties' => true,
             ],
             'CacheableActiveRecord' => [
                 'class' => \DevGroup\TagDependencyHelper\CacheableActiveRecord::className(),

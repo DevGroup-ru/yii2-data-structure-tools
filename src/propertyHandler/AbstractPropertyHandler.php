@@ -88,11 +88,4 @@ abstract class AbstractPropertyHandler extends Widget
         );
     }
 
-    /**
-     * @return string class name with namespace
-     */
-    public static function className()
-    {
-        return get_called_class();
-    }
 }

@@ -57,6 +57,8 @@ class Property extends ActiveRecord
     const DATA_TYPE_BOOLEAN = 5;
     const DATA_TYPE_INVARIANT_STRING = 6;
 
+    const PACKED_HANDLER_PARAMS = 'handlerParams';
+
     /**
      * @inheritdoc
      */
@@ -150,7 +152,7 @@ class Property extends ActiveRecord
             'is_internal' => Module::t('app', 'Is Internal'),
             'allow_multiple_values' => Module::t('app', 'Allow Multiple Values'),
             'storage_id' => Module::t('app', 'Storage ID'),
-            'packed_json_default_value' => Module::t('app', 'Packed Json Default Value'),
+            'packed_json_params' => Module::t('app', 'Packed Json Params'),
             'property_handler_id' => Module::t('app', 'Property Handler ID'),
             'name' => Module::t('app', 'Name'),
             'in_search' => Module::t('app', 'Use in search'),
