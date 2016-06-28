@@ -8,6 +8,7 @@ use DevGroup\DataStructure\models\Property;
 use DevGroup\DataStructure\models\PropertyGroup;
 use DevGroup\DataStructure\Properties\Module;
 use Yii;
+use yii\helpers\ArrayHelper;
 use yii\web\NotFoundHttpException;
 
 /**
@@ -78,7 +79,10 @@ class EditProperty extends BaseAdminAction
                 $event
             );
 
-
+            $params = $model->params;
+            $handlerParams = Yii::$app->request->post(Property::PACKED_ADDITIONAL_RULES, []);
+            $params[Property::PACKED_ADDITIONAL_RULES] = $handlerParams;
+            $model->params = $params;
 
             if ($event->isValid === true && $model->save() && !Yii::$app->request->isPjax) {
                 \yii\caching\TagDependency::invalidate(

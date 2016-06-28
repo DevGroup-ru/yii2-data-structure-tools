@@ -65,8 +65,9 @@ class Property extends ActiveRecord
     const MODE_ALLOW_SINGLE = 0b00000001;
     const MODE_ALLOW_MULTIPLE = 0b00000010;
     const MODE_ALLOW_ALL = 0b00000011;
-
+    // Packed sub arrays
     const PACKED_HANDLER_PARAMS = 'handlerParams';
+    const PACKED_ADDITIONAL_RULES = 'additionalRules';
 
     /**
      * @inheritdoc
@@ -574,5 +575,16 @@ class Property extends ActiveRecord
         /** @var AbstractPropertyStorage $storageClassName */
         $storageClassName = $this->storage->class_name;
         $storageClassName::afterUnbind($this, $propertyGroup);
+    }
+
+    /**
+     * check if property required
+     * @return bool
+     */
+    public function isRequired()
+    {
+        $params = $this->params;
+        $required = boolval(ArrayHelper::getValue($params, Property::PACKED_ADDITIONAL_RULES . '.required', false));
+        return $required;
     }
 }

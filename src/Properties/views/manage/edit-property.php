@@ -1,9 +1,11 @@
 <?php
 
 use DevGroup\AdminUtils\events\ModelEditForm;
+use DevGroup\DataStructure\models\Property;
 use DevGroup\DataStructure\Properties\actions\EditProperty;
 use DevGroup\DataStructure\Properties\helpers\FrontendPropertiesHelper;
 use DevGroup\DataStructure\Properties\Module;
+use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 
@@ -23,6 +25,7 @@ if ($model->isNewRecord) {
 } else {
     $this->title = Module::t('app', 'Edit property') . ' ' . $model->id;
 }
+$required = $model->isRequired();
 
 $this->params['breadcrumbs'][] = $this->title;
 
@@ -123,6 +126,8 @@ $this->registerJs("DataStructureTools.init();");
                 <?= $form->field($model, 'is_internal')->checkbox() ?>
                 <?= $form->field($model, 'in_search')->checkbox() ?>
                 <?= $form->field($model, 'allow_multiple_values')->checkbox() ?>
+                <?= Html::checkbox(Property::PACKED_ADDITIONAL_RULES . '[required]', $required, ['label' => 'Required']) ?>
+
             </div>
             <div class="col-xs-12">
                 <?php

@@ -219,6 +219,9 @@ trait PropertiesTrait
                 $handler = $property->handler();
 
                 $rules = ArrayHelper::merge($rules, $handler->getValidationRules($property));
+                if ($property->isRequired()) {
+                    $rules = ArrayHelper::merge($rules, [[$property->key, 'required']]);
+                }
             }
         }
         return $rules;
