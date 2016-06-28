@@ -9,6 +9,8 @@ use DevGroup\DataStructure\Properties\validators\ValuesValidator;
 
 class WysiwygField extends AbstractPropertyHandler
 {
+    
+    public static $multipleMode = Property::MODE_ALLOW_ALL;
 
     /**
      * Get validation rules for a property.

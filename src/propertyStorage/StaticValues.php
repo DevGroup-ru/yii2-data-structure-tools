@@ -20,6 +20,9 @@ use yii\helpers\Json;
 
 class StaticValues extends AbstractPropertyStorage
 {
+    public static $type = Property::TYPE_VALUES_LIST;
+    public static $multipleMode = Property::MODE_ALLOW_ALL;
+
     /**
      * Get static value ids sql by property id(s).
      * @param int | int[] $id

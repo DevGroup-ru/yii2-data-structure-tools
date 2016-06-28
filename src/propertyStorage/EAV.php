@@ -21,6 +21,7 @@ use yii\helpers\Json;
 
 class EAV extends AbstractPropertyStorage
 {
+    public static $multipleMode = Property::MODE_ALLOW_ALL;
 
     /**
      * @inheritdoc

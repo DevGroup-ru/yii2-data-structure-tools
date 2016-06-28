@@ -13,6 +13,8 @@ use yii\jui\JuiAsset;
  */
 class TextField extends AbstractPropertyHandler
 {
+    public static $multipleMode = Property::MODE_ALLOW_ALL;
+
     /**
      * @inheritdoc
      */

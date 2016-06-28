@@ -21,6 +21,8 @@ use yii\helpers\Json;
 
 class TableInheritance extends AbstractPropertyStorage
 {
+    public static $multipleMode = Property::MODE_ALLOW_SINGLE;
+
     /**
      * @inheritdoc
      */

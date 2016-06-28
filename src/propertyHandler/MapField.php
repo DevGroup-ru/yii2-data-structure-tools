@@ -6,6 +6,7 @@ use DevGroup\DataStructure\models\Property;
 
 class MapField extends AbstractPropertyHandler
 {
+    public static $multipleMode = Property::MODE_ALLOW_SINGLE;
 
     public $key;
 

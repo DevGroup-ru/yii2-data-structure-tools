@@ -94,3 +94,4 @@ use yii\widgets\Pjax;
     ]); ?>
     <div class="clearfix"></div>
     <?php Pjax::end(); ?>
+</div>

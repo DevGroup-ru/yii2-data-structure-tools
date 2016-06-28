@@ -12,6 +12,8 @@ use DevGroup\DataStructure\Properties\validators\ValuesValidator;
  */
 class TextArea extends AbstractPropertyHandler
 {
+    public static $multipleMode = Property::MODE_ALLOW_ALL;
+
     /**
      * @inheritdoc
      */

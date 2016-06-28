@@ -49,6 +49,7 @@ class Property extends ActiveRecord
     use MultilingualTrait;
     use TagDependencyTrait;
 
+    // Data types
     const DATA_TYPE_STRING = 0;
     const DATA_TYPE_INTEGER = 1;
     const DATA_TYPE_FLOAT = 2;
@@ -56,6 +57,14 @@ class Property extends ActiveRecord
     const DATA_TYPE_PACKED_JSON = 4;
     const DATA_TYPE_BOOLEAN = 5;
     const DATA_TYPE_INVARIANT_STRING = 6;
+    // Handler type
+    const TYPE_CUSTOM_VALUE = 1;
+    const TYPE_VALUES_LIST = 2;
+    // Multiple mode
+    const MODE_ALLOW_NOTHING = 0;
+    const MODE_ALLOW_SINGLE = 0b00000001;
+    const MODE_ALLOW_MULTIPLE = 0b00000010;
+    const MODE_ALLOW_ALL = 0b00000011;
 
     const PACKED_HANDLER_PARAMS = 'handlerParams';
 

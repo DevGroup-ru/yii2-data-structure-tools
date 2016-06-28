@@ -13,6 +13,7 @@ use yii\jui\JuiAsset;
 
 class MaskedInput extends AbstractPropertyHandler
 {
+    public static $multipleMode = Property::MODE_ALLOW_ALL;
 
     /**
      * Get validation rules for a property.

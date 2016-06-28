@@ -11,6 +11,9 @@ use yii\helpers\Html;
 
 class StaticValues extends AbstractPropertyHandler
 {
+    public static $type = Property::TYPE_VALUES_LIST;
+    public static $multipleMode = Property::MODE_ALLOW_ALL;
+
     /**
      * Forces property to be of integer data type
      * @param \DevGroup\DataStructure\models\Property $property

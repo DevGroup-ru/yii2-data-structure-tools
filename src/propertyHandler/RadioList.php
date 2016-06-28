@@ -9,6 +9,8 @@ use DevGroup\DataStructure\models\StaticValue;
 
 class RadioList extends AbstractPropertyHandler
 {
+    public static $type = Property::TYPE_VALUES_LIST;
+    public static $multipleMode = Property::MODE_ALLOW_ALL;
 
     /**
      * Get validation rules for a property.

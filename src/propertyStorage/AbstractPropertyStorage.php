@@ -31,6 +31,9 @@ use yii\helpers\Json;
  */
 abstract class AbstractPropertyStorage implements Filter
 {
+    public static $type = Property::TYPE_CUSTOM_VALUE;
+    public static $multipleMode = Property::MODE_ALLOW_NOTHING;
+
     /**
      * @var ActiveRecord[] | HasProperties[] | PropertiesTrait[] Applicable property model class names identity map by property id
      */

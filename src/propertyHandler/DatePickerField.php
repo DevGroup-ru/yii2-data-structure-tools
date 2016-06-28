@@ -11,6 +11,8 @@ use yii\jui\JuiAsset;
 class DatePickerField extends AbstractPropertyHandler
 {
 
+    public static $multipleMode = Property::MODE_ALLOW_ALL;
+
     /**
      * Get validation rules for a property.
      *

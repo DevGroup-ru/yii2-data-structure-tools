@@ -16,6 +16,8 @@ abstract class AbstractPropertyHandler extends Widget
     const FRONTEND_RENDER = 'frontend-render';
     const FRONTEND_EDIT = 'frontend-edit';
 
+    public static $type = Property::TYPE_CUSTOM_VALUE;
+    public static $multipleMode = Property::MODE_ALLOW_NOTHING;
 
     public function afterFind($model, $attribute)
     {

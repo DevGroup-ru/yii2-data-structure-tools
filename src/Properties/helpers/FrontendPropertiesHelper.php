@@ -42,14 +42,32 @@ class FrontendPropertiesHelper
     public static function handlersSelectOptions()
     {
         return Yii::$app->cache->lazy(function () {
-            $query = new Query();
-            $rows = $query
-                ->select(['id', 'name'])
+            return (new Query)
+                ->select(['name', 'id'])
                 ->from(PropertyHandlers::tableName())
-                ->orderBy(['sort_order'=>SORT_ASC])
-                ->all();
-            return ArrayHelper::map($rows, 'id', 'name');
+                ->orderBy(['sort_order' => SORT_ASC])
+                ->indexBy('id')
+                ->column();
         }, 'PropertyHandlerId2Name', 86400, PropertyHandlers::commonTag());
+    }
+
+    public static function handlersSelectOptionOptions()
+    {
+        return Yii::$app->cache->lazy(function () {
+            $rows = (new Query)
+                ->select(['class_name', 'id'])
+                ->from(PropertyHandlers::tableName())
+                ->orderBy(['sort_order' => SORT_ASC])
+                ->indexBy('id')
+                ->column();
+            foreach ($rows as $id => $className) {
+                $rows[$id] = [
+                    'data-type' => $className::$type,
+                    'data-mode' => $className::$multipleMode,
+                ];
+            }
+            return $rows;
+        }, 'PropertyHandlerId2Option', 86400, PropertyHandlers::commonTag());
     }
 
     /**
@@ -59,13 +77,31 @@ class FrontendPropertiesHelper
     public static function storagesSelectOptions()
     {
         return Yii::$app->cache->lazy(function () {
-            $query = new Query();
-            $rows = $query
-                ->select(['id', 'name'])
+            return (new Query)
+                ->select(['name', 'id'])
                 ->from(PropertyStorage::tableName())
-                ->orderBy(['sort_order'=>SORT_ASC])
-                ->all();
-            return ArrayHelper::map($rows, 'id', 'name');
+                ->orderBy(['sort_order' => SORT_ASC])
+                ->indexBy('id')
+                ->column();
         }, 'PropertyStorageId2Name', 86400, PropertyStorage::commonTag());
+    }
+
+    public static function storagesSelectOptionOptions()
+    {
+        return Yii::$app->cache->lazy(function () {
+            $rows = (new Query)
+                ->select(['class_name', 'id'])
+                ->from(PropertyStorage::tableName())
+                ->orderBy(['sort_order' => SORT_ASC])
+                ->indexBy('id')
+                ->column();
+            foreach ($rows as $id => $className) {
+                $rows[$id] = [
+                    'data-type' => $className::$type,
+                    'data-mode' => $className::$multipleMode,
+                ];
+            }
+            return $rows;
+        }, 'PropertyHandlerId2Option', 86400, PropertyHandlers::commonTag());
     }
 }
