@@ -93,7 +93,7 @@ class Module extends BaseModule implements BootstrapInterface
             ];
         }
         $app->on(Application::EVENT_BEFORE_REQUEST, function () {
-            if (Yii::getAlias('@dataStructure') === '@dataStructure') {
+            if (Yii::getAlias('@dataStructure', false) === '@dataStructure') {
                 Yii::$app->setAliases([
                     '@dataStructure' => '@vendor/devgroup/yii2-data-structure-tools/src/',
                 ]);
