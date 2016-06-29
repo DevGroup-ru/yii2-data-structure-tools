@@ -1,5 +1,4 @@
 <?php
-
 return [
     1 => [
         'id' => 1,
@@ -11,6 +10,7 @@ return [
         'domain' => 'yii2-data-structure-tools.dev',
         'folder' => 'en',
         'yii_language' => 'en-US',
+        'context_id' => '1',
     ],
     2 => [
         'id' => 2,
@@ -22,5 +22,6 @@ return [
         'domain' => 'yii2-data-structure-tools.dev',
         'folder' => 'ru',
         'yii_language' => 'ru',
+        'context_id' => '1',
     ],
 ];

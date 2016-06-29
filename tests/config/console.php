@@ -24,7 +24,8 @@ return [
         ],
         'multilingual' => [
             'class' => \DevGroup\Multilingual\Multilingual::class,
-            'default_language_id' => 1,
+            'language_id' => 1,
+            'context_id' => 1,
             'handlers' => [
                 [
                     'class' => \DevGroup\Multilingual\DefaultGeoProvider::class,
