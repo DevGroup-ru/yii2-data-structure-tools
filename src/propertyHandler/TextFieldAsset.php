@@ -6,7 +6,7 @@ use yii\web\AssetBundle;
 
 class TextFieldAsset extends AssetBundle
 {
-    public $sourcePath = '@dataStructure/propertyHandler/resources/TextField';
+    public $sourcePath = '@DevGroup/DataStructure/propertyHandler/resources/TextField';
     public $css = [
         'styles.css',
     ];

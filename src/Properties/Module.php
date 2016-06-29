@@ -92,13 +92,6 @@ class Module extends BaseModule implements BootstrapInterface
                 'class' => TranslateEavController::class,
             ];
         }
-        $app->on(Application::EVENT_BEFORE_REQUEST, function () {
-            if (Yii::getAlias('@dataStructure', false) === '@dataStructure') {
-                Yii::$app->setAliases([
-                    '@dataStructure' => '@vendor/devgroup/yii2-data-structure-tools/src/',
-                ]);
-            }
-        });
 
         $this->registerTranslations();
     }
