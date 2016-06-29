@@ -22,7 +22,7 @@ class SearchFindTest extends DSTCommonTestCase
         sleep(4);
         /** @var Search $search */
         $search = Yii::$app->getModule('properties')->getSearch();
-        $res = $search->findInProperties(Product::class, ['storage' => [StaticValues::class, EAV::class]], [1 => ['plastic'], 11 => ['15', '19']]);
+        $res = $search->filterByProperties(Product::class, ['storage' => [StaticValues::class, EAV::class]], [1 => ['plastic'], 11 => ['15', '19']]);
         $this->assertArraySubset([4, 5], $res);
     }
 }

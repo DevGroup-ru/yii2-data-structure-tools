@@ -8,6 +8,7 @@ use DevGroup\DataStructure\search\base\AbstractSearch;
 use DevGroup\DataStructure\search\elastic\helpers\IndexHelper;
 use DevGroup\DataStructure\search\helpers\LanguageHelper;
 use DevGroup\DataStructure\traits\PropertiesTrait;
+use DevGroup\TagDependencyHelper\TagDependencyTrait;
 use Elasticsearch\Client;
 use Elasticsearch\ClientBuilder;
 use Elasticsearch\Common\Exceptions\NoNodesAvailableException;
@@ -92,7 +93,7 @@ class Search extends AbstractSearch
     /**
      * @inheritdoc
      */
-    public function findInProperties($modelClass = '', $config = [], $params = [])
+    public function filterByProperties($modelClass = '', $config = [], $params = [])
     {
         $index = IndexHelper::classToIndex($modelClass);
         if (true === empty($index)) {
@@ -101,6 +102,20 @@ class Search extends AbstractSearch
         $query = self::buildQuery($params, $index);
         $res = IndexHelper::primaryKeysByCondition($this->client, $query);
         return array_keys($res);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function findInProperties(
+        $modelClass = '',
+        $config = [],
+        $params = [],
+        $content = '',
+        $intersect = false
+    )
+    {
+        // TODO: Implement findInProperties() method.
     }
 
     /**

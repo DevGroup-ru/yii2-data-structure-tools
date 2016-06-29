@@ -624,4 +624,80 @@ class EAV extends AbstractPropertyStorage
         }
         return $result;
     }
+
+    /**
+     * @inheritdoc
+     */
+    public static function getModelIdsByContent(
+        $modelClass,
+        $propertyIds,
+        $content,
+        $intersect = false,
+        $customDependency = null,
+        $cacheLifetime = 86400
+    )
+    {
+        if (empty($propertyIds)) {
+            return false;
+        }
+        $storageId = PropertyStorageHelper::storageIdByClass(static::class);
+        // build a cache key and make a available properties array
+        $availableProperties = [];
+        foreach ($propertyIds as $propertyId) {
+            if (
+                ($property = Property::findById($propertyId)) === null
+                || $property->storage_id !== $storageId
+            ) {
+                continue;
+            }
+            $availableProperties[] = $propertyId;
+        }
+        if (empty($availableProperties)) {
+            return false;
+        }
+        $cacheKey = 'GetModelIdsByContent:EAV:' . Yii::$app->language
+            . ':' . (int) $intersect . ':' . implode(':', $availableProperties);
+        $result = Yii::$app->cache->get($cacheKey);
+        if ($result === false) {
+            $tags = [NamingHelper::getCommonTag($modelClass)];
+            // build a query
+            $query = (new Query())
+                ->select('model_id')
+                ->from($modelClass::eavTable())
+                ->groupBy('model_id');
+            foreach ($availableProperties as $propertyId) {
+                $property = Property::findById($propertyId);
+                $tags[] = $property->objectTag();
+                $columnName = static::dataTypeToEavColumn($property->data_type);
+                $query->orWhere(
+                    [
+                        'and',
+                        ['property_id' => $propertyId],
+                        ['language_id' => $property->canTranslate() ? Yii::$app->multilingual->language_id : 0],
+                        ['like', $columnName, $content]
+                    ]
+                );
+            }
+            if ($intersect === true) {
+                // @todo implement an another algorithm
+                // This method has a bug (intersect only) if you search by several properties and one (or more) is allowed multiple
+                $query->having(new Expression('COUNT(model_id) >= ' . count($availableProperties)));
+            }
+            $result = $query->column();
+            if ($customDependency === null) {
+                $dependency = new TagDependency(['tags' => $tags]);
+            } else {
+                $dependency = new ChainedDependency(
+                    [
+                        'dependencies' => [
+                            $customDependency,
+                            new TagDependency(['tags' => $tags])
+                        ]
+                    ]
+                );
+            }
+            Yii::$app->cache->set($cacheKey, $result, $cacheLifetime, $dependency);
+        }
+        return $result;
+    }
 }

@@ -50,6 +50,7 @@
 	<property id="5" key="diagonal" data_type="2" is_internal="0" allow_multiple_values="0" storage_id="2" packed_json_params="{}" property_handler_id="2" />
 	<property id="6" key="processor" data_type="3" is_internal="0" allow_multiple_values="0" storage_id="2" packed_json_params="{}" property_handler_id="2" />
 	<property id="7" key="extra" data_type="3" is_internal="0" allow_multiple_values="1" storage_id="2" packed_json_params="{}" property_handler_id="2" />
+	<property id="8" key="description" data_type="3" is_internal="0" allow_multiple_values="0" storage_id="2" packed_json_params="{}" property_handler_id="2" />
 
 	<property_translation model_id="1" language_id="1" name="material" description="material" />
 	<property_translation model_id="1" language_id="2" name="material" description="материал" />
@@ -65,6 +66,8 @@
 	<property_translation model_id="6" language_id="2" name="processor" description="процессор" />
 	<property_translation model_id="7" language_id="1" name="extra" description="" />
 	<property_translation model_id="7" language_id="2" name="дополнительно" description="" />
+	<property_translation model_id="8" language_id="1" name="description" description="" />
+	<property_translation model_id="8" language_id="2" name="описание" description="" />
     <property_translation model_id="11" language_id="1" name="Count" description="" />
     <property_translation model_id="11" language_id="2" name="Количество" description="" />
 
@@ -94,8 +97,9 @@
 	<product_eav id="9" model_id="2" property_id="7" sort_order="0" value_integer="0" value_float="0" value_string="" value_text="wi-fi" language_id="1" />
 	<product_eav id="10" model_id="2" property_id="7" sort_order="0" value_integer="0" value_float="0" value_string="" value_text="bluetooth" language_id="1" />
 	<product_eav id="11" model_id="2" property_id="7" sort_order="0" value_integer="0" value_float="0" value_string="" value_text="3G" language_id="1" />
+	<product_eav id="12" model_id="2" property_id="8" sort_order="0" value_integer="0" value_float="0" value_string="" value_text="This position has a wi-fi, bluetooth, 3g, lte and other awesome features" language_id="1" />
 
-    <product_static_values model_id="1" static_value_id="1" sort_order="0"  />
+    <product_static_values model_id="1" static_value_id="1" sort_order="0" />
     <product_static_values model_id="1" static_value_id="4" sort_order="0" />
     <product_static_values model_id="1" static_value_id="5" sort_order="0" />
 

@@ -90,6 +90,24 @@ interface Filter
         $cacheLifetime = 86400);
 
     /**
+     * @param string|ActiveRecord|HasProperties|PropertiesTrait|TagDependencyTrait $modelClass
+     * @param integer[] $propertyIds
+     * @param string $content
+     * @param bool $intersect
+     * @param null $customDependency
+     * @param int $cacheLifetime
+     * @return false|integer[]
+     */
+    public static function getModelIdsByContent(
+        $modelClass,
+        $propertyIds,
+        $content,
+        $intersect = false,
+        $customDependency = null,
+        $cacheLifetime = 86400
+    );
+
+    /**
      * Prepares all available properties values for use in filter form view.
      *
      * @param string $modelClass correct model class name. Model have to have PropertiesTrait

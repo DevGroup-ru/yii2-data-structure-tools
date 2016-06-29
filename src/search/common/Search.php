@@ -9,6 +9,7 @@ use DevGroup\DataStructure\propertyStorage\AbstractPropertyStorage;
 use DevGroup\DataStructure\propertyStorage\StaticValues;
 use DevGroup\DataStructure\search\base\AbstractSearch;
 use DevGroup\DataStructure\traits\PropertiesTrait;
+use DevGroup\TagDependencyHelper\TagDependencyTrait;
 use Yii;
 use yii\db\ActiveRecord;
 use yii\helpers\ArrayHelper;
@@ -32,7 +33,7 @@ class Search extends AbstractSearch
     /**
      * @inheritdoc
      */
-    public function findInProperties($modelClass = '', $config = [], $params = [])
+    public function filterByProperties($modelClass = '', $config = [], $params = [])
     {
         if (false === is_string($modelClass) || false === class_exists($modelClass)) {
             return [];
@@ -56,6 +57,53 @@ class Search extends AbstractSearch
             $data = $data === false
                 ? $modelIds
                 : array_intersect($data, $modelIds);
+        }
+        // fallback. return all ids
+        if ($data === false) {
+            return $modelClass::find()->select($model->primaryKey())->column();
+        }
+        return $data;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function findInProperties(
+        $modelClass = '',
+        $config = [],
+        $params = [],
+        $content = '',
+        $intersect = false
+    )
+    {
+        if (false === is_string($modelClass) || false === class_exists($modelClass)) {
+            return [];
+        }
+        /** @var ActiveRecord | HasProperties | PropertiesTrait $model */
+        $model = new $modelClass;
+        if (false === method_exists($model, 'ensurePropertyGroupIds')) {
+            return [];
+        }
+        /** @var AbstractPropertyStorage[] $storage */
+        $storage = self::prepareStorage($config);
+        $data = false;
+        foreach ($storage as $one) {
+            $modelIds = $one::getModelIdsByContent($modelClass, $params, $content, $intersect);
+            if ($modelIds === false) {
+                continue;
+            }
+            if ($intersect) {
+                if (empty($modelIds)) {
+                    return [];
+                }
+                $data = $data === false
+                    ? $modelIds
+                    : array_intersect($data, $modelIds);
+            } else {
+                $data = $data === false
+                    ? $modelIds
+                    : array_merge($data, $modelIds);
+            }
         }
         // fallback. return all ids
         if ($data === false) {

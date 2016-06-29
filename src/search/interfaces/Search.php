@@ -28,9 +28,27 @@ interface Search
      * @param string|ActiveRecord|PropertiesTrait|HasProperties|TagDependencyTrait $modelClass
      * @param array $config
      * @param array $params
-     * @return array
+     * @return integer[]
      */
-    public function findInProperties($modelClass = '', $config = [], $params = []);
+    public function filterByProperties($modelClass = '', $config = [], $params = []);
+
+    /**
+     * Performs search in assigned properties values by content
+     *
+     * @param string|ActiveRecord|PropertiesTrait|HasProperties|TagDependencyTrait $modelClass entity class name
+     * @param array $config list of params for configuration of a search component
+     * @param array $params list of property names
+     * @param string $content a keyword or a phrase for searching
+     * @param string $intersect whether to return model ids that contains `content` in all `params` at the same time
+     * @return integer[] model ids list
+     */
+    public function findInProperties(
+        $modelClass = '',
+        $config = [],
+        $params = [],
+        $content = '',
+        $intersect = false
+    );
 
     /**
      * Prepares data for filter form render

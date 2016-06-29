@@ -106,7 +106,7 @@ class CommonSearchTest extends DSTCommonTestCase
      */
     public function testFilterWithoutParams($search)
     {
-        $res = $search->findInProperties(Product::class, ['storage' => [StaticValues::class, EAV::class]]);
+        $res = $search->filterByProperties(Product::class, ['storage' => [StaticValues::class, EAV::class]]);
         $this->assertCount(5, $res);
     }
 
@@ -116,7 +116,7 @@ class CommonSearchTest extends DSTCommonTestCase
      */
     public function testFilterWithParamsNoResults($search)
     {
-        $res = $search->findInProperties(Product::class, ['storage' => [StaticValues::class, EAV::class]], [1 => [3], 11 => [11, 13]]);
+        $res = $search->filterByProperties(Product::class, ['storage' => [StaticValues::class, EAV::class]], [1 => [3], 11 => [11, 13]]);
         $this->assertEmpty($res);
     }
 
@@ -126,7 +126,7 @@ class CommonSearchTest extends DSTCommonTestCase
      */
     public function testFilterWithParamsWithResults($search)
     {
-        $res = $search->findInProperties(Product::class, ['storage' => [StaticValues::class, EAV::class]], [1 => [2], 11 => [11, 13]]);
+        $res = $search->filterByProperties(Product::class, ['storage' => [StaticValues::class, EAV::class]], [1 => [2], 11 => [11, 13]]);
         sort($res);
         $this->assertArraySubset([4, 5], $res);
     }
@@ -137,7 +137,7 @@ class CommonSearchTest extends DSTCommonTestCase
      */
     public function testFilterWithNoModel($search)
     {
-        $res = $search->findInProperties([]);
+        $res = $search->filterByProperties([]);
         $this->assertEmpty($res);
     }
 
@@ -147,7 +147,7 @@ class CommonSearchTest extends DSTCommonTestCase
      */
     public function testFilterIncorrectModel($search)
     {
-        $res = $search->findInProperties(PropertyStorage::class);
+        $res = $search->filterByProperties(PropertyStorage::class);
         $this->assertEmpty($res);
     }
 
@@ -158,19 +158,19 @@ class CommonSearchTest extends DSTCommonTestCase
     public function testFilterByEav($search)
     {
         // empty result
-        $res = $search->findInProperties(Product::class, ['storage' => [StaticValues::class, EAV::class]], [3 => ['test']]);
+        $res = $search->filterByProperties(Product::class, ['storage' => [StaticValues::class, EAV::class]], [3 => ['test']]);
         $this->assertEmpty($res);
         // all models
-        $res = $search->findInProperties(Product::class, ['storage' => [StaticValues::class, EAV::class]], []);
+        $res = $search->filterByProperties(Product::class, ['storage' => [StaticValues::class, EAV::class]], []);
         $this->assertSame(5, count($res));
         // single property
-        $res = $search->findInProperties(Product::class, ['storage' => [StaticValues::class, EAV::class]], [3 => ['138*67*7']]);
+        $res = $search->filterByProperties(Product::class, ['storage' => [StaticValues::class, EAV::class]], [3 => ['138*67*7']]);
         $this->assertArraySubset([1], $res);
         // multi properties
-        $res = $search->findInProperties(Product::class, ['storage' => [StaticValues::class, EAV::class]], [3 => ['138*67*7'], 4 => ['2']]);
+        $res = $search->filterByProperties(Product::class, ['storage' => [StaticValues::class, EAV::class]], [3 => ['138*67*7'], 4 => ['2']]);
         $this->assertArraySubset([1], $res);
         // multi properties and multi values check
-        $res = $search->findInProperties(Product::class, ['storage' => [StaticValues::class, EAV::class]], [2 => [4, 6], 7 => ['3G', 'wi-fi']]);
+        $res = $search->filterByProperties(Product::class, ['storage' => [StaticValues::class, EAV::class]], [2 => [4, 6], 7 => ['3G', 'wi-fi']]);
         $this->assertArraySubset(['1' => '2'], $res);
     }
 
@@ -181,22 +181,62 @@ class CommonSearchTest extends DSTCommonTestCase
     public function testFilterByEavAndStatic($search)
     {
         // bad eav + bad static
-        $res = $search->findInProperties(Product::class, ['storage' => [StaticValues::class, EAV::class]], [3 => ['1234'], 1 => [2]]);
+        $res = $search->filterByProperties(Product::class, ['storage' => [StaticValues::class, EAV::class]], [3 => ['1234'], 1 => [2]]);
         $this->assertEmpty($res);
         // bad eav + static
-        $res = $search->findInProperties(Product::class, ['storage' => [StaticValues::class, EAV::class]], [3 => ['1234'], 1 => [1]]);
+        $res = $search->filterByProperties(Product::class, ['storage' => [StaticValues::class, EAV::class]], [3 => ['1234'], 1 => [1]]);
         $this->assertEmpty($res);
         // eav + bas static
-        $res = $search->findInProperties(Product::class, ['storage' => [StaticValues::class, EAV::class]], [3 => ['138*67*7'], 1 => [2]]);
+        $res = $search->filterByProperties(Product::class, ['storage' => [StaticValues::class, EAV::class]], [3 => ['138*67*7'], 1 => [2]]);
         $this->assertEmpty($res);
         // eav + static
-        $res = $search->findInProperties(Product::class, ['storage' => [StaticValues::class, EAV::class]], [3 => ['138*67*7'], 1 => [1]]);
+        $res = $search->filterByProperties(Product::class, ['storage' => [StaticValues::class, EAV::class]], [3 => ['138*67*7'], 1 => [1]]);
         $this->assertArraySubset([1], $res);
         // eav + 2 static
-        $res = $search->findInProperties(Product::class, ['storage' => [StaticValues::class, EAV::class]], [3 => ['138*67*7'], 1 => [1], 2 => [4]]);
+        $res = $search->filterByProperties(Product::class, ['storage' => [StaticValues::class, EAV::class]], [3 => ['138*67*7'], 1 => [1], 2 => [4]]);
         $this->assertArraySubset([1], $res);
         // 2 eav + static
-        $res = $search->findInProperties(Product::class, ['storage' => [StaticValues::class, EAV::class]], [3 => ['138*67*7'], 4 => [2], 2 => [4]]);
+        $res = $search->filterByProperties(Product::class, ['storage' => [StaticValues::class, EAV::class]], [3 => ['138*67*7'], 4 => [2], 2 => [4]]);
         $this->assertArraySubset([1], $res);
+    }
+
+    /**
+     * @depends testFilterFormData
+     * @param Search $search
+     */
+    public function testFindContentInProperties($search)
+    {
+        $res = $search->findInProperties(
+            Product::class,
+            ['storage' => [StaticValues::class, EAV::class]],
+            [7],
+            'too'
+        );
+        $this->assertArraySubset([2], $res);
+        $res = $search->findInProperties(
+            Product::class,
+            ['storage' => [StaticValues::class, EAV::class]],
+            [6, 8],
+            'too',
+            false
+        );
+        $this->assertArraySubset([2], $res);
+        $res = $search->findInProperties(
+            Product::class,
+            ['storage' => [StaticValues::class, EAV::class]],
+            [7, 8],
+            'too',
+            true
+        );
+        $this->assertArraySubset([2], $res);
+        $this->assertArraySubset([2], $res);
+        $res = $search->findInProperties(
+            Product::class,
+            ['storage' => [StaticValues::class, EAV::class]],
+            [7, 6],
+            'too',
+            true
+        );
+        $this->assertEmpty($res);
     }
 }

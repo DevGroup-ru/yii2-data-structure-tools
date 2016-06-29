@@ -124,7 +124,7 @@ public function actionFilter()
       StaticValues::class,
     ]
   ];
-  $modelIds = $search->findInProperties(Page::class, $config);
+  $modelIds = $search->filterByProperties(Page::class, $config);
   $dataProvider = new ActiveDataProvider([
       //provider config
   ]);
