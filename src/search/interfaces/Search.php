@@ -51,6 +51,16 @@ interface Search
     );
 
     /**
+     * Performs a search in range of property values
+     *
+     * @param string|ActiveRecord|PropertiesTrait|HasProperties|TagDependencyTrait $modelClass
+     * @param array $config
+     * @param array $params
+     * @return mixed
+     */
+    public function filterByPropertiesRange($modelClass = '', $config = [], $params = []);
+
+    /**
      * Prepares data for filter form render
      *
      * @param array $params

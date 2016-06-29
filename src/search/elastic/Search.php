@@ -107,6 +107,14 @@ class Search extends AbstractSearch
     /**
      * @inheritdoc
      */
+    public function filterByPropertiesRange($modelClass = '', $config = [], $params = [])
+    {
+        // TODO: Implement findInPropertiesRange() method.
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function findInProperties(
         $modelClass = '',
         $config = [],
@@ -117,7 +125,7 @@ class Search extends AbstractSearch
     {
         // TODO: Implement findInProperties() method.
     }
-
+    
     /**
      * @inheritdoc
      */

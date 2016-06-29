@@ -111,6 +111,41 @@ class Search extends AbstractSearch
         }
         return $data;
     }
+    
+    /**
+     * @inheritdoc
+     */
+    public function filterByPropertiesRange($modelClass = '', $config = [], $params = [])
+    {
+        if (false === is_string($modelClass) || false === class_exists($modelClass)) {
+            return [];
+        }
+        /** @var ActiveRecord | HasProperties | PropertiesTrait $model */
+        $model = new $modelClass;
+        if (false === method_exists($model, 'ensurePropertyGroupIds')) {
+            return [];
+        }
+        $storage = self::prepareStorage($config);
+        $data = false;
+        ksort($params);
+        /** @var AbstractPropertyStorage $one */
+        foreach ($storage as $one) {
+            $modelIds = $one::getModelIdsByRange($modelClass, $params);
+            if ($modelIds === false) {
+                continue;
+            } elseif (empty($modelIds)) {
+                return [];
+            }
+            $data = $data === false
+                ? $modelIds
+                : array_intersect($data, $modelIds);
+        }
+        // fallback. return all ids
+        if ($data === false) {
+            return $modelClass::find()->select($model->primaryKey())->column();
+        }
+        return $data;
+    }
 
     /**
      * Prepares list of applicable storage

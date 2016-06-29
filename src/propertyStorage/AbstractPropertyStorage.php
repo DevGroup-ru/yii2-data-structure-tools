@@ -425,4 +425,17 @@ abstract class AbstractPropertyStorage implements Filter
     {
         return false;
     }
+
+    /**
+     * @inheritdoc
+     */
+    public static function getModelIdsByRange(
+        $modelClass,
+        $selections,
+        $customDependency = null,
+        $cacheLifetime = 86400
+    )
+    {
+        return false;
+    }
 }

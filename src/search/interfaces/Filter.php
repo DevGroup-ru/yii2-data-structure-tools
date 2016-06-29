@@ -87,7 +87,33 @@ interface Filter
         $modelClass,
         $selections,
         $customDependency = null,
-        $cacheLifetime = 86400);
+        $cacheLifetime = 86400
+    );
+
+    /**
+     * @param string|ActiveRecord|HasProperties|PropertiesTrait|TagDependencyTrait $modelClass
+     * @param array $selections looks like:
+     * [
+     *  'propertyId1' => [
+     *      'min' => 'minValue',
+     *      'max' => 'maxValue',
+     *  ],
+     *  'propertyId2' => [
+     *      'min' => 'minValue',
+     *      'max' => 'maxValue',
+     *  ],
+     *  ...
+     * ]
+     * @param null|string|\yii\caching\Dependency $customDependency
+     * @param int $cacheLifetime
+     * @return false|array
+     */
+    public static function getModelIdsByRange(
+        $modelClass,
+        $selections,
+        $customDependency = null,
+        $cacheLifetime = 86400
+    );
 
     /**
      * @param string|ActiveRecord|HasProperties|PropertiesTrait|TagDependencyTrait $modelClass

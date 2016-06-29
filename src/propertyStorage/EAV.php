@@ -37,19 +37,17 @@ class EAV extends AbstractPropertyStorage
 
         /** @var \yii\db\Command $command */
         $query = new Query();
-        $query->select('*')
-            ->from($firstModel->eavTable())
-            ->where(PropertiesHelper::getInCondition($models))
-            ->orderBy([
-                'model_id' => SORT_ASC,
-                'sort_order' => SORT_ASC,
-            ]);
+        $query->select('*')->from($firstModel->eavTable())->where(PropertiesHelper::getInCondition($models))->orderBy(
+                [
+                    'model_id' => SORT_ASC,
+                    'sort_order' => SORT_ASC,
+                ]
+            );
         if (null !== $languageId) {
-            $query->andWhere(['language_id' => [(int)$languageId, 0]]);
+            $query->andWhere(['language_id' => [(int) $languageId, 0]]);
         }
 
-        $values = $query->createCommand($firstModel->getDb())
-            ->queryAll();
+        $values = $query->createCommand($firstModel->getDb())->queryAll();
         $values = ArrayHelper::map(
             $values,
             'id',
@@ -87,6 +85,7 @@ class EAV extends AbstractPropertyStorage
      * @param array $propertyRows
      * @param Property $property
      * @param int | false $textAreaHandlerId
+     *
      * @return array | string
      */
     private static function fillForBackend($propertyRows, $property, $textAreaHandlerId)
@@ -124,6 +123,7 @@ class EAV extends AbstractPropertyStorage
     /**
      * @param array $propertyRows
      * @param Property $property
+     *
      * @return array|string
      */
     private static function fillForFrontend($propertyRows, $property)
@@ -156,8 +156,10 @@ class EAV extends AbstractPropertyStorage
         $firstModel = reset($models);
 
         /** @var \yii\db\Command $command */
-        $command = $firstModel->getDb()->createCommand()
-            ->delete($firstModel->eavTable(), PropertiesHelper::getInCondition($models));
+        $command = $firstModel->getDb()->createCommand()->delete(
+                $firstModel->eavTable(),
+                PropertiesHelper::getInCondition($models)
+            );
 
         $command->execute();
     }
@@ -216,8 +218,7 @@ class EAV extends AbstractPropertyStorage
             return true;
         }
         $cmd = $firstModel->getDb()->createCommand();
-        return $cmd
-            ->batchInsert(
+        return $cmd->batchInsert(
                 $firstModel->eavTable(),
                 [
                     'model_id',
@@ -244,7 +245,7 @@ class EAV extends AbstractPropertyStorage
         $modelId = $model->id;
         $propertyId = $propertyModel->id;
         $key = $propertyModel->key;
-        $values = (array)$model->$key;
+        $values = (array) $model->$key;
         if (count($values) === 0) {
             return [];
         }
@@ -266,6 +267,7 @@ class EAV extends AbstractPropertyStorage
      * @param $propertyId
      * @param $valueField
      * @param int $langId
+     *
      * @return array
      */
     private static function prepareRows($values, $modelId, $propertyId, $valueField, $langId = 0)
@@ -282,11 +284,11 @@ class EAV extends AbstractPropertyStorage
                 $modelId,
                 $propertyId,
                 $index,
-                $valueField === 'value_integer' ? (int)$value : 0,
-                $valueField === 'value_float' ? (float)$value : 0,
+                $valueField === 'value_integer' ? (int) $value : 0,
+                $valueField === 'value_float' ? (float) $value : 0,
                 $valueField === 'value_string' ? $value : '',
                 $valueField === 'value_text' ? $value : '',
-                $langId
+                $langId,
             ];
         }
         return $rows;
@@ -330,10 +332,10 @@ class EAV extends AbstractPropertyStorage
     public function deleteProperties($models, $propertyIds)
     {
         foreach ($models as $model) {
-            $model->getDb()
-                ->createCommand()
-                ->delete($model->eavTable(), ['model_id' => $model->id, 'property_id' => (array)$propertyIds])
-                ->execute();
+            $model->getDb()->createCommand()->delete(
+                    $model->eavTable(),
+                    ['model_id' => $model->id, 'property_id' => (array) $propertyIds]
+                )->execute();
         }
     }
 
@@ -344,13 +346,10 @@ class EAV extends AbstractPropertyStorage
     {
         $classNames = static::getApplicablePropertyModelClassNames($property->id);
         foreach ($classNames as $className) {
-            $className::getDb()
-                ->createCommand()
-                ->delete(
+            $className::getDb()->createCommand()->delete(
                     $className::eavTable(),
                     ['property_id' => $property->id]
-                )
-                ->execute();
+                )->execute();
         }
     }
 
@@ -361,9 +360,7 @@ class EAV extends AbstractPropertyStorage
     {
         $classNames = self::getApplicablePropertyModelClassNames($property->id);
         foreach ($classNames as $className) {
-            if (true === isset($changedAttributes['data_type'])
-                && ($property->data_type != $changedAttributes['data_type'])
-            ) {
+            if (true === isset($changedAttributes['data_type']) && ($property->data_type != $changedAttributes['data_type'])) {
                 self::updateDataType($property, $changedAttributes['data_type'], $className);
             }
         }
@@ -396,11 +393,9 @@ class EAV extends AbstractPropertyStorage
             'language_id' => 0,
         ];
         $whereCondition = ['property_id' => $property->id];
-        $oldValues = (new Query())
-            ->select(array_keys($rowConfig))
-            ->from($className::eavTable())
-            ->where($whereCondition)
-            ->all();
+        $oldValues = (new Query())->select(array_keys($rowConfig))->from($className::eavTable())->where(
+                $whereCondition
+            )->all();
         $newValues = [];
         //lang based rows we can search for both [model_id, property_id]
         //language based value for lang independent row we should get for Yii::$app->multilingual->default_language_id
@@ -412,48 +407,54 @@ class EAV extends AbstractPropertyStorage
                 $newRow[$newColumn] = Property::castValueToDataType($row[$oldColumn], $property->data_type);
                 $newValues[] = $newRow;
             }
-        } else if ((false === $canTranslate) && (true === $wasTranslatable)) {
-            //remove duplicated language based values and set language_id to 0
-            $checks = [];
-            $defaultLang = Yii::$app->multilingual->default_language_id;
-            foreach ($oldValues as $row) {
-                $checkVar = $row['model_id'] . '-' . $row['property_id'];
-                if (false === in_array($checkVar, $checks)
-                    && ($row['language_id'] == $defaultLang || $row['language_id'] == 0)
-                ) {
-                    $newRow = array_replace($rowConfig, $row);
-                    $newRow[$oldColumn] = $valueToOldColumn;
-                    $newRow[$newColumn] = Property::castValueToDataType($row[$oldColumn], $property->data_type);
-                    $newRow['language_id'] = 0;
-                    $newValues[] = $newRow;
-                    $checks[] = $checkVar;
-                }
-            }
-        } else if ((true === $canTranslate) && (false === $wasTranslatable)) {
-            //duplicate rows for all lang ids
-            $langs = Yii::$app->multilingual->getAllLanguages();
-            $langs = ArrayHelper::map($langs, 'id', 'id');
-            foreach ($oldValues as $row) {
-                $newRow = array_replace($rowConfig, $row);
-                $newRow[$oldColumn] = $valueToOldColumn;
-                $newRow[$newColumn] = Property::castValueToDataType($row[$oldColumn], $property->data_type);
-                foreach ($langs as $langId) {
-                    $newRow['language_id'] = $langId;
-                    $newValues[] = $newRow;
-                }
-            }
         } else {
-            //leave all rows just move values with no duplicated for other languages
-            $checks = [];
-            foreach ($oldValues as $row) {
-                $checkVar = $row['model_id'] . '-' . $row['property_id'];
-                if (false === in_array($checkVar, $checks)) {
-                    $newRow = array_replace($rowConfig, $row);
-                    $newRow[$oldColumn] = $valueToOldColumn;
-                    $newRow[$newColumn] = Property::castValueToDataType($row[$oldColumn], $property->data_type);
-                    $newRow['language_id'] = 0;
-                    $newValues[] = $newRow;
-                    $checks[] = $checkVar;
+            if ((false === $canTranslate) && (true === $wasTranslatable)) {
+                //remove duplicated language based values and set language_id to 0
+                $checks = [];
+                $defaultLang = Yii::$app->multilingual->default_language_id;
+                foreach ($oldValues as $row) {
+                    $checkVar = $row['model_id'] . '-' . $row['property_id'];
+                    if (false === in_array(
+                            $checkVar,
+                            $checks
+                        ) && ($row['language_id'] == $defaultLang || $row['language_id'] == 0)
+                    ) {
+                        $newRow = array_replace($rowConfig, $row);
+                        $newRow[$oldColumn] = $valueToOldColumn;
+                        $newRow[$newColumn] = Property::castValueToDataType($row[$oldColumn], $property->data_type);
+                        $newRow['language_id'] = 0;
+                        $newValues[] = $newRow;
+                        $checks[] = $checkVar;
+                    }
+                }
+            } else {
+                if ((true === $canTranslate) && (false === $wasTranslatable)) {
+                    //duplicate rows for all lang ids
+                    $langs = Yii::$app->multilingual->getAllLanguages();
+                    $langs = ArrayHelper::map($langs, 'id', 'id');
+                    foreach ($oldValues as $row) {
+                        $newRow = array_replace($rowConfig, $row);
+                        $newRow[$oldColumn] = $valueToOldColumn;
+                        $newRow[$newColumn] = Property::castValueToDataType($row[$oldColumn], $property->data_type);
+                        foreach ($langs as $langId) {
+                            $newRow['language_id'] = $langId;
+                            $newValues[] = $newRow;
+                        }
+                    }
+                } else {
+                    //leave all rows just move values with no duplicated for other languages
+                    $checks = [];
+                    foreach ($oldValues as $row) {
+                        $checkVar = $row['model_id'] . '-' . $row['property_id'];
+                        if (false === in_array($checkVar, $checks)) {
+                            $newRow = array_replace($rowConfig, $row);
+                            $newRow[$oldColumn] = $valueToOldColumn;
+                            $newRow[$newColumn] = Property::castValueToDataType($row[$oldColumn], $property->data_type);
+                            $newRow['language_id'] = 0;
+                            $newValues[] = $newRow;
+                            $checks[] = $checkVar;
+                        }
+                    }
                 }
             }
         }
@@ -479,8 +480,7 @@ class EAV extends AbstractPropertyStorage
         $customDependency = null,
         $customKey = '',
         $cacheLifetime = 86400
-    )
-    {
+    ) {
         $property = Property::findById($propertyId);
         $column = static::dataTypeToEavColumn($property->data_type);
         $params = static::prepareParams($params, $column);
@@ -518,8 +518,7 @@ class EAV extends AbstractPropertyStorage
         $returnType = self::RETURN_ALL,
         $customDependency = null,
         $cacheLifetime = 86400
-    )
-    {
+    ) {
         $result = $returnType === self::RETURN_COUNT ? 0 : [];
         $property = Property::findById($propertyId);
         $tags = [$property->objectTag()];
@@ -538,7 +537,7 @@ class EAV extends AbstractPropertyStorage
             )->addGroupBy($className::primaryKey());
             $dependency = static::dependencyHelper(
                 $customDependency,
-                ArrayHelper::merge($tags, (array)$className::commonTag())
+                ArrayHelper::merge($tags, (array) $className::commonTag())
             );
             $result = static::valueByReturnType(
                 $returnType,
@@ -560,8 +559,7 @@ class EAV extends AbstractPropertyStorage
         $selections,
         $customDependency = null,
         $cacheLifetime = 86400
-    )
-    {
+    ) {
         if (empty($selections)) {
             return false;
         }
@@ -570,10 +568,9 @@ class EAV extends AbstractPropertyStorage
         $availableProperties = [];
         $cacheKey = 'GetModelIdsByValues:EAV:' . Yii::$app->language;
         foreach ($selections as $propertyId => $values) {
-            if (
-                count($values) < 1
-                || ($property = Property::findById($propertyId)) === null
-                || $property->storage_id !== $storageId
+            if (count($values) < 1 || ($property = Property::findById(
+                    $propertyId
+                )) === null || $property->storage_id !== $storageId
             ) {
                 continue;
             }
@@ -588,10 +585,7 @@ class EAV extends AbstractPropertyStorage
         if ($result === false) {
             $tags = [NamingHelper::getCommonTag($modelClass)];
             // build a query
-            $query = (new Query())
-                ->select('model_id')
-                ->from($modelClass::eavTable())
-                ->groupBy('model_id');
+            $query = (new Query())->select('model_id')->from($modelClass::eavTable())->groupBy('model_id');
             $valuesCount = 0;
             foreach ($availableProperties as $propertyId => $values) {
                 $property = Property::findById($propertyId);
@@ -602,7 +596,7 @@ class EAV extends AbstractPropertyStorage
                     [
                         'and',
                         ['language_id' => $property->canTranslate() ? Yii::$app->multilingual->language_id : 0],
-                        [$columnName => $values]
+                        [$columnName => $values],
                     ]
                 );
             }
@@ -615,8 +609,8 @@ class EAV extends AbstractPropertyStorage
                     [
                         'dependencies' => [
                             $customDependency,
-                            new TagDependency(['tags' => $tags])
-                        ]
+                            new TagDependency(['tags' => $tags]),
+                        ],
                     ]
                 );
             }
@@ -624,6 +618,7 @@ class EAV extends AbstractPropertyStorage
         }
         return $result;
     }
+
 
     /**
      * @inheritdoc
@@ -696,6 +691,84 @@ class EAV extends AbstractPropertyStorage
                     ]
                 );
             }
+            Yii::$app->cache->set($cacheKey, $result, $cacheLifetime, $dependency);
+        }
+        return $result;
+    }
+    
+    /**
+     * @param HasProperties|PropertiesTrait|\DevGroup\TagDependencyHelper\TagDependencyTrait|string|ActiveRecord $modelClass
+     * @param array $selections
+     * @param null $customDependency
+     * @param int $cacheLifetime
+     *
+     * @return array|bool|false
+     */
+    public static function getModelIdsByRange(
+        $modelClass,
+        $selections,
+        $customDependency = null,
+        $cacheLifetime = 86400
+    ) {
+        if (empty($selections)) {
+            return false;
+        }
+        $storageId = PropertyStorageHelper::storageIdByClass(static::class);
+        // build a cache key and make a available properties array
+        $availableProperties = [];
+        $cacheKey = 'GetModelIdsByRange:EAV:' . Yii::$app->language;
+        foreach ($selections as $propertyId => $values) {
+            if (count($values) < 1 || ($property = Property::findById($propertyId)) === null || $property->storage_id !== $storageId) {
+                continue;
+            }
+            ksort($values);
+            $availableProperties[$propertyId] = $values;
+            $cacheKey .= ':' . $propertyId . ':' . implode('-', $values);
+        }
+        if (empty($availableProperties)) {
+            return false;
+        }
+        $result = Yii::$app->cache->get($cacheKey);
+        if ($result === false) {
+            $tags = [NamingHelper::getCommonTag($modelClass)];
+            if ($customDependency === null) {
+                $dependency = new TagDependency(['tags' => $tags]);
+            } else {
+                $dependency = new ChainedDependency(
+                    [
+                        'dependencies' => [
+                            $customDependency,
+                            new TagDependency(['tags' => $tags]),
+                        ],
+                    ]
+                );
+            }
+            // build a query
+            $query = (new Query())->select('model_id')->from($modelClass::eavTable())->groupBy('model_id');
+            $valuesCount = 0;
+            foreach ($availableProperties as $propertyId => $values) {
+                $default = ['min' => ~PHP_INT_MAX, 'max' => PHP_INT_MAX];
+                $values = ArrayHelper::merge($default, $values);
+                if ($values['min'] > $values['max']) {
+                    return [];
+                }
+                $property = Property::findById($propertyId);
+                $tags[] = $property->objectTag();
+                $columnName = static::dataTypeToEavColumn($property->data_type);
+                $valuesCount ++;
+                $query->orWhere(
+                    [
+                        'and',
+                        [
+                            'language_id' => $property->canTranslate() ? Yii::$app->multilingual->language_id : 0,
+                            'property_id' => $propertyId,
+                        ],
+                        ['and', ['>=', $columnName, $values['min']], ['<=', $columnName, $values['max']]],
+                    ]
+                );
+            }
+            $query->having(new Expression('COUNT(model_id) = ' . $valuesCount));
+            $result = $query->column();
             Yii::$app->cache->set($cacheKey, $result, $cacheLifetime, $dependency);
         }
         return $result;
