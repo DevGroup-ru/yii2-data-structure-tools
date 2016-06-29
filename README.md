@@ -26,6 +26,13 @@ or add
 
 to the require section of your `composer.json` file.
 
+Add to config
+```
+    'aliases' => [
+        '@DevGroup/DataStructure' => '@vendor/devgroup/yii2-data-structure-tools/src',
+    ],
+```
+
 
 Usage
 -----
