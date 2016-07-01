@@ -1,26 +1,23 @@
 <?php
 /**
  * @var $property Property
+ * @var $form ActiveForm
  */
 use DevGroup\DataStructure\models\Property;
+use DevGroup\DataStructure\propertyHandler\RelatedEntity;
 use devgroup\jsoneditor\Jsoneditor;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 use yii\helpers\Json;
+use yii\widgets\ActiveForm;
 
 echo Yii::t('app', 'Masked input settings');
 
-echo Jsoneditor::widget(
-    [
-        'editorOptions' => [
-            'modes' => ['code', 'form', 'text', 'tree', 'view'],
-            'mode' => 'tree',
-        ],
-        'name' => Property::PACKED_HANDLER_PARAMS,
-        'options' => [],
-        'value' => Json::encode(ArrayHelper::getValue($property, 'params.' . Property::PACKED_HANDLER_PARAMS)),
-    ]
-);
+echo $form->field($property, 'params[' . Property::PACKED_HANDLER_PARAMS . '][alias]')->label(
+    Yii::t('app', 'Class name')
+)->dropDownList(RelatedEntity::$aliases, ['prompt' => Yii::t('app', 'Not selected'),]);
+
+echo $form->field($property, 'params[' . Property::PACKED_HANDLER_PARAMS . '][mask]')->label(Yii::t('app', 'Mask'));
 
 ?>
 <div class="col-sm-12 blog-sidebar">

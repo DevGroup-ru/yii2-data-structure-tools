@@ -7,12 +7,19 @@
  */
 
 use DevGroup\DataStructure\models\Property;
+use DevGroup\DataStructure\propertyHandler\RelatedEntity;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 use yii\widgets\MaskedInput;
 
-$maskedSettings = ArrayHelper::getValue($property, 'params.' . Property::PACKED_HANDLER_PARAMS, []);
+$params = ArrayHelper::getValue($property, 'params.' . Property::PACKED_HANDLER_PARAMS, []);
+$maskedSettings = [];
+if (empty($params['mask']) === false) {
+    $maskedSettings['mask'] = $params['mask'];
+} else {
+    $maskedSettings = ['clientOptions' => ['alias' => RelatedEntity::$aliases[$params['alias']],],];
+}
 if ($property->allow_multiple_values == 1) :
     $inputName = Html::getInputName($model, $property->key) . '[]';
     $inputId = Html::getInputId($model, $property->key);

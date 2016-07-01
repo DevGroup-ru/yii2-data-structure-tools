@@ -48,9 +48,16 @@ class MaskedInput extends AbstractPropertyHandler
             $property->data_type = Property::DATA_TYPE_INVARIANT_STRING;
         }
         $data = Yii::$app->request->post(Property::PACKED_HANDLER_PARAMS);
+        if (empty($data) === true) {
+            $data = ArrayHelper::getValue(
+                Yii::$app->request->post($property->formName()),
+                'params.' . Property::PACKED_HANDLER_PARAMS,
+                []
+            );
+        }
         $param = $property->params;
         if (!empty($data)) {
-            $params[Property::PACKED_HANDLER_PARAMS] = Json::decode($data);
+            $params[Property::PACKED_HANDLER_PARAMS] = $data;
             $property->params = $params;
             $property->packAttributes();
         }
@@ -65,8 +72,8 @@ class MaskedInput extends AbstractPropertyHandler
         if (!$event->model->isNewRecord && $event->model->handler()->className() == self::class) {
             $view = $event->getView();
             $model = $event->model;
-
-            echo $view->render('_masked-input-settings', ['property' => $model,]);
+            $form = $event->form;
+            echo $view->render('_masked-input-settings', ['property' => $model, 'form' => $form]);
         }
     }
 

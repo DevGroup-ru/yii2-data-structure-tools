@@ -14,6 +14,13 @@ use yii\jui\JuiAsset;
 class RelatedEntity extends AbstractPropertyHandler
 {
     public static $multipleMode = Property::MODE_ALLOW_ALL;
+    public static $aliases = [
+        1 => 'date',
+        2 => 'ip',
+        3 => 'url',
+        4 => 'email',
+        5 => 'decimal',
+    ];
 
     /**
      * Get validation rules for a property.
