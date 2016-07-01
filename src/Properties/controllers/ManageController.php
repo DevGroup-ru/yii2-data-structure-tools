@@ -4,6 +4,7 @@ namespace DevGroup\DataStructure\Properties\controllers;
 
 use DevGroup\AdminUtils\controllers\BaseController;
 use DevGroup\DataStructure\Properties\actions\AddModelPropertyGroup;
+use DevGroup\DataStructure\Properties\actions\AjaxRelatedEntities;
 use DevGroup\DataStructure\Properties\actions\DeleteModelPropertyGroup;
 use DevGroup\DataStructure\Properties\actions\DeleteProperty;
 use DevGroup\DataStructure\Properties\actions\DeletePropertyGroup;
@@ -11,6 +12,7 @@ use DevGroup\DataStructure\Properties\actions\DeleteStaticValue;
 use DevGroup\DataStructure\Properties\actions\EditProperty;
 use DevGroup\DataStructure\Properties\actions\EditPropertyGroup;
 use DevGroup\DataStructure\Properties\actions\EditStaticValue;
+use DevGroup\DataStructure\Properties\actions\GetAttributeNames;
 use DevGroup\DataStructure\Properties\actions\ListGroupProperties;
 use DevGroup\DataStructure\Properties\actions\ListPropertyGroups;
 use Yii;
@@ -39,10 +41,10 @@ class ManageController extends BaseController
     {
         return [
             'add-model-property-group' => [
-                'class' => AddModelPropertyGroup::class
+                'class' => AddModelPropertyGroup::class,
             ],
             'delete-model-property-group' => [
-                'class' => DeleteModelPropertyGroup::class
+                'class' => DeleteModelPropertyGroup::class,
             ],
             'list-property-groups' => [
                 'class' => ListPropertyGroups::class,
@@ -67,6 +69,12 @@ class ManageController extends BaseController
             ],
             'delete-property' => [
                 'class' => DeleteProperty::class,
+            ],
+            'get-attributes-names' => [
+                'class' => GetAttributeNames::class,
+            ],
+            'ajax-related-entities' => [
+                'class' => AjaxRelatedEntities::class,
             ],
         ];
     }

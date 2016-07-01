@@ -1,5 +1,6 @@
 <?php
 
+use DevGroup\DataStructure\propertyHandler\DatePickerField;
 use yii\db\Migration;
 
 class m160627_114046_datepicker_field extends Migration
@@ -10,7 +11,7 @@ class m160627_114046_datepicker_field extends Migration
             '{{%property_handlers}}',
             [
                 'name' => 'DatePicker Field',
-                'class_name' => \DevGroup\DataStructure\propertyHandler\DatePickerField::class,
+                'class_name' => DatePickerField::class,
                 'sort_order' => 6,
                 'packed_json_default_config' => '[]',
             ]
@@ -22,7 +23,7 @@ class m160627_114046_datepicker_field extends Migration
         $this->delete(
             '{{%property_handlers}}',
             [
-                'class_name' => \DevGroup\DataStructure\propertyHandler\DatePickerField::class,
+                'class_name' => DatePickerField::class,
             ]
         );
     }

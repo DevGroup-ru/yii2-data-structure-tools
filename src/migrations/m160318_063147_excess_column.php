@@ -18,7 +18,7 @@ class m160318_063147_excess_column extends Migration
                 [
                     'storage_id' => PropertyStorage::find()
                         ->select('id')
-                        ->where(['class_name' => \DevGroup\DataStructure\propertyStorage\TableInheritance::class])
+                        ->where(['class_name' => TableInheritance::class])
                         ->scalar()
                 ]
             )

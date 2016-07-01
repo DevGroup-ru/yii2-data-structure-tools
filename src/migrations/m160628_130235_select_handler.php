@@ -1,5 +1,6 @@
 <?php
 
+use DevGroup\DataStructure\propertyHandler\Select;
 use DevGroup\DataStructure\propertyHandler\StaticValues;
 use yii\db\Migration;
 
@@ -12,7 +13,7 @@ class m160628_130235_select_handler extends Migration
             '{{%property_handlers}}',
             [
                 'name' => 'Select',
-                'class_name' => \DevGroup\DataStructure\propertyHandler\Select::class,
+                'class_name' => Select::class,
                 'sort_order' => 2,
                 'packed_json_default_config' => '[]',
             ]
@@ -24,7 +25,7 @@ class m160628_130235_select_handler extends Migration
         $this->update('{{%property_handlers}}', ['name' => 'Static values'], ['class_name' => StaticValues::class]);
         $this->delete(
             '{{%property_handlers}}',
-            ['class_name' => \DevGroup\DataStructure\propertyHandler\Select::class,]
+            ['class_name' => Select::class,]
         );
     }
 

@@ -1,5 +1,6 @@
 <?php
 
+use DevGroup\DataStructure\propertyHandler\RadioList;
 use yii\db\Migration;
 
 class m160623_124052_radio_list extends Migration
@@ -10,7 +11,7 @@ class m160623_124052_radio_list extends Migration
             '{{%property_handlers}}',
             [
                 'name' => 'Radio list',
-                'class_name' => \DevGroup\DataStructure\propertyHandler\RadioList::class,
+                'class_name' => RadioList::class,
                 'sort_order' => 6,
                 'packed_json_default_config' => '[]',
             ]
@@ -22,7 +23,7 @@ class m160623_124052_radio_list extends Migration
         $this->delete(
             '{{%property_handlers}}',
             [
-                'class_name' => \DevGroup\DataStructure\propertyHandler\RadioList::class,
+                'class_name' => RadioList::class,
             ]
         );
     }

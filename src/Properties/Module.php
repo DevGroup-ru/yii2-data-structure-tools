@@ -8,6 +8,7 @@ use DevGroup\DataStructure\commands\ElasticIndexController;
 use DevGroup\DataStructure\commands\TranslateEavController;
 use DevGroup\DataStructure\Properties\actions\EditProperty;
 use DevGroup\DataStructure\propertyHandler\MaskedInput;
+use DevGroup\DataStructure\propertyHandler\RelatedEntity;
 use DevGroup\DataStructure\propertyHandler\StaticValues;
 use DevGroup\DataStructure\search\base\AbstractSearch;
 use DevGroup\DataStructure\search\common\Search;
@@ -53,6 +54,11 @@ class Module extends BaseModule implements BootstrapInterface
             View::className(),
             EditProperty::EVENT_AFTER_FORM,
             [MaskedInput::class, 'onPropertyEditForm']
+        );
+        ModelEditForm::on(
+            View::className(),
+            EditProperty::EVENT_AFTER_FORM,
+            [RelatedEntity::class, 'onPropertyEditForm']
         );
     }
 

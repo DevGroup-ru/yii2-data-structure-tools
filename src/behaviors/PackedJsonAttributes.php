@@ -111,6 +111,9 @@ class PackedJsonAttributes extends Behavior
     public function __get($name)
     {
         if (in_array($name, $this->_packedAttributes)) {
+            if (array_key_exists($name, $this->_unpackedValues) === false) {
+                $this->unpackAttributes();
+            }
             return $this->_unpackedValues[$name];
         }
         return parent::__get($name);

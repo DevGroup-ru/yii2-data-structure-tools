@@ -1,5 +1,6 @@
 <?php
 
+use DevGroup\DataStructure\propertyHandler\HiddenField;
 use yii\db\Migration;
 
 class m160623_072249_hidden_input extends Migration
@@ -10,7 +11,7 @@ class m160623_072249_hidden_input extends Migration
             '{{%property_handlers}}',
             [
                 'name' => 'Hidden field',
-                'class_name' => \DevGroup\DataStructure\propertyHandler\HiddenField::class,
+                'class_name' => HiddenField::class,
                 'sort_order' => 6,
                 'packed_json_default_config' => '[]',
             ]
@@ -22,7 +23,7 @@ class m160623_072249_hidden_input extends Migration
         $this->delete(
             '{{%property_handlers}}',
             [
-                'class_name' => \DevGroup\DataStructure\propertyHandler\HiddenField::class,
+                'class_name' => HiddenField::class,
             ]
         );
     }

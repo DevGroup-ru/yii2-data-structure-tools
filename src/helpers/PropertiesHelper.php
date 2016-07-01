@@ -6,17 +6,16 @@ use DevGroup\DataStructure\models\ApplicablePropertyModels;
 use DevGroup\DataStructure\models\Property;
 use DevGroup\DataStructure\models\PropertyGroup;
 use DevGroup\DataStructure\models\PropertyPropertyGroup;
-use DevGroup\DataStructure\Properties\Module;
+use DevGroup\DataStructure\propertyHandler\RelatedEntity;
 use DevGroup\DataStructure\propertyStorage\AbstractPropertyStorage;
 use DevGroup\DataStructure\propertyStorage\EAV;
-use phpDocumentor\Reflection\DocBlock\Tag\PropertyReadTag;
 use Yii;
 use yii\base\Exception;
-use yii\base\UnknownPropertyException;
+use yii\base\Model;
 use yii\caching\TagDependency;
+use yii\db\ActiveRecord;
 use yii\db\Query;
 use yii\helpers\ArrayHelper;
-use yii\web\ServerErrorHttpException;
 
 class PropertiesHelper
 {
@@ -38,21 +37,25 @@ class PropertiesHelper
                 Yii::$app->cache->delete('ApplicablePropertyModels');
             }
 
-            static::$applicablePropertyModels = Yii::$app->cache->lazy(function () {
-                $query = new \yii\db\Query();
-                $rows = $query
-                    ->select(['id', 'class_name'])
-                    ->from(ApplicablePropertyModels::tableName())
-                    ->all();
-                array_walk($rows, function (&$item) {
-                    $item['id'] = intval($item['id']);
-                });
-                return ArrayHelper::map(
-                    $rows,
-                    'class_name',
-                    'id'
-                );
-            }, 'ApplicablePropertyModels', 86400);
+            static::$applicablePropertyModels = Yii::$app->cache->lazy(
+                function () {
+                    $query = new Query();
+                    $rows = $query->select(['id', 'class_name'])->from(ApplicablePropertyModels::tableName())->all();
+                    array_walk(
+                        $rows,
+                        function (&$item) {
+                            $item['id'] = intval($item['id']);
+                        }
+                    );
+                    return ArrayHelper::map(
+                        $rows,
+                        'class_name',
+                        'id'
+                    );
+                },
+                'ApplicablePropertyModels',
+                86400
+            );
         }
         return static::$applicablePropertyModels;
     }
@@ -105,6 +108,7 @@ class PropertiesHelper
     /**
      * @param \yii\db\ActiveRecord[] $models
      * @param bool $frontend
+     *
      * @return array|\yii\db\ActiveRecord[]
      */
     public static function fillProperties(&$models, $frontend = false)
@@ -193,10 +197,10 @@ class PropertiesHelper
         }
         /** @var \yii\db\ActiveRecord|\DevGroup\DataStructure\traits\PropertiesTrait|\DevGroup\TagDependencyHelper\TagDependencyTrait $firstModel */
         $firstModel = reset($models);
-//        if ($firstModel->propertyGroupIds !== null) {
-//            // assume that we have already got them
-//            return;
-//        }
+        //        if ($firstModel->propertyGroupIds !== null) {
+        //            // assume that we have already got them
+        //            return;
+        //        }
 
         $tags = [
             PropertyGroup::commonTag(),
@@ -205,19 +209,21 @@ class PropertiesHelper
             $tags[] = $model->objectTag();
         }
 
-        $binding_rows = Yii::$app->cache->lazy(function () use ($firstModel, $models) {
-            $query = new Query();
+        $binding_rows = Yii::$app->cache->lazy(
+            function () use ($firstModel, $models) {
+                $query = new Query();
 
-            $query
-                ->select(['model_id', 'property_group_id'])
-                ->from($firstModel->bindedPropertyGroupsTable())
-                ->where(PropertiesHelper::getInCondition($models))
-                ->orderBy(['sort_order' => SORT_ASC]);
+                $query->select(['model_id', 'property_group_id'])->from(
+                    $firstModel->bindedPropertyGroupsTable()
+                )->where(PropertiesHelper::getInCondition($models))->orderBy(['sort_order' => SORT_ASC]);
 
-            return $query
-                ->all($firstModel->getDb());
+                return $query->all($firstModel->getDb());
 
-        }, static::generateCacheKey($models, 'property_groups_ids'), 86400, $tags);
+            },
+            static::generateCacheKey($models, 'property_groups_ids'),
+            86400,
+            $tags
+        );
 
         array_walk(
             $binding_rows,
@@ -265,6 +271,7 @@ class PropertiesHelper
     /**
      * @param \yii\db\ActiveRecord[]|\DevGroup\DataStructure\traits\PropertiesTrait[] $models
      * @param PropertyGroup $propertyGroup
+     *
      * @return bool
      */
     public static function bindGroupToModels(&$models, PropertyGroup $propertyGroup)
@@ -276,16 +283,14 @@ class PropertiesHelper
                 return false;
             }
 
-            $model->getDb()->createCommand()
-                ->insert(
-                    $model->bindedPropertyGroupsTable(),
-                    [
-                        'model_id' => $model->id,
-                        'property_group_id' => $propertyGroup->id,
-                        'sort_order' => count($model->propertyGroupIds),
-                    ]
-                )
-                ->execute();
+            $model->getDb()->createCommand()->insert(
+                $model->bindedPropertyGroupsTable(),
+                [
+                    'model_id' => $model->id,
+                    'property_group_id' => $propertyGroup->id,
+                    'sort_order' => count($model->propertyGroupIds),
+                ]
+            )->execute();
 
             $model->propertyGroupIds[] = $propertyGroup->id;
 
@@ -301,6 +306,7 @@ class PropertiesHelper
     /**
      * @param \yii\db\ActiveRecord[]|\DevGroup\DataStructure\traits\PropertiesTrait[] $models
      * @param PropertyGroup $propertyGroup
+     *
      * @return bool
      */
     public static function unbindGroupFromModels(&$models, PropertyGroup $propertyGroup)
@@ -310,42 +316,33 @@ class PropertiesHelper
                 // maybe it'll be better to throw special exception in such case
                 return false;
             }
-            $query = (new Query())
-                ->select('property_id')
-                ->from(PropertyPropertyGroup::tableName())
-                ->where(
-                    [
-                        'property_group_id' => $propertyGroup->id,
-                    ]
-                );
-            $subQuerySql = (new Query())
-                ->select('property_id')
-                ->from($model->bindedPropertyGroupsTable() . ' opg')
-                ->innerJoin(
-                    PropertyPropertyGroup::tableName() . ' ppg',
-                    'opg.property_group_id = ppg.property_group_id'
-                )
-                ->groupBy('property_id')
-                ->having('COUNT(*) = 1')
-                ->where(
-                    [
-                        'model_id' => $model->id,
-                    ]
-                )->createCommand()->getRawSql();
+            $query = (new Query())->select('property_id')->from(PropertyPropertyGroup::tableName())->where(
+                [
+                    'property_group_id' => $propertyGroup->id,
+                ]
+            );
+            $subQuerySql = (new Query())->select('property_id')->from(
+                $model->bindedPropertyGroupsTable() . ' opg'
+            )->innerJoin(
+                PropertyPropertyGroup::tableName() . ' ppg',
+                'opg.property_group_id = ppg.property_group_id'
+            )->groupBy('property_id')->having('COUNT(*) = 1')->where(
+                [
+                    'model_id' => $model->id,
+                ]
+            )->createCommand()->getRawSql();
             $propertyIdsToDelete = $query->andWhere('property_id IN (' . $subQuerySql . ')')->column();
             $storageHandlers = PropertyStorageHelper::getHandlersForModel(reset($models));
             foreach ($storageHandlers as $handler) {
                 $handler->deleteProperties($models, $propertyIdsToDelete);
             }
-            $model->getDb()->createCommand()
-                ->delete(
-                    $model->bindedPropertyGroupsTable(),
-                    [
-                        'model_id' => $model->id,
-                        'property_group_id' => $propertyGroup->id,
-                    ]
-                )
-                ->execute();
+            $model->getDb()->createCommand()->delete(
+                $model->bindedPropertyGroupsTable(),
+                [
+                    'model_id' => $model->id,
+                    'property_group_id' => $propertyGroup->id,
+                ]
+            )->execute();
             TagDependency::invalidate($model->getTagDependencyCacheComponent(), [$model->objectTag()]);
         }
         return true;
@@ -381,6 +378,7 @@ class PropertiesHelper
 
     /**
      * @param $models
+     *
      * @return array Array where key is model.id and value is model's index in array of $models
      */
     public static function idToArrayIndex(&$models)
@@ -395,6 +393,7 @@ class PropertiesHelper
     /**
      * @param \yii\db\ActiveRecord|\DevGroup\DataStructure\traits\PropertiesTrait $model
      * @param string $attribute
+     *
      * @return Property | null
      */
     public static function getPropertyModel($model, $attribute)
@@ -408,7 +407,9 @@ class PropertiesHelper
 
     /**
      * Get available property groups by class name.
+     *
      * @param string $className
+     *
      * @return array
      * @throws Exception
      */
@@ -418,10 +419,9 @@ class PropertiesHelper
         $availableGroups = Yii::$app->cache->lazy(
             function () use ($applicablePropertyModelId) {
                 return ArrayHelper::map(
-                    PropertyGroup::find()
-                        ->where(['applicable_property_model_id' => $applicablePropertyModelId])
-                        ->orderBy('sort_order ASC')
-                        ->all(),
+                    PropertyGroup::find()->where(
+                        ['applicable_property_model_id' => $applicablePropertyModelId]
+                    )->orderBy('sort_order ASC')->all(),
                     'id',
                     function ($model) {
                         return !empty($model->name) ? $model->name : $model->internal_name;
@@ -460,5 +460,53 @@ class PropertiesHelper
     ) {
         $storageClass = $property->storage->class_name;
         return $storageClass::getModelsByPropertyValues($property->id, $values, $returnType);
+    }
+
+    /**
+     * @param string $className
+     * @param bool $throwException
+     *
+     * @return array
+     * @throws Exception
+     */
+    public static function getAttributeNamesByClassName($className = '', $throwException = false)
+    {
+        $except = false;
+        if (empty($className) === false) {
+            $model = new $className;
+            if ($model instanceof Model) {
+                /** @var $model Model */
+                return $model->attributeLabels();
+            } else {
+                $except = true;
+            }
+        }
+        if ($throwException && $except) {
+            throw new Exception;
+        } else {
+            return [];
+        }
+    }
+
+    /**
+     * @param Property $property
+     * @param ActiveRecord $model
+     *
+     * @throws Exception
+     */
+    public static function getRelatedEntitiesByProperty($property, $model)
+    {
+        if ($property->handler() instanceof RelatedEntity === false) {
+            throw new Exception(Yii::t('app', 'Set correct property handler'));
+        }
+        $handlerParam = ArrayHelper::getValue($property->params, Property::PACKED_HANDLER_PARAMS);
+        $className = $handlerParam['className'];
+        $sortOrder = $handlerParam['sortOrder'];
+        $order = boolval($handlerParam['order']) ? SORT_DESC : SORT_ASC;
+
+        $primaries = $model->primaryKey();
+        $primary = reset($primaries);
+        return $className::find()->where([$primary => $model->{$property->key}])
+            ->orderBy([$sortOrder => $order])->all();
     }
 }

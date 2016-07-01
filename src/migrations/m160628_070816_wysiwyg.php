@@ -1,5 +1,6 @@
 <?php
 
+use DevGroup\DataStructure\propertyHandler\WysiwygField;
 use yii\db\Migration;
 
 class m160628_070816_wysiwyg extends Migration
@@ -10,7 +11,7 @@ class m160628_070816_wysiwyg extends Migration
             '{{%property_handlers}}',
             [
                 'name' => 'Wysiwyg Field',
-                'class_name' => \DevGroup\DataStructure\propertyHandler\WysiwygField::class,
+                'class_name' => WysiwygField::class,
                 'sort_order' => 6,
                 'packed_json_default_config' => '[]',
             ]
@@ -22,7 +23,7 @@ class m160628_070816_wysiwyg extends Migration
         $this->delete(
             '{{%property_handlers}}',
             [
-                'class_name' => \DevGroup\DataStructure\propertyHandler\WysiwygField::class,
+                'class_name' => WysiwygField::class,
             ]
         );
     }
