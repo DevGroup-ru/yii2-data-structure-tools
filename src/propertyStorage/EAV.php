@@ -411,7 +411,7 @@ class EAV extends AbstractPropertyStorage
             if ((false === $canTranslate) && (true === $wasTranslatable)) {
                 //remove duplicated language based values and set language_id to 0
                 $checks = [];
-                $defaultLang = Yii::$app->multilingual->default_language_id;
+                $defaultLang = Yii::$app->multilingual->language_id;
                 foreach ($oldValues as $row) {
                     $checkVar = $row['model_id'] . '-' . $row['property_id'];
                     if (false === in_array(
