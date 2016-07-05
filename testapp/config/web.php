@@ -6,7 +6,7 @@ $config = [
     'vendorPath' => '@app/../vendor',
     'id' => 'minimal',
     'basePath' => dirname(__DIR__),
-    'bootstrap' => ['log', 'multilingual', 'debug', 'properties'],
+    'bootstrap' => ['log', 'multilingual', 'debug', 'properties', 'adminUtils'],
     'modules' => [
         'gii' => [
             'class' => 'yii\gii\Module',
@@ -16,6 +16,9 @@ $config = [
         ],
         'properties' => [
             'class' => 'DevGroup\DataStructure\Properties\Module',
+        ],
+        'adminUtils' => [
+            'class' => DevGroup\AdminUtils\AdminModule::class,
         ],
     ],
     'components' => [
