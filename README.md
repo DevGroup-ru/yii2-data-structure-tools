@@ -124,7 +124,7 @@ public function actionFilter()
       StaticValues::class,
     ]
   ];
-  $modelIds = $search->filterByProperties(Page::class, $config);
+  $modelIds = $search->filterByProperties(Page::class, $config, \Yii::$app->request->get('filter'));
   $dataProvider = new ActiveDataProvider([
       //provider config
   ]);
