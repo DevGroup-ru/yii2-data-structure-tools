@@ -61,7 +61,13 @@ class IndexHelper extends Object
         $res = $client->search($condition);
         if (false === empty($res['hits']['hits'])) {
             foreach ($res['hits']['hits'] as $doc) {
-                $primaryKeys[$doc['_id']] = $doc['_type'];
+                if (false === isset($primaryKeys[$doc['_id']])) {
+                    $primaryKeys[$doc['_id']] = [$doc['_type']];
+                } else {
+                    if (false === in_array($doc['_type'], $primaryKeys[$doc['_id']])) {
+                        $primaryKeys[$doc['_id']][] = $doc['_type'];
+                    }
+                }
             }
         }
         return $primaryKeys;

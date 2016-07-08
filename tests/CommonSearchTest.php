@@ -370,8 +370,8 @@ class CommonSearchTest extends DSTCommonTestCase
         $res = $search->findInProperties(
             Product::class,
             ['storage' => [StaticValues::class, EAV::class]],
-            [7],
-            'too'
+            [8],
+            'wi-fi'
         );
         $this->assertArraySubset([2], $res);
         $res = $search->findInProperties(

@@ -284,8 +284,8 @@ class EAV extends AbstractPropertyStorage
                 $modelId,
                 $propertyId,
                 $index,
-                $valueField === 'value_integer' ? (int) $value : 0,
-                $valueField === 'value_float' ? (float) $value : 0,
+                $valueField === 'value_integer' ? (int) $value : null,
+                $valueField === 'value_float' ? (float) $value : null,
                 $valueField === 'value_string' ? $value : '',
                 $valueField === 'value_text' ? $value : '',
                 $langId,
@@ -386,8 +386,8 @@ class EAV extends AbstractPropertyStorage
             'model_id' => 0,
             'property_id' => 0,
             'sort_order' => 0,
-            'value_integer' => 0,
-            'value_float' => 0,
+            'value_integer' => null,
+            'value_float' => null,
             'value_string' => '',
             'value_text' => '',
             'language_id' => 0,
@@ -571,6 +571,7 @@ class EAV extends AbstractPropertyStorage
             if (count($values) < 1 || ($property = Property::findById(
                     $propertyId
                 )) === null || $property->storage_id !== $storageId
+                || $property->in_search !== 1
             ) {
                 continue;
             }
@@ -642,6 +643,7 @@ class EAV extends AbstractPropertyStorage
             if (
                 ($property = Property::findById($propertyId)) === null
                 || $property->storage_id !== $storageId
+                || $property->in_search != 1
             ) {
                 continue;
             }

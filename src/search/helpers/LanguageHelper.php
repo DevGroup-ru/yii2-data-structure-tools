@@ -13,14 +13,20 @@ use yii\helpers\ArrayHelper;
  */
 class LanguageHelper extends Component
 {
+    private static $languages = [];
+
+    private static $current;
+
     /**
      * @return array
      */
     public static function getAll()
     {
-        $langs = Yii::$app->multilingual->getAllLanguages();
-        $langs = ArrayHelper::map($langs, 'id', 'iso_639_2t');
-        return $langs;
+        if (true === empty(self::$languages)) {
+            $langs = Yii::$app->multilingual->getAllLanguages();
+            self::$languages = ArrayHelper::map($langs, 'id', 'iso_639_2t');
+        }
+        return self::$languages;
 
     }
 
@@ -29,8 +35,11 @@ class LanguageHelper extends Component
      */
     public static function getCurrent()
     {
-        $langs = self::getAll();
-        $currentId = Yii::$app->multilingual->language_id;
-        return isset($langs[$currentId]) ? $langs[$currentId] : 'eng';
+        if (true === empty(self::$current)) {
+            $langs = self::getAll();
+            $currentId = Yii::$app->multilingual->language_id;
+            self::$current = isset($langs[$currentId]) ? $langs[$currentId] : 'eng';
+        }
+        return self::$current;
     }
 }

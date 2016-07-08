@@ -113,14 +113,16 @@ class Watch extends AbstractWatch
         $pks = IndexHelper::primaryKeysByCondition($this->client, $query);
         if (count($pks) > 0) {
             $params = ['body' => []];
-            foreach ($pks as $id => $type) {
-                $params['body'][] = [
-                    'delete' => [
-                        '_index' => $index,
-                        '_type' => $type,
-                        '_id' => $id
-                    ]
-                ];
+            foreach ($pks as $id => $types) {
+                foreach ($types as $type) {
+                    $params['body'][] = [
+                        'delete' => [
+                            '_index' => $index,
+                            '_type' => $type,
+                            '_id' => $id
+                        ]
+                    ];
+                }
             }
             $this->client->bulk($params);
         }
@@ -137,53 +139,63 @@ class Watch extends AbstractWatch
         if (false === empty($model->propertiesIds) && false === empty($model->propertiesValues)) {
             //leave only not empty properties
             $workingProps = array_filter($model->propertiesValues, function ($e) {
-                return false === empty($e);
+                if (true === is_array($e)) {
+                    foreach ($e as $val) {
+                        return (count($val) > 0 && false === empty($val[0]));
+                    }
+                } else {
+                    return false === empty($e);
+                }
             });
-            //TODO refactor. Work with all storages & possibly not yet created
-            //collecting applicable storages
-            $storage = (new Query())->from(PropertyStorage::tableName())->select(['class_name', 'id'])->where([
-                'class_name' => [
-                    StaticValues::class,
-                    EAV::class
-                ]
-            ])->all();
-            $storageClassToId = ArrayHelper::map($storage, 'class_name', 'id');
-            $storageIdToIndexType = ArrayHelper::map($storage, 'id', function ($e) {
-                return IndexHelper::storageClassToType($e['class_name']);
-            });
+            //collecting storages
+            $storage = (new Query())
+                ->from(PropertyStorage::tableName())
+                ->select('id')
+                ->indexBy('class_name')
+                ->column();
             //selecting all applicable properties to work with
-            $props = (new Query())->from(Property::tableName())->select(['id', 'key', 'storage_id'])->where(
-                [
+            $rawProps = (new Query())->from(Property::tableName())
+                ->select(['id', 'key', 'storage_id', 'data_type'])
+                ->where([
                     'id' => array_keys($workingProps),
-                    'storage_id' => array_keys($storageIdToIndexType),
                     'in_search' => 1
-                ]
-            )->all();
-            //grouping them by storage id
-            $props = ArrayHelper::map($props, 'id', 'key', 'storage_id');
-            if (false === empty($props[$storageClassToId[StaticValues::class]])) {
-                $staticBulk = self::prepareStatic(
-                    $props[$storageClassToId[StaticValues::class]],
-                    $model->id,
-                    $workingProps,
-                    $index,
-                    $storageIdToIndexType[$storageClassToId[StaticValues::class]]
-                );
-                $this->client->bulk($staticBulk);
+                ])
+                ->all();
+            $props = ArrayHelper::map($rawProps, 'id', 'key', 'storage_id');
+            foreach ($storage as $className => $id) {
+                if (false === isset($props[$id]) || true === empty($props[$id])) {
+                    continue;
+                }
+                $indexData = self::prepareIndexData($className, $props[$id], $workingProps, $index, $model);
+                if (false === empty($indexData)) {
+                    $this->client->bulk($indexData);
+                }
             }
-            //TODO implement EAV values filling
-            /*
-            if (false === empty($props[$storageClassToId[EAV::class]])) {
-                $eavBulk = self::prepareEav(
-                    $props[$storageClassToId[EAV::class]],
-                    $model->id,
-                    $workingProps,
-                    $index,
-                    $storageIdToIndexType[$storageClassToId[EAV::class]]
-                );
-            }
-            */
         }
+    }
+
+    /**
+     * @param $className
+     * @param $props
+     * @param $workingProps
+     * @param $index
+     * @param ActiveRecord | HasProperties | PropertiesTrait $model
+     * @return array
+     */
+    private static function prepareIndexData($className, $props, $workingProps, $index, $model)
+    {
+        $data = [];
+        $languages = LanguageHelper::getAll();
+        $type = IndexHelper::storageClassToType($className);
+        switch ($className) {
+            case StaticValues::class :
+                $data = self::prepareStatic($props, $model->id, $workingProps, $index, $type, $languages);
+                break;
+            case EAV::class :
+                $data = self::prepareEav($model, $props, $index, $type, $languages);
+                break;
+        }
+        return $data;
     }
 
     /**
@@ -194,11 +206,11 @@ class Watch extends AbstractWatch
      * @param array $workingProps
      * @param string $index index name i.e.: page
      * @param string $type index type i.e.: static_values
+     * @param array $languages
      * @return array
      */
-    private static function prepareStatic($props, $modelId, $workingProps, $index, $type)
+    private static function prepareStatic($props, $modelId, $workingProps, $index, $type, $languages)
     {
-        $languages = LanguageHelper::getAll();
         $res = $valIds = [];
         //leave only applicable properties with according values
         $workingProps = array_intersect_key($workingProps, $props);
@@ -224,33 +236,81 @@ class Watch extends AbstractWatch
                 $propertyValues[$value['model_id']]['slug_' . $languages[$value['language_id']]] = $value['slug'];
             }
         }
-        $res['body'][] = ['index' => [
-            '_id' => $modelId,
-            '_index' => $index,
-            '_type' => $type,
-        ]];
-        $res['body'][] = [
-            'model_id' => $modelId,
-            'propertyValues' => array_values($propertyValues),
-        ];
+        if (false === empty($propertyValues)) {
+            $res['body'][] = ['index' => [
+                '_id' => $modelId,
+                '_index' => $index,
+                '_type' => $type,
+            ]];
+            $res['body'][] = [
+                'model_id' => $modelId,
+                Search::STATIC_VALUES_FILED => array_values($propertyValues),
+            ];
+        }
         return $res;
     }
 
     /**
      * Prepares bulk data to store in elasticsearch index for model properties eav values
      *
+     * @param HasProperties | PropertiesTrait $model
      * @param array $props
-     * @param integer $modelId
-     * @param array $workingProps
-     * @param string $index index name i.e.: page
-     * @param string $type index type i.e.: static_values
+     * @param string $index
+     * @param string $type
+     * @param array $languages
      * @return array
      */
-    /*
-    private static function prepareEav($props, $modelId, $workingProps, $index, $type)
+    private static function prepareEav($model, $props, $index, $type, $languages)
     {
-        $bulk = [];
-        return $bulk;
+        $eavTable = $model->eavTable();
+        $values = (new Query())
+            ->from($eavTable)
+            ->where([
+                'model_id' => $model->id,
+                'property_id' => array_keys($props)
+            ])
+            ->select([
+                'id',
+                'property_id',
+                'value_integer',
+                'value_float',
+                'value_string',
+                'value_text',
+                'language_id'
+            ])
+            ->all();
+        $rows = $data = [];
+        foreach ($values as $val) {
+            $propKey = isset($props[$val['property_id']]) ? $props[$val['property_id']] : null;
+            $row = [
+                'eav_value_id' => $val['id'],
+                'prop_id' => $val['property_id'],
+                'prop_key' => $propKey,
+                'value_integer' => $val['value_integer'],
+                'value_float' => $val['value_float'],
+            ];
+            if ($val['language_id'] == 0) {
+                $row['utr_text'] = $val['value_text'];
+            } else {
+                if (false === isset($languages[$val['language_id']])) {
+                    continue;
+                }
+                $row['str_value_' . $languages[$val['language_id']]] = $val['value_string'];
+                $row['txt_value_' . $languages[$val['language_id']]] = $val['value_text'];
+            }
+            $rows[] = $row;
+        }
+        if (false === empty($rows)) {
+            $data['body'][] = ['index' => [
+                '_id' => $model->id,
+                '_index' => $index,
+                '_type' => $type,
+            ]];
+            $data['body'][] = [
+                'model_id' => $model->id,
+                Search::EAV_FIELD => $rows,
+            ];
+        }
+        return $data;
     }
-    */
 }

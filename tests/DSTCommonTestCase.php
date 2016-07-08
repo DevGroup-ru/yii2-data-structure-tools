@@ -91,6 +91,9 @@ class DSTCommonTestCase extends \PHPUnit_Extensions_Database_TestCase
             if (true === $client->indices()->exists(['index' => 'product'])) {
                 $client->indices()->delete(['index' => 'product']);
             }
+            if (true === $client->indices()->exists(['index' => 'category'])) {
+                $client->indices()->delete(['index' => 'category']);
+            }
             Yii::$app->runAction('properties/elastic/fill-index');
         }
         if (true === $this->runWeb) {
@@ -136,6 +139,9 @@ class DSTCommonTestCase extends \PHPUnit_Extensions_Database_TestCase
             $client = ClientBuilder::create()->build();
             if (true === $client->indices()->exists(['index' => 'product'])) {
                 $client->indices()->delete(['index' => 'product']);
+            }
+            if (true === $client->indices()->exists(['index' => 'category'])) {
+                $client->indices()->delete(['index' => 'category']);
             }
         }
         // all identity map should be cleared

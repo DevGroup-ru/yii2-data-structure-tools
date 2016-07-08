@@ -2,7 +2,7 @@
 
 namespace DevGroup\DataStructure\tests;
 
-use DevGroup\DataStructure\propertyHandler\StaticValues;
+use DevGroup\DataStructure\propertyStorage\StaticValues;
 use DevGroup\DataStructure\propertyStorage\EAV;
 use DevGroup\DataStructure\search\elastic\Search;
 use DevGroup\DataStructure\tests\models\Product;

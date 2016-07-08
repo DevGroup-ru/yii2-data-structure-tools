@@ -44,13 +44,25 @@
 			<static_value_translation model_id="6" language_id="1" name="silver" description="silver" slug="silver" />
 			<static_value_translation model_id="6" language_id="2" name="silver" description="серебряный" slug="silver" />
 
+    <property id="9" key="some_integer" in_search="0" data_type="1" is_internal="0" allow_multiple_values="0" storage_id="1" packed_json_params="{}" property_handler_id="11" />
+        <static_value id="91" property_id="9" sort_order="1" />
+            <static_value_translation model_id="91" language_id="1" name="91" description="91" slug="91" />
+            <static_value_translation model_id="91" language_id="2" name="91" description="91" slug="91" />
+        <static_value id="92" property_id="9" sort_order="2" />
+            <static_value_translation model_id="92" language_id="1" name="92" description="92" slug="92" />
+            <static_value_translation model_id="92" language_id="2" name="92" description="92" slug="92" />
+        <static_value id="93" property_id="9" sort_order="3" />
+            <static_value_translation model_id="93" language_id="1" name="93" description="93" slug="93" />
+            <static_value_translation model_id="93" language_id="2" name="93" description="93" slug="93" />
 
-	<property id="3" key="size" data_type="0" is_internal="0" allow_multiple_values="0" storage_id="2" packed_json_params="{}" property_handler_id="2" />
-	<property id="4" key="sim" data_type="1" is_internal="0" allow_multiple_values="0" storage_id="2" packed_json_params="{}" property_handler_id="2" />
-	<property id="5" key="diagonal" data_type="2" is_internal="0" allow_multiple_values="0" storage_id="2" packed_json_params="{}" property_handler_id="2" />
-	<property id="6" key="processor" data_type="3" is_internal="0" allow_multiple_values="0" storage_id="2" packed_json_params="{}" property_handler_id="2" />
+
+    <property id="3" key="size" in_search="1" data_type="0" is_internal="0" allow_multiple_values="0" storage_id="2" packed_json_params="{}" property_handler_id="2" />
+	<property id="4" key="sim" in_search="1" data_type="1" is_internal="0" allow_multiple_values="0" storage_id="2" packed_json_params="{}" property_handler_id="2" />
+	<property id="5" key="diagonal" in_search="1" data_type="2" is_internal="0" allow_multiple_values="0" storage_id="2" packed_json_params="{}" property_handler_id="2" />
+	<property id="6" key="processor" in_search="1" data_type="3" is_internal="0" allow_multiple_values="0" storage_id="2" packed_json_params="{}" property_handler_id="2" />
 	<property id="7" key="extra" data_type="3" is_internal="0" allow_multiple_values="1" storage_id="2" packed_json_params="{}" property_handler_id="2" />
-	<property id="8" key="description" data_type="3" is_internal="0" allow_multiple_values="0" storage_id="2" packed_json_params="{}" property_handler_id="2" />
+	<property id="8" key="description" in_search="1" data_type="3" is_internal="0" allow_multiple_values="0" storage_id="2" packed_json_params="{}" property_handler_id="2" />
+
 
 	<property_translation model_id="1" language_id="1" name="material" description="material" />
 	<property_translation model_id="1" language_id="2" name="material" description="материал" />
@@ -68,6 +80,8 @@
 	<property_translation model_id="7" language_id="2" name="дополнительно" description="" />
 	<property_translation model_id="8" language_id="1" name="description" description="" />
 	<property_translation model_id="8" language_id="2" name="описание" description="" />
+    <property_translation model_id="9" language_id="1" name="Некоторый Int" description="" />
+    <property_translation model_id="9" language_id="2" name="Some Int" description="" />
     <property_translation model_id="11" language_id="1" name="Count" description="" />
     <property_translation model_id="11" language_id="2" name="Количество" description="" />
 
@@ -81,6 +95,7 @@
 	<property_property_group property_id="5" property_group_id="1" sort_order_property_groups="0" sort_order_group_properties="0" />
 	<property_property_group property_id="6" property_group_id="1" sort_order_property_groups="0" sort_order_group_properties="0" />
     <property_property_group property_id="11" property_group_id="1" sort_order_property_groups="0" sort_order_group_properties="0" />
+    <property_property_group property_id="9" property_group_id="1" sort_order_property_groups="0" sort_order_group_properties="0" />
 
 	<product_property_groups model_id="1" property_group_id="1" sort_order="0" />
 	<product_property_groups model_id="2" property_group_id="1" sort_order="0" />
@@ -108,6 +123,8 @@
     <product_static_values model_id="2" static_value_id="6" sort_order="0" />
 
     <product_static_values model_id="3" static_value_id="12" sort_order="0" />
+    <product_static_values model_id="3" static_value_id="92" sort_order="0" />
+    <product_static_values model_id="3" static_value_id="93" sort_order="0" />
 
     <product_static_values model_id="4" static_value_id="13" sort_order="0" />
     <product_static_values model_id="4" static_value_id="11" sort_order="0" />
@@ -116,5 +133,7 @@
     <product_static_values model_id="5" static_value_id="12" sort_order="0" />
     <product_static_values model_id="5" static_value_id="13" sort_order="0" />
     <product_static_values model_id="5" static_value_id="2" sort_order="0" />
+
+
 
 </dataset>

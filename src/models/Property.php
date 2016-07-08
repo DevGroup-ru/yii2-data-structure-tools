@@ -402,15 +402,15 @@ class Property extends ActiveRecord
     {
         switch ($type) {
             case Property::DATA_TYPE_FLOAT:
-                return floatval($value);
+                return empty($value) ? null : floatval($value);
                 break;
 
             case Property::DATA_TYPE_BOOLEAN:
-                return boolval($value);
+                return empty($value) ? null : boolval($value);
                 break;
 
             case Property::DATA_TYPE_INTEGER:
-                return intval($value);
+                return empty($value) ? null : intval($value);
                 break;
 
             default:

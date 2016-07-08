@@ -36,12 +36,12 @@ class IndexHelperTest extends DSTCommonTestCase
                                                         'must' => [
                                                             [
                                                                 'term' => [
-                                                                    'propertyValues.prop_id' => 1
+                                                                    'static_data.prop_id' => 1
                                                                 ]
                                                             ],
                                                             [
                                                                 'term' => [
-                                                                    'propertyValues.value_rus.raw' => 'plastic'
+                                                                    'static_data.value_rus.raw' => 'plastic'
                                                                 ]
                                                             ]
                                                         ]
@@ -58,12 +58,12 @@ class IndexHelperTest extends DSTCommonTestCase
                                                         'must' => [
                                                             [
                                                                 'term' => [
-                                                                    'propertyValues.prop_id' => 11
+                                                                    'static_data.prop_id' => 11
                                                                 ]
                                                             ],
                                                             [
                                                                 'term' => [
-                                                                    'propertyValues.value_rus.raw' => '19'
+                                                                    'static_data.value_rus.raw' => '19'
                                                                 ]
                                                             ]
                                                         ]
@@ -80,6 +80,6 @@ class IndexHelperTest extends DSTCommonTestCase
             ]
         ];
         $res = IndexHelper::primaryKeysByCondition($client, $query);
-        $this->assertArraySubset([4 => 'static_values', 5 => 'static_values'], $res);
+        $this->assertArraySubset([4 => ['static_values'], 5 => ['static_values']], $res);
     }
 }
