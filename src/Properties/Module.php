@@ -52,12 +52,12 @@ class Module extends BaseModule implements BootstrapInterface
         );
         ModelEditForm::on(
             View::className(),
-            EditProperty::EVENT_AFTER_FORM,
+            EditProperty::EVENT_FORM_BEFORE_SUBMIT,
             [MaskedInput::class, 'onPropertyEditForm']
         );
         ModelEditForm::on(
             View::className(),
-            EditProperty::EVENT_AFTER_FORM,
+            EditProperty::EVENT_FORM_BEFORE_SUBMIT,
             [RelatedEntity::class, 'onPropertyEditForm']
         );
     }

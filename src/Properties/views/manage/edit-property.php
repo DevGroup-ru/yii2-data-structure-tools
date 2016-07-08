@@ -126,7 +126,14 @@ $this->registerJs("DataStructureTools.init();");
                 <?= $form->field($model, 'is_internal')->checkbox() ?>
                 <?= $form->field($model, 'in_search')->checkbox() ?>
                 <?= $form->field($model, 'allow_multiple_values')->checkbox() ?>
-                <?= Html::checkbox(Property::PACKED_ADDITIONAL_RULES . '[required]', $required, ['label' => 'Required']) ?>
+                <?= Html::checkbox(
+                    Property::PACKED_ADDITIONAL_RULES . '[required]',
+                    $required,
+                    [
+                        'label' => Module::t('app','Required')
+                    ]
+                ) ;
+                ?>
 
             </div>
             <div class="col-xs-12">
@@ -135,19 +142,15 @@ $this->registerJs("DataStructureTools.init();");
                 $this->trigger(EditProperty::EVENT_FORM_BEFORE_SUBMIT, $event);
                 ?>
 
-                <?php
-                $event = new ModelEditForm($form, $model);
-                $this->trigger(EditProperty::EVENT_FORM_AFTER_SUBMIT, $event);
-                ?>
-
-                <?php
-                $event = new ModelEditForm($form, $model);
-                $this->trigger(EditProperty::EVENT_AFTER_FORM, $event);
-                ?>
 
                 <div class="form-group">
                     <?= Html::submitButton($model->isNewRecord ? Module::t('app', 'Create') : Module::t('app', 'Save'), ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>
                 </div>
+
+                <?php
+                $event = new ModelEditForm($form, $model);
+                $this->trigger(EditProperty::EVENT_FORM_AFTER_SUBMIT, $event);
+                ?>
             </div>
         </div>
 
@@ -155,5 +158,8 @@ $this->registerJs("DataStructureTools.init();");
 
 
     <?php $form::end(); ?>
-
+    <?php
+    $event = new ModelEditForm($form, $model);
+    $this->trigger(EditProperty::EVENT_AFTER_FORM, $event);
+    ?>
 </div>

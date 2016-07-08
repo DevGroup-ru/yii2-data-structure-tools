@@ -170,6 +170,69 @@ class DatabaseTest extends \PHPUnit_Extensions_Database_TestCase
 
     }
 
+    public function testDeleteProperty()
+    {
+        $power = new Property();
+        $power->key = 'power';
+        $power->translate(1)->name = 'Power';
+        $power->translate(2)->name = 'Power';
+        $power->data_type = Property::DATA_TYPE_INTEGER;
+        $power->storage_id = 3;
+        $power->property_handler_id = PropertyHandlerHelper::getInstance()->handlerIdByClassName(
+            \DevGroup\DataStructure\propertyHandler\TextField::className()
+        );
+        $this->assertTrue($power->validate());
+        $saved = $power->save();
+
+        $this->assertTrue($saved, var_export($power->errors, true));
+
+
+        /***
+         * @var $property Property
+         */
+        $property = Property::findOne(['key' => 'power']);
+        $this->assertNotNull($property);
+        $this->assertEquals(0, $property->is_deleted);
+        $result = $property->delete();
+
+        $this->assertFalse($result);
+        $this->assertEquals(1, $property->is_deleted);
+
+        $result = $property->hardDelete();
+
+        $this->assertEquals(1, $result);
+
+        $property = Property::findOne(['key' => 'power']);
+
+        $this->assertNull($property);
+
+    }
+
+
+    public function testDeletePropertyGroup()
+    {
+        $propertyGroup = new PropertyGroup(Product::className());
+        $propertyGroup->internal_name = 'Specification';
+        $propertyGroup->translate(1)->name = 'Specification';
+        $propertyGroup->translate(2)->name = 'Specification';
+        $this->assertTrue($propertyGroup->save());
+
+        $propertyId = $propertyGroup->id;
+
+
+        $propertyGroup = PropertyGroup::findOne(['id' => $propertyId]);
+
+        $this->assertEquals(0, $propertyGroup->is_deleted);
+        $result = $propertyGroup->delete();
+
+        $this->assertFalse($result);
+        $this->assertEquals(1, $propertyGroup->is_deleted);
+        $property = Property::findOne(['key' => 'power']);
+
+        $this->assertNull($property);
+
+    }
+
     public function testAutoAdd()
     {
         $propertyGroup = new PropertyGroup(Product::className());
@@ -195,7 +258,7 @@ class DatabaseTest extends \PHPUnit_Extensions_Database_TestCase
         $this->assertSame([$propertyGroup->id], $product->propertyGroupIds);
 
 
-        $propertyGroup->delete();
+        $propertyGroup->hardDelete();
 
         $product = Product::findOne(1);
         $models = [$product];
@@ -370,7 +433,7 @@ class DatabaseTest extends \PHPUnit_Extensions_Database_TestCase
 
         $linux = new StaticValue($os);
         $linux->name = 'Linux';
-        
+
         $this->assertTrue($linux->save());
 
         $this->assertSame([
@@ -396,7 +459,7 @@ class DatabaseTest extends \PHPUnit_Extensions_Database_TestCase
         $models = [&$product];
         $this->assertTrue(PropertiesHelper::storeValues($models));
         $product->invalidateTags();
-        
+
         // test fill
         /** @var Product $productFromDatabase */
         $productFromDatabase = Product::findOne(1);

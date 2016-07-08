@@ -1,7 +1,9 @@
 <?php
+use DevGroup\AdminUtils\FrontendHelper;
 use DevGroup\DataStructure\models\StaticValue;
 use DevGroup\DataStructure\Properties\Module;
 use yii\helpers\Html;
+use yii\helpers\Url;
 use yii\widgets\ActiveForm;
 
 /***
@@ -9,7 +11,7 @@ use yii\widgets\ActiveForm;
  */
 
 $this->params['breadcrumbs'][] = [
-    'label' => $model->property->name,
+    'label' => Module::t('app', 'Edit property') . ' ' . $model->property->id,
     'url' => [
         'edit-property',
         'id' => $model->property_id,
@@ -41,18 +43,17 @@ $this->params['breadcrumbs'][] = $this->title;
             'form' => $form,
         ])
         ?>
-        <div class="form-group">
-            <?= Html::submitButton(
-                $model->isNewRecord ? Module::t(
-                    'app',
-                    'Create'
-                ) : Module::t(
-                    'app',
-                    'Save'
-                ),
-                ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']
-            ) ?>
-        </div>
+
+        <?= FrontendHelper::formSaveButtons(
+            $model,
+            Url::to(
+                [
+                    'edit-property',
+                    'id' => $model->property_id,
+                    'propertyGroupId' => $model->property->defaultPropertyGroup->id
+                ]
+            )
+        ) ?>
 
         <?php ActiveForm::end(); ?>
 

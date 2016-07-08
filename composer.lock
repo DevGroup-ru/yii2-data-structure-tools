@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "1bc0fe0f72bdfec621f8bef69a24b560",
-    "content-hash": "17fd1b1bd92088def55c2dee6e09ac1e",
+    "hash": "74edf5b3399ed67f29bd0e932fa40c77",
+    "content-hash": "c4bb5bf68b80dae60c369bf9b60a0fc7",
     "packages": [
         {
             "name": "arogachev/yii2-sortable",
@@ -406,6 +406,58 @@
             "time": "2016-05-23 16:30:24"
         },
         {
+            "name": "devgroup/yii2-entity",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/DevGroup-ru/yii2-entity.git",
+                "reference": "87602b69d4ccdf8cb232dd8d082f0f2853fc5caa"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/DevGroup-ru/yii2-entity/zipball/87602b69d4ccdf8cb232dd8d082f0f2853fc5caa",
+                "reference": "87602b69d4ccdf8cb232dd8d082f0f2853fc5caa",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.5.0",
+                "yiisoft/yii2": "~2.0.0"
+            },
+            "require-dev": {
+                "codeception/codeception": "^2.2",
+                "yiisoft/yii2-codeception": "~2.0.0"
+            },
+            "type": "yii2-extension",
+            "autoload": {
+                "psr-4": {
+                    "DevGroup\\Entity\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Alexander Kozhevnikov",
+                    "email": "b37hr3z3n@gmail.com"
+                },
+                {
+                    "name": "Pavel Fedotov",
+                    "email": "fps.06@mail.ru"
+                }
+            ],
+            "description": "Yii2 entity",
+            "keywords": [
+                "active-record",
+                "ar",
+                "entity",
+                "extension",
+                "yii2"
+            ],
+            "time": "2016-07-04 11:04:53"
+        },
+        {
             "name": "devgroup/yii2-jsoneditor",
             "version": "dev-master",
             "source": {
@@ -465,12 +517,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/DevGroup-ru/yii2-multilingual.git",
-                "reference": "2028a4e586d4dfbe9477635014f2c0815114b4ee"
+                "reference": "e5dcbcd23958e8eb34044abcd2a7005b76b7b9be"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/DevGroup-ru/yii2-multilingual/zipball/2028a4e586d4dfbe9477635014f2c0815114b4ee",
-                "reference": "2028a4e586d4dfbe9477635014f2c0815114b4ee",
+                "url": "https://api.github.com/repos/DevGroup-ru/yii2-multilingual/zipball/e5dcbcd23958e8eb34044abcd2a7005b76b7b9be",
+                "reference": "e5dcbcd23958e8eb34044abcd2a7005b76b7b9be",
                 "shasum": ""
             },
             "require": {
@@ -509,7 +561,7 @@
                 "multilingual",
                 "yii2"
             ],
-            "time": "2016-06-26 10:09:16"
+            "time": "2016-07-05 05:31:08"
         },
         {
             "name": "devgroup/yii2-tag-dependency-helper",
@@ -671,12 +723,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/FortAwesome/Font-Awesome.git",
-                "reference": "51b979d1a99c119acd1d36475b78c9b05bbe9611"
+                "reference": "4c8cb044576e6dde990ef64963671ea46e23c268"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/FortAwesome/Font-Awesome/zipball/51b979d1a99c119acd1d36475b78c9b05bbe9611",
-                "reference": "51b979d1a99c119acd1d36475b78c9b05bbe9611",
+                "url": "https://api.github.com/repos/FortAwesome/Font-Awesome/zipball/4c8cb044576e6dde990ef64963671ea46e23c268",
+                "reference": "4c8cb044576e6dde990ef64963671ea46e23c268",
                 "shasum": ""
             },
             "require-dev": {
@@ -711,7 +763,7 @@
                 "font",
                 "icon"
             ],
-            "time": "2016-06-23 10:40:57"
+            "time": "2016-06-30 18:10:06"
         },
         {
             "name": "guzzlehttp/ringphp",
@@ -1155,16 +1207,16 @@
         },
         {
             "name": "unclead/yii2-multiple-input",
-            "version": "1.2.18",
+            "version": "1.2.19",
             "source": {
                 "type": "git",
                 "url": "https://github.com/unclead/yii2-multiple-input.git",
-                "reference": "c9b394c0636678dda6ba176e4ed2f8e598499e71"
+                "reference": "1e312ec8d071bd331fc4b6cf24d59d8afc988b10"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/unclead/yii2-multiple-input/zipball/c9b394c0636678dda6ba176e4ed2f8e598499e71",
-                "reference": "c9b394c0636678dda6ba176e4ed2f8e598499e71",
+                "url": "https://api.github.com/repos/unclead/yii2-multiple-input/zipball/1e312ec8d071bd331fc4b6cf24d59d8afc988b10",
+                "reference": "1e312ec8d071bd331fc4b6cf24d59d8afc988b10",
                 "shasum": ""
             },
             "require": {
@@ -1196,7 +1248,7 @@
                 "yii2 multiple input",
                 "yii2 tabular input"
             ],
-            "time": "2016-06-13 14:22:26"
+            "time": "2016-07-01 14:04:51"
         },
         {
             "name": "vova07/yii2-imperavi-widget",
@@ -1266,12 +1318,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/yii2tech/filedb.git",
-                "reference": "a55960a8957b87e923c11250562761f683f1fe59"
+                "reference": "04d7e9c65ac5c40837069edaae5f53e0837598af"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/yii2tech/filedb/zipball/a55960a8957b87e923c11250562761f683f1fe59",
-                "reference": "a55960a8957b87e923c11250562761f683f1fe59",
+                "url": "https://api.github.com/repos/yii2tech/filedb/zipball/04d7e9c65ac5c40837069edaae5f53e0837598af",
+                "reference": "04d7e9c65ac5c40837069edaae5f53e0837598af",
                 "shasum": ""
             },
             "require": {
@@ -1306,7 +1358,7 @@
                 "static",
                 "yii2"
             ],
-            "time": "2016-05-25 09:31:12"
+            "time": "2016-06-28 09:38:50"
         },
         {
             "name": "yiisoft/yii2",
@@ -1314,12 +1366,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/yiisoft/yii2-framework.git",
-                "reference": "803f428d06a2d48481da2777de17eeec9cf8aee7"
+                "reference": "73ed6e2e549bdb21f726e390d5792cb1ff271beb"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/yiisoft/yii2-framework/zipball/803f428d06a2d48481da2777de17eeec9cf8aee7",
-                "reference": "803f428d06a2d48481da2777de17eeec9cf8aee7",
+                "url": "https://api.github.com/repos/yiisoft/yii2-framework/zipball/73ed6e2e549bdb21f726e390d5792cb1ff271beb",
+                "reference": "73ed6e2e549bdb21f726e390d5792cb1ff271beb",
                 "shasum": ""
             },
             "require": {
@@ -1400,7 +1452,7 @@
                 "framework",
                 "yii2"
             ],
-            "time": "2016-06-25 20:59:18"
+            "time": "2016-07-04 13:16:45"
         },
         {
             "name": "yiisoft/yii2-bootstrap",
@@ -1672,12 +1724,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/DevGroup-ru/yii2-admin-utils.git",
-                "reference": "e745bf1ecaaa536d4f01b6fb84824858a5c1b1d8"
+                "reference": "298545d55b1747beb0ae4bd9e4cdb2d1b6aefcc1"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/DevGroup-ru/yii2-admin-utils/zipball/e745bf1ecaaa536d4f01b6fb84824858a5c1b1d8",
-                "reference": "e745bf1ecaaa536d4f01b6fb84824858a5c1b1d8",
+                "url": "https://api.github.com/repos/DevGroup-ru/yii2-admin-utils/zipball/298545d55b1747beb0ae4bd9e4cdb2d1b6aefcc1",
+                "reference": "298545d55b1747beb0ae4bd9e4cdb2d1b6aefcc1",
                 "shasum": ""
             },
             "require": {
@@ -1715,7 +1767,7 @@
                 "extension",
                 "yii2"
             ],
-            "time": "2016-05-19 12:23:03"
+            "time": "2016-07-04 07:22:21"
         },
         {
             "name": "devgroup/yii2-frontend-utils",
@@ -1884,12 +1936,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/fzaninotto/Faker.git",
-                "reference": "7a98043c1c985612ffefbe8a5f0ec087808a1d19"
+                "reference": "726a36230cf4811db4b71f18fdd19b9ea4389a54"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/fzaninotto/Faker/zipball/7a98043c1c985612ffefbe8a5f0ec087808a1d19",
-                "reference": "7a98043c1c985612ffefbe8a5f0ec087808a1d19",
+                "url": "https://api.github.com/repos/fzaninotto/Faker/zipball/726a36230cf4811db4b71f18fdd19b9ea4389a54",
+                "reference": "726a36230cf4811db4b71f18fdd19b9ea4389a54",
                 "shasum": ""
             },
             "require": {
@@ -1926,41 +1978,90 @@
                 "faker",
                 "fixtures"
             ],
-            "time": "2016-06-27 12:50:43"
+            "time": "2016-07-01 12:18:29"
         },
         {
-            "name": "phpdocumentor/reflection-docblock",
-            "version": "2.0.4",
+            "name": "phpdocumentor/reflection-common",
+            "version": "dev-master",
             "source": {
                 "type": "git",
-                "url": "https://github.com/phpDocumentor/ReflectionDocBlock.git",
-                "reference": "d68dbdc53dc358a816f00b300704702b2eaff7b8"
+                "url": "https://github.com/phpDocumentor/ReflectionCommon.git",
+                "reference": "144c307535e82c8fdcaacbcfc1d6d8eeb896687c"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpDocumentor/ReflectionDocBlock/zipball/d68dbdc53dc358a816f00b300704702b2eaff7b8",
-                "reference": "d68dbdc53dc358a816f00b300704702b2eaff7b8",
+                "url": "https://api.github.com/repos/phpDocumentor/ReflectionCommon/zipball/144c307535e82c8fdcaacbcfc1d6d8eeb896687c",
+                "reference": "144c307535e82c8fdcaacbcfc1d6d8eeb896687c",
                 "shasum": ""
             },
             "require": {
-                "php": ">=5.3.3"
+                "php": ">=5.5"
             },
             "require-dev": {
-                "phpunit/phpunit": "~4.0"
-            },
-            "suggest": {
-                "dflydev/markdown": "~1.0",
-                "erusev/parsedown": "~1.0"
+                "phpunit/phpunit": "^4.6"
             },
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "2.0.x-dev"
+                    "dev-master": "1.0.x-dev"
                 }
             },
             "autoload": {
-                "psr-0": {
-                    "phpDocumentor": [
+                "psr-4": {
+                    "phpDocumentor\\Reflection\\": [
+                        "src"
+                    ]
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Jaap van Otterdijk",
+                    "email": "opensource@ijaap.nl"
+                }
+            ],
+            "description": "Common reflection classes used by phpdocumentor to reflect the code structure",
+            "homepage": "http://www.phpdoc.org",
+            "keywords": [
+                "FQSEN",
+                "phpDocumentor",
+                "phpdoc",
+                "reflection",
+                "static analysis"
+            ],
+            "time": "2015-12-27 11:43:31"
+        },
+        {
+            "name": "phpdocumentor/reflection-docblock",
+            "version": "3.1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/phpDocumentor/ReflectionDocBlock.git",
+                "reference": "9270140b940ff02e58ec577c237274e92cd40cdd"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/phpDocumentor/ReflectionDocBlock/zipball/9270140b940ff02e58ec577c237274e92cd40cdd",
+                "reference": "9270140b940ff02e58ec577c237274e92cd40cdd",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.5",
+                "phpdocumentor/reflection-common": "^1.0@dev",
+                "phpdocumentor/type-resolver": "^0.2.0",
+                "webmozart/assert": "^1.0"
+            },
+            "require-dev": {
+                "mockery/mockery": "^0.9.4",
+                "phpunit/phpunit": "^4.4"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "phpDocumentor\\Reflection\\": [
                         "src/"
                     ]
                 }
@@ -1972,10 +2073,58 @@
             "authors": [
                 {
                     "name": "Mike van Riel",
-                    "email": "mike.vanriel@naenius.com"
+                    "email": "me@mikevanriel.com"
                 }
             ],
-            "time": "2015-02-03 12:10:50"
+            "description": "With this component, a library can provide support for annotations via DocBlocks or otherwise retrieve information that is embedded in a DocBlock.",
+            "time": "2016-06-10 09:48:41"
+        },
+        {
+            "name": "phpdocumentor/type-resolver",
+            "version": "0.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/phpDocumentor/TypeResolver.git",
+                "reference": "b39c7a5b194f9ed7bd0dd345c751007a41862443"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/phpDocumentor/TypeResolver/zipball/b39c7a5b194f9ed7bd0dd345c751007a41862443",
+                "reference": "b39c7a5b194f9ed7bd0dd345c751007a41862443",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.5",
+                "phpdocumentor/reflection-common": "^1.0"
+            },
+            "require-dev": {
+                "mockery/mockery": "^0.9.4",
+                "phpunit/phpunit": "^5.2||^4.8.24"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.0.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "phpDocumentor\\Reflection\\": [
+                        "src/"
+                    ]
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Mike van Riel",
+                    "email": "me@mikevanriel.com"
+                }
+            ],
+            "time": "2016-06-10 07:14:17"
         },
         {
             "name": "phpspec/php-diff",
@@ -2621,23 +2770,23 @@
         },
         {
             "name": "sebastian/environment",
-            "version": "dev-master",
+            "version": "1.3.x-dev",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/environment.git",
-                "reference": "4e8f0da10ac5802913afc151413bc8c53b6c2716"
+                "reference": "622c5dc0a8036cfc4ccd73c7b1b668a431e69d96"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/environment/zipball/4e8f0da10ac5802913afc151413bc8c53b6c2716",
-                "reference": "4e8f0da10ac5802913afc151413bc8c53b6c2716",
+                "url": "https://api.github.com/repos/sebastianbergmann/environment/zipball/622c5dc0a8036cfc4ccd73c7b1b668a431e69d96",
+                "reference": "622c5dc0a8036cfc4ccd73c7b1b668a431e69d96",
                 "shasum": ""
             },
             "require": {
-                "php": ">=5.3.3"
+                "php": "^5.3.3 || ^7.0"
             },
             "require-dev": {
-                "phpunit/phpunit": "~4.4"
+                "phpunit/phpunit": "^4.8 || ^5.0"
             },
             "type": "library",
             "extra": {
@@ -2667,7 +2816,7 @@
                 "environment",
                 "hhvm"
             ],
-            "time": "2016-05-17 03:18:57"
+            "time": "2016-06-11 08:21:19"
         },
         {
             "name": "sebastian/exporter",
@@ -2881,12 +3030,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/yaml.git",
-                "reference": "b2c4f0f1401619c43071be4cbd760559196441cf"
+                "reference": "b69648974b39cc6f76aea9d3aee8212cd0c0d75d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/yaml/zipball/b2c4f0f1401619c43071be4cbd760559196441cf",
-                "reference": "b2c4f0f1401619c43071be4cbd760559196441cf",
+                "url": "https://api.github.com/repos/symfony/yaml/zipball/b69648974b39cc6f76aea9d3aee8212cd0c0d75d",
+                "reference": "b69648974b39cc6f76aea9d3aee8212cd0c0d75d",
                 "shasum": ""
             },
             "require": {
@@ -2928,7 +3077,57 @@
             ],
             "description": "Symfony Yaml Component",
             "homepage": "https://symfony.com",
-            "time": "2016-06-23 13:44:47"
+            "time": "2016-07-01 16:08:10"
+        },
+        {
+            "name": "webmozart/assert",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/webmozart/assert.git",
+                "reference": "3a8e045064f294992a13966b6c892fb9d64853a3"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/webmozart/assert/zipball/3a8e045064f294992a13966b6c892fb9d64853a3",
+                "reference": "3a8e045064f294992a13966b6c892fb9d64853a3",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^5.3.3|^7.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^4.6",
+                "sebastian/version": "^1.0.1"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.1-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Webmozart\\Assert\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Bernhard Schussek",
+                    "email": "bschussek@gmail.com"
+                }
+            ],
+            "description": "Assertions to validate method input/output with nice error messages.",
+            "keywords": [
+                "assert",
+                "check",
+                "validate"
+            ],
+            "time": "2016-03-04 13:27:44"
         },
         {
             "name": "yiisoft/yii2-codeception",

@@ -15,6 +15,9 @@ use DevGroup\DataStructure\Properties\actions\EditStaticValue;
 use DevGroup\DataStructure\Properties\actions\GetAttributeNames;
 use DevGroup\DataStructure\Properties\actions\ListGroupProperties;
 use DevGroup\DataStructure\Properties\actions\ListPropertyGroups;
+use DevGroup\DataStructure\Properties\actions\RestoreProperty;
+use DevGroup\DataStructure\Properties\actions\RestorePropertyGroup;
+use DevGroup\DataStructure\Properties\actions\RestoreStaticValue;
 use Yii;
 use yii\filters\VerbFilter;
 
@@ -76,6 +79,15 @@ class ManageController extends BaseController
             'ajax-related-entities' => [
                 'class' => AjaxRelatedEntities::class,
             ],
+            'restore-property' => [
+                'class' => RestoreProperty::class
+            ],
+            'restore-property-group' => [
+                'class' => RestorePropertyGroup::class
+            ],
+            'restore-static-value' => [
+                'class' => RestoreStaticValue::class
+            ]
         ];
     }
 }

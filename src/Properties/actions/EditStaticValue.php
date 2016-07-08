@@ -3,6 +3,7 @@
 namespace DevGroup\DataStructure\Properties\actions;
 
 use DevGroup\AdminUtils\actions\BaseAdminAction;
+use DevGroup\AdminUtils\traits\BackendRedirect;
 use DevGroup\DataStructure\models\StaticValue;
 use DevGroup\DataStructure\Properties\Module;
 use Yii;
@@ -10,9 +11,11 @@ use yii\web\NotFoundHttpException;
 
 class EditStaticValue extends BaseAdminAction
 {
+    use BackendRedirect;
+
     public $viewFile = 'edit-static-value';
 
-    public function run($property_id, $id = null, $return_url = null)
+    public function run($property_id, $propertyGroupId, $id = null, $return_url = null)
     {
         /** @var StaticValue $model */
         $model = StaticValue::loadModel(
@@ -40,19 +43,31 @@ class EditStaticValue extends BaseAdminAction
             }
 
             if ($model->save()) {
-                Yii::$app->session->setFlash('success', Module::t('app', 'Static value saved.'));
 
-                return $this->controller->redirect([
-                    'edit-static-value',
-                    'property_id' => $model->property_id,
-                    'id' => $model->id,
-                    'return_url' => $return_url
-                ]);
+                return $this->redirectUser(
+                    $model->id,
+                    true,
+                    [
+                        'edit-property',
+                        'id' => $property_id,
+                        'propertyGroupId' => $propertyGroupId
+                    ],
+                    [
+                        'edit-static-value',
+                        'property_id' => $property_id,
+                        'propertyGroupId' => $propertyGroupId
+                    ]
+                );
             }
         }
 
         return $this->render([
             'model' => $model,
         ]);
+    }
+
+    public function redirect($url)
+    {
+        return $this->controller->redirect($url);
     }
 }

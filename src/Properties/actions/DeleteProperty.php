@@ -8,11 +8,26 @@ use DevGroup\DataStructure\Properties\Module;
 use Yii;
 use yii\web\NotFoundHttpException;
 
+/**
+ * Class DeleteProperty
+ * @package DevGroup\DataStructure\Properties\actions
+ */
 class DeleteProperty extends BaseAdminAction
 {
+    /**
+     * @var string
+     */
     public $listPropertyGroupsActionId = 'list-group-properties';
 
-    public function run($id, $propertyGroupId)
+    /**
+     * @param $id
+     * @param $propertyGroupId
+     * @param bool|false $hard
+     * @return \yii\web\Response
+     * @throws \Exception
+     * @throws bool
+     */
+    public function run($id, $propertyGroupId, $hard = false)
     {
         /** @var Property $model */
         $model = Property::loadModel(
@@ -22,9 +37,17 @@ class DeleteProperty extends BaseAdminAction
             86400,
             new NotFoundHttpException("Property model with specified id not found")
         );
-        if ($model->delete() !== false) {
-            Yii::$app->session->setFlash('warning', Module::t('app', 'Property has been deleted.'));
+
+        if ($hard === false) {
+            (boolval($model->delete()) === false && $model->isDeleted() === true) ?
+                Yii::$app->session->setFlash('info', Module::t('app', 'Item has been hidden.')) :
+                Yii::$app->session->setFlash('warning', Module::t('app', 'Item has not been hidden.'));
+        } elseif ((bool)$hard === true) {
+            $model->hardDelete() !== false ?
+                Yii::$app->session->setFlash('danger', Module::t('app', 'Item has been deleted.')) :
+                Yii::$app->session->setFlash('warning', Module::t('app', 'Item has not been deleted.'));
         }
+
         return $this->controller->redirect(
             [
                 $this->listPropertyGroupsActionId,

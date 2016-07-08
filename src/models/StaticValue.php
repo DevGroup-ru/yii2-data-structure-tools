@@ -3,6 +3,8 @@ namespace DevGroup\DataStructure\models;
 
 use arogachev\sortable\behaviors\numerical\ContinuousNumericalSortableBehavior;
 use DevGroup\DataStructure\Properties\Module;
+use DevGroup\Entity\traits\EntityTrait;
+use DevGroup\Entity\traits\SoftDeleteTrait;
 use DevGroup\Multilingual\behaviors\MultilingualActiveRecord;
 use DevGroup\Multilingual\traits\MultilingualTrait;
 use DevGroup\TagDependencyHelper\CacheableActiveRecord;
@@ -37,6 +39,22 @@ class StaticValue extends ActiveRecord
 
     use MultilingualTrait;
     use TagDependencyTrait;
+    use EntityTrait;
+    use SoftDeleteTrait;
+
+
+    /**
+     * @inheritdoc
+     */
+    private $rules = [
+        [['sort_order', 'property_id'], 'integer',],
+        [['property_id'], 'required',],
+        [['slug'], 'default', 'value' => ''],
+        [['id'], 'integer', 'on' => 'search'],
+        [['name', 'slug', 'is_deleted'], 'safe', 'on' => 'search'],
+        [['sort_order', 'property_id'], 'filter', 'filter' => 'intval'],
+    ];
+
 
     /**
      * @param Property|null $property
@@ -51,20 +69,6 @@ class StaticValue extends ActiveRecord
     }
 
 
-    /**
-     * @inheritdoc
-     */
-    public function rules()
-    {
-        return [
-            [['sort_order', 'property_id'], 'integer',],
-            [['property_id'], 'required',],
-            [['slug'], 'default', 'value' => ''],
-            [['id'], 'integer', 'on' => 'search'],
-            [['name','slug'], 'safe', 'on'=>'search'],
-            [['sort_order', 'property_id'], 'filter', 'filter' => 'intval'],
-        ];
-    }
     /**
      * @inheritdoc
      */
@@ -96,7 +100,7 @@ class StaticValue extends ActiveRecord
     /**
      * @inheritdoc
      */
-    public function attributeLabels()
+    public function getAttributeLabels()
     {
         return [
             'id' => Module::t('app', 'ID'),
@@ -220,12 +224,13 @@ class StaticValue extends ActiveRecord
      * @return ActiveDataProvider
      * @codeCoverageIgnore
      */
-    public function search($propertyId = null, $params = [])
+    public function search($propertyId = null, $params = [], $showHidden = false)
     {
         $query = self::find();
         if ($propertyId !== null) {
             $query->where(['property_id' => $propertyId]);
         }
+
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
@@ -241,13 +246,17 @@ class StaticValue extends ActiveRecord
         $dataProvider->sort->defaultOrder = ['sort_order' => SORT_ASC];
 
         if (!($this->load($params))) {
+            if ($showHidden === false) {
+                $this->is_deleted = 0;
+                $query->andWhere(['is_deleted' => $this->is_deleted]);
+            }
             return $dataProvider;
         }
 
         // perform filtering
         $query->andFilterWhere(['id' => $this->id]);
         $query->andFilterWhere(['sort_order' => $this->sort_order]);
-
+        $query->andFilterWhere(['is_deleted' => $this->is_deleted]);
 
         // filter by multilingual field
         $query->andFilterWhere(['like', 'static_value_translation.slug', $this->slug]);

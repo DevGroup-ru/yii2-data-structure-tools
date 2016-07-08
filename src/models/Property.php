@@ -7,6 +7,8 @@ use DevGroup\DataStructure\helpers\PropertyHandlerHelper;
 use DevGroup\DataStructure\helpers\PropertyStorageHelper;
 use DevGroup\DataStructure\Properties\Module;
 use DevGroup\DataStructure\propertyStorage\AbstractPropertyStorage;
+use DevGroup\Entity\traits\EntityTrait;
+use DevGroup\Entity\traits\SoftDeleteTrait;
 use DevGroup\Multilingual\behaviors\MultilingualActiveRecord;
 use DevGroup\Multilingual\traits\MultilingualTrait;
 use DevGroup\TagDependencyHelper\CacheableActiveRecord;
@@ -35,6 +37,7 @@ use yii\web\ServerErrorHttpException;
  * @property string $name
  * @property string $description
  * @property string $slug
+ * @property integer $is_deleted
  * @property PropertyGroup[] $propertyGroups
  * @property PropertyGroup $defaultPropertyGroup
  * @property StaticValue[] $staticValues
@@ -48,6 +51,8 @@ class Property extends ActiveRecord
 
     use MultilingualTrait;
     use TagDependencyTrait;
+    use EntityTrait;
+    use SoftDeleteTrait;
 
     // Data types
     const DATA_TYPE_STRING = 0;
@@ -99,7 +104,7 @@ class Property extends ActiveRecord
     /**
      * @inheritdoc
      */
-    public function rules()
+    protected function getRules()
     {
         return [
             ['key', 'unique'],
@@ -108,23 +113,8 @@ class Property extends ActiveRecord
             [['is_internal', 'allow_multiple_values'], 'filter', 'filter' => 'boolval'],
             [['data_type', 'in_search'], 'integer',],
             [['data_type'], 'required',],
-            [
-                'storage_id',
-                function ($attribute) {
-                    return PropertyStorageHelper::storageById($this->$attribute);
-                }
-            ],
-            [
-                'property_handler_id',
-                function ($attribute) {
-                    try {
-                        PropertyHandlerHelper::getInstance()->handlerById($this->$attribute);
-                    } catch (\Exception $e) {
-                        return false;
-                    }
-                    return true;
-                }
-            ],
+            ['storage_id', 'validateStorage'],
+            ['property_handler_id', 'validatePropertyHandler'],
             [['storage_id', 'data_type', 'property_handler_id'], 'filter', 'filter' => 'intval'],
             ['id', 'integer', 'on' => 'search'],
         ];
@@ -146,14 +136,15 @@ class Property extends ActiveRecord
             'property_handler_id',
             'name',
             'in_search',
+            'is_deleted'
         ];
         return $scenarios;
     }
 
     /**
-     * @inheritdoc
+     * @return array
      */
-    public function attributeLabels()
+    protected function getAttributeLabels()
     {
         return [
             'id' => Module::t('app', 'ID'),
@@ -172,12 +163,13 @@ class Property extends ActiveRecord
     /**
      * @param $propertyGroupId
      * @param $params
+     * @param $showHidden
      *
      * @return \yii\data\ActiveDataProvider
      *
      * @codeCoverageIgnore
      */
-    public function search($propertyGroupId, $params)
+    public function search($propertyGroupId, $params, $showHidden = false)
     {
         $query = self::find();
         if ($propertyGroupId !== null) {
@@ -201,19 +193,26 @@ class Property extends ActiveRecord
         ];
 
         if (!($this->load($params))) {
+            if ($showHidden === false) {
+                $this->is_deleted = 0;
+                $query->andWhere(['is_deleted' => $this->is_deleted]);
+            }
             return $dataProvider;
         }
+
 
         // perform filtering
         $query->andFilterWhere(['id' => $this->id]);
         $query->andFilterWhere(['like', 'key', $this->key]);
         $query->andFilterWhere(['is_internal' => $this->is_internal]);
         $query->andFilterWhere(['data_type' => $this->data_type]);
+        $query->andFilterWhere(['is_deleted' => $this->is_deleted]);
         $query->andFilterWhere(['storage_id' => $this->storage_id]);
         $query->andFilterWhere(['property_handler_id' => $this->property_handler_id]);
 
         // filter by multilingual field
         $query->andFilterWhere(['like', 'property_translation.name', $this->name]);
+
 
         return $dataProvider;
     }
@@ -586,5 +585,27 @@ class Property extends ActiveRecord
         $params = $this->params;
         $required = boolval(ArrayHelper::getValue($params, Property::PACKED_ADDITIONAL_RULES . '.required', false));
         return $required;
+    }
+
+    /**
+     * @param $attribute
+     * @param $params
+     */
+    public function validateStorage($attribute, $params)
+    {
+        try {
+            PropertyStorageHelper::storageById($this->$attribute);
+        } catch (ServerErrorHttpException $e) {
+            $this->addError($attribute, 'Storage not found');
+        }
+    }
+
+    public function validatePropertyHandler($attribute, $params)
+    {
+        try {
+            PropertyHandlerHelper::getInstance()->handlerById($this->$attribute);
+        } catch (\Exception $e) {
+            $this->addError($attribute, 'Property Handler not found');
+        }
     }
 }

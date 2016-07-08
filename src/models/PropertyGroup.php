@@ -3,6 +3,8 @@ namespace DevGroup\DataStructure\models;
 
 use DevGroup\DataStructure\helpers\PropertiesHelper;
 use DevGroup\DataStructure\Properties\Module;
+use DevGroup\Entity\traits\EntityTrait;
+use DevGroup\Entity\traits\SoftDeleteTrait;
 use DevGroup\Multilingual\behaviors\MultilingualActiveRecord;
 use DevGroup\Multilingual\traits\MultilingualTrait;
 use DevGroup\TagDependencyHelper\CacheableActiveRecord;
@@ -16,11 +18,12 @@ use yii\db\Query;
 /**
  * Class PropertyGroup
  *
- * @property integer    $id
- * @property integer    $property_group_model_id
- * @property integer    $sort_order
- * @property boolean    $is_auto_added
- * @property string     $internal_name
+ * @property integer $id
+ * @property integer $property_group_model_id
+ * @property integer $sort_order
+ * @property boolean $is_auto_added
+ * @property integer $is_deleted
+ * @property string $internal_name
  * @property Property[] $properties Properties via relation! Don't use it in frontend as it is not cacheable.
  *
  * @mixin \DevGroup\Multilingual\behaviors\MultilingualActiveRecord
@@ -32,6 +35,18 @@ class PropertyGroup extends ActiveRecord
 
     use MultilingualTrait;
     use TagDependencyTrait;
+    use EntityTrait;
+    use SoftDeleteTrait;
+
+
+    protected $rules = [
+        [['internal_name'], 'required',],
+        [['sort_order', 'applicable_property_model_id'], 'integer'],
+        [['sort_order'], 'default', 'value' => 0],
+        [['id'], 'integer', 'on' => 'search'],
+        [['is_auto_added'], 'filter', 'filter' => 'boolval'],
+        ['applicable_property_model_id', 'validateApplicablePropertyMode'],
+    ];
 
     /**
      * PropertyGroup constructor.
@@ -72,22 +87,6 @@ class PropertyGroup extends ActiveRecord
         return '{{%property_group}}';
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function rules()
-    {
-        return [
-            [['internal_name'], 'required',],
-            [['sort_order', 'applicable_property_model_id'], 'integer'],
-            [['sort_order'], 'default', 'value' => 0],
-            [['id'], 'integer', 'on' => 'search'],
-            [['is_auto_added'], 'filter', 'filter'=>'boolval'],
-            ['applicable_property_model_id', function ($attribute) {
-                return PropertiesHelper::classNameForApplicablePropertyModelId($this->$attribute) !== false;
-            }],
-        ];
-    }
 
     /**
      * @inheritdoc
@@ -95,7 +94,7 @@ class PropertyGroup extends ActiveRecord
     public function scenarios()
     {
         $scenarios = parent::scenarios();
-        $scenarios['search'] = ['id', 'internal_name', 'sort_order', 'is_auto_added', 'name'];
+        $scenarios['search'] = ['id', 'internal_name', 'sort_order', 'is_auto_added', 'name', 'is_deleted'];
         return $scenarios;
     }
 
@@ -140,7 +139,7 @@ class PropertyGroup extends ActiveRecord
      * - invalidates needed cache
      * - automatically adds bindings if this group is_auto_added
      *
-     * @param bool  $insert
+     * @param bool $insert
      * @param array $changedAttributes
      */
     public function afterSave($insert, $changedAttributes)
@@ -164,9 +163,9 @@ class PropertyGroup extends ActiveRecord
     }
 
     /**
-     * @inheritdoc
+     * @return array
      */
-    public function attributeLabels()
+    public function getAttributeLabels()
     {
         return [
             'id' => Module::t('app', 'ID'),
@@ -272,12 +271,12 @@ class PropertyGroup extends ActiveRecord
                     },
                     PropertyGroup::find()
                         ->select('id')
-                        ->where(['applicable_property_model_id' => $applicablePropertyModelId, 'is_auto_added'=>1])
+                        ->where(['applicable_property_model_id' => $applicablePropertyModelId, 'is_auto_added' => 1])
                         ->orderBy(['sort_order' => SORT_ASC])
                         ->column()
                 );
             },
-            'AutoAddedGroupsIds:'.$applicablePropertyModelId,
+            'AutoAddedGroupsIds:' . $applicablePropertyModelId,
             86400 // @todo Add dependencies
         );
     }
@@ -285,14 +284,14 @@ class PropertyGroup extends ActiveRecord
     /**
      * Returns ActiveDataProvider for searching PropertyGroup models
      *
-     * @param integer $applicablePropertyModelId  Applicable property model id
-     * @param array   $params                     Array of filter params
+     * @param integer $applicablePropertyModelId Applicable property model id
+     * @param array $params Array of filter params
      *
      * @return \yii\data\ActiveDataProvider
      *
      * @codeCoverageIgnore
      */
-    public function search($applicablePropertyModelId, $params)
+    public function search($applicablePropertyModelId, $params, $showHidden = false)
     {
         $query = self::find()
             ->where([
@@ -311,6 +310,10 @@ class PropertyGroup extends ActiveRecord
         ];
 
         if (!($this->load($params))) {
+            if ($showHidden === false) {
+                $this->is_deleted = 0;
+                $query->andWhere(['is_deleted' => $this->is_deleted]);
+            }
             return $dataProvider;
         }
 
@@ -318,11 +321,16 @@ class PropertyGroup extends ActiveRecord
         $query->andFilterWhere(['id' => $this->id]);
         $query->andFilterWhere(['like', 'internal_name', $this->internal_name]);
         $query->andFilterWhere(['is_auto_added' => $this->is_auto_added]);
-
+        $query->andFilterWhere(['is_deleted' => $this->is_deleted]);
         // filter by multilingual field
         $query->andFilterWhere(['like', 'property_group_translation.name', $this->name]);
 
         return $dataProvider;
+    }
+
+    public function validateApplicablePropertyMode($attribute, $params)
+    {
+        return PropertiesHelper::classNameForApplicablePropertyModelId($this->$attribute) !== false;
     }
 
 //    public function link($name, $model, $extraColumns = [])
