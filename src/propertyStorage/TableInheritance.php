@@ -4,11 +4,13 @@ namespace DevGroup\DataStructure\propertyStorage;
 
 use DevGroup\DataStructure\behaviors\HasProperties;
 use DevGroup\DataStructure\helpers\PropertiesHelper;
+use DevGroup\DataStructure\helpers\PropertyStorageHelper;
 use DevGroup\DataStructure\models\ApplicablePropertyModels;
 use DevGroup\DataStructure\models\Property;
 use DevGroup\DataStructure\models\PropertyGroup;
 use DevGroup\DataStructure\Properties\Module;
 use DevGroup\DataStructure\traits\PropertiesTrait;
+use DevGroup\TagDependencyHelper\NamingHelper;
 use Yii;
 use yii\caching\ChainedDependency;
 use yii\caching\TagDependency;
@@ -386,6 +388,215 @@ class TableInheritance extends AbstractPropertyStorage
             );
         }
 
+        return $result;
+    }
+
+    public static function getModelIdsByValues(
+        $modelClass,
+        $selections,
+        $customDependency = null,
+        $cacheLifetime = 86400
+    ) {
+        if (empty($selections)) {
+            return false;
+        }
+        $storageId = PropertyStorageHelper::storageIdByClass(static::class);
+        // build a cache key and make a available properties array
+        $availableProperties = [];
+        $cacheKey = 'GetModelIdsByValues:TableInheritance';
+        foreach ($selections as $propertyId => $values) {
+            if (count($values) < 1 || ($property = Property::findById(
+                    $propertyId
+                )) === null || $property->storage_id !== $storageId || (bool) $property->in_search === false
+            ) {
+                continue;
+            }
+            sort($values);
+            $availableProperties[$propertyId] = $values;
+            $cacheKey .= ':' . $propertyId . ':' . implode('-', $values);
+        }
+        if (empty($availableProperties)) {
+            return false;
+        }
+        $result = Yii::$app->cache->get($cacheKey);
+        if ($result === false) {
+            $tags = [NamingHelper::getCommonTag($modelClass)];
+            // build a query
+            $query = (new Query())->select('model_id')->from($modelClass::tableInheritanceTable());
+            foreach ($availableProperties as $propertyId => $values) {
+                $property = Property::findById($propertyId);
+                $tags[] = $property->objectTag();
+                foreach($values as $value) {
+                    $query->andWhere([$property->key => $value]);
+                }
+            }
+            $result = $query->column();
+            if ($customDependency === null) {
+                $dependency = new TagDependency(['tags' => $tags]);
+            } else {
+                $dependency = new ChainedDependency(
+                    [
+                        'dependencies' => [
+                            $customDependency,
+                            new TagDependency(['tags' => $tags]),
+                        ],
+                    ]
+                );
+            }
+            Yii::$app->cache->set($cacheKey, $result, $cacheLifetime, $dependency);
+        }
+        return $result;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public static function getModelIdsByContent(
+        $modelClass,
+        $propertyIds,
+        $content,
+        $intersect = false,
+        $customDependency = null,
+        $cacheLifetime = 86400
+    )
+    {
+        if (empty($propertyIds)) {
+            return false;
+        }
+        $storageId = PropertyStorageHelper::storageIdByClass(static::class);
+        // build a cache key and make a available properties array
+        $availableProperties = [];
+        foreach ($propertyIds as $propertyId) {
+            if (
+                ($property = Property::findById($propertyId)) === null
+                || $property->storage_id !== $storageId
+            ) {
+                continue;
+            }
+            $availableProperties[] = $propertyId;
+        }
+        if (empty($availableProperties)) {
+            return false;
+        }
+        $cacheKey = 'GetModelIdsByContent:TableInheritance'
+            . ':' . (int) $intersect . ':' . implode(':', $availableProperties);
+        $result = Yii::$app->cache->get($cacheKey);
+        if ($result === false) {
+            $tags = [NamingHelper::getCommonTag($modelClass)];
+            // build a query
+            $query = (new Query())
+                ->select('model_id')
+                ->from($modelClass::tableInheritanceTable());
+            foreach ($availableProperties as $propertyId) {
+                $property = Property::findById($propertyId);
+                $tags[] = $property->objectTag();
+                if($intersect === true) {
+                    $query->orWhere(['like', $property->key, $content]);
+                } else {
+                    $query->andWhere(['like', $property->key, $content]);
+                }
+
+
+            }
+            $result = $query->column();
+            if ($customDependency === null) {
+                $dependency = new TagDependency(['tags' => $tags]);
+            } else {
+                $dependency = new ChainedDependency(
+                    [
+                        'dependencies' => [
+                            $customDependency,
+                            new TagDependency(['tags' => $tags])
+                        ]
+                    ]
+                );
+            }
+            Yii::$app->cache->set($cacheKey, $result, $cacheLifetime, $dependency);
+        }
+        return $result;
+    }
+
+    /**
+     * @param HasProperties|PropertiesTrait|\DevGroup\TagDependencyHelper\TagDependencyTrait|string|ActiveRecord $modelClass
+     * @param array $selections
+     * @param null $customDependency
+     * @param int $cacheLifetime
+     *
+     * @return array|bool|false
+     */
+    public static function getModelIdsByRange(
+        $modelClass,
+        $selections,
+        $customDependency = null,
+        $cacheLifetime = 86400
+    ) {
+        if (empty($selections)) {
+            return false;
+        }
+        $storageId = PropertyStorageHelper::storageIdByClass(static::class);
+        // build a cache key and make a available properties array
+        $availableProperties = [];
+        $cacheKey = 'GetModelIdsByRange:TableInheritance';
+        foreach ($selections as $propertyId => $values) {
+            if (count($values) < 1 ||
+                ($property = Property::findById($propertyId)) === null ||
+                $property->storage_id !== $storageId ||
+                (bool) $property->in_search === false
+            ) {
+                continue;
+            }
+            ksort($values);
+            $availableProperties[$propertyId] = $values;
+            $cacheKey .= ':' . $propertyId . ':' . implode('-', $values);
+        }
+        if (empty($availableProperties) === true) {
+            return false;
+        }
+        $result = Yii::$app->cache->get($cacheKey);
+        if ($result === false) {
+            $tags = [NamingHelper::getCommonTag($modelClass)];
+            if ($customDependency === null) {
+                $dependency = new TagDependency(['tags' => $tags]);
+            } else {
+                $dependency = new ChainedDependency(
+                    [
+                        'dependencies' => [
+                            $customDependency,
+                            new TagDependency(['tags' => $tags]),
+                        ],
+                    ]
+                );
+            }
+            // build a query
+            $query = (new Query())->select('model_id')->from($modelClass::tableInheritanceTable());
+            foreach ($availableProperties as $propertyId => $values) {
+                $default = ['min' => ~PHP_INT_MAX, 'max' => PHP_INT_MAX];
+                $values = ArrayHelper::merge($default, $values);
+                if ($values['min'] > $values['max']) {
+                    return [];
+                }
+                $property = Property::findById($propertyId);
+                $tags[] = $property->objectTag();
+                $query->andWhere(
+                    [
+                       'and',
+                        [
+                            '>=',
+                            $property->key,
+                            $values['min']
+                        ],
+                        [
+                            '<=',
+                            $property->key,
+                            $values['max']
+                        ]
+                    ]
+
+                );
+            }
+            $result = $query->column();
+            Yii::$app->cache->set($cacheKey, $result, $cacheLifetime, $dependency);
+        }
         return $result;
     }
 

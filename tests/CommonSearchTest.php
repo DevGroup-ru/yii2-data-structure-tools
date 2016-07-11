@@ -2,10 +2,16 @@
 
 namespace DevGroup\DataStructure\tests;
 
+use DevGroup\DataStructure\helpers\PropertiesHelper;
+use DevGroup\DataStructure\helpers\PropertyHandlerHelper;
+use DevGroup\DataStructure\helpers\PropertyStorageHelper;
+use DevGroup\DataStructure\models\Property;
+use DevGroup\DataStructure\models\PropertyGroup;
 use DevGroup\DataStructure\models\PropertyStorage;
 use DevGroup\DataStructure\models\StaticValue;
 use DevGroup\DataStructure\propertyStorage\EAV;
 use DevGroup\DataStructure\propertyStorage\StaticValues;
+use DevGroup\DataStructure\propertyStorage\TableInheritance;
 use DevGroup\DataStructure\search\common\Search;
 use DevGroup\DataStructure\tests\models\Product;
 use DevGroup\DataStructure\tests\models\Category;
@@ -194,6 +200,107 @@ class CommonSearchTest extends DSTCommonTestCase
         $this->assertArraySubset(['1' => '2'], $res);
     }
 
+
+
+    public function testFilterByTableInheritance()
+    {
+        $search = Yii::$app->getModule('properties')->getSearch();
+        $propertyGroup = new PropertyGroup(Product::className());
+        $propertyGroup->internal_name = 'Specification';
+        $propertyGroup->translate(1)->name = 'Specification';
+        $propertyGroup->translate(2)->name = 'Specification';
+        $this->assertTrue($propertyGroup->save());
+
+
+        $power = new Property();
+        $power->key = 'power';
+        $power->translate(1)->name = 'Power';
+        $power->translate(2)->name = 'Power';
+        $power->in_search = 1;
+        $power->data_type = Property::DATA_TYPE_INTEGER;
+        $power->storage_id = PropertyStorageHelper::storageIdByClass(TableInheritance::class);
+        $power->property_handler_id = PropertyHandlerHelper::getInstance()->handlerIdByClassName(
+            \DevGroup\DataStructure\propertyHandler\TextField::className()
+        );
+        $this->assertTrue($power->validate());
+        $saved = $power->save();
+
+        $this->assertTrue($saved, var_export($power->errors, true));
+
+
+
+        $height = new Property();
+        $height->key = 'height';
+        $height->translate(1)->name = 'height';
+        $height->translate(2)->name = 'height';
+        $height->in_search = 1;
+        $height->data_type = Property::DATA_TYPE_INTEGER;
+        $height->storage_id = PropertyStorageHelper::storageIdByClass(TableInheritance::class);
+        $height->property_handler_id = PropertyHandlerHelper::getInstance()->handlerIdByClassName(
+            \DevGroup\DataStructure\propertyHandler\TextField::className()
+        );
+        $this->assertTrue($height->validate());
+        $saved = $height->save();
+
+        $this->assertTrue($saved, var_export($height->errors, true));
+
+
+        $productInDb = Product::findOne(['id'=>1]);
+
+
+        $propertyGroup->link(
+            'properties',
+            $power
+        );
+
+        $propertyGroup->link(
+            'properties',
+            $height
+        );
+        $this->assertTrue($productInDb->addPropertyGroup($propertyGroup));
+        $productInDb->power = 120;
+        $productInDb->height = 2;
+        $models = [ &$productInDb ];
+        $this->assertTrue(PropertiesHelper::storeValues($models));
+        $this->assertTrue($productInDb->save());
+
+        $res = $search->filterByProperties(
+            Product::class,
+            [
+                'storage' => [TableInheritance::class]
+            ],
+            [
+                $power->id => ['120'],
+                $height->id => ['2']
+            ]
+        );
+
+        $this->assertCount(1, $res);
+
+
+        /** Not allow multiple */
+        $productInDb2 = Product::findOne(['id'=>2]);
+        $this->assertTrue($productInDb2->addPropertyGroup($propertyGroup));
+        $productInDb2->power = 130;
+        $productInDb2->height = 4;
+        $models = [ &$productInDb2 ];
+        $this->assertTrue(PropertiesHelper::storeValues($models));
+        $this->assertTrue($productInDb2->save());
+
+        $res = $search->filterByProperties(
+            Product::class,
+            [
+                'storage' => [TableInheritance::class]
+            ],
+            [
+                $height->id => ['4'],
+                $power->id => ['120', '130']
+            ]
+        );
+        $this->assertCount(0, $res);
+
+    }
+
     /**
      * @depends testFilterFormData
      *
@@ -303,6 +410,106 @@ class CommonSearchTest extends DSTCommonTestCase
     }
 
     /**
+     * @group range
+     */
+    public function testRangeTableInheritance()
+    {
+        $search = Yii::$app->getModule('properties')->getSearch();
+        $propertyGroup = new PropertyGroup(Product::className());
+        $propertyGroup->internal_name = 'Specification';
+        $propertyGroup->translate(1)->name = 'Specification';
+        $propertyGroup->translate(2)->name = 'Specification';
+        $this->assertTrue($propertyGroup->save());
+
+
+        $power = new Property();
+        $power->key = 'power';
+        $power->translate(1)->name = 'Power';
+        $power->translate(2)->name = 'Power';
+        $power->in_search = 1;
+        $power->data_type = Property::DATA_TYPE_INTEGER;
+        $power->storage_id = PropertyStorageHelper::storageIdByClass(TableInheritance::class);
+        $power->property_handler_id = PropertyHandlerHelper::getInstance()->handlerIdByClassName(
+            \DevGroup\DataStructure\propertyHandler\TextField::className()
+        );
+        $this->assertTrue($power->validate());
+        $saved = $power->save();
+
+        $this->assertTrue($saved, var_export($power->errors, true));
+
+
+
+        $height = new Property();
+        $height->key = 'height';
+        $height->translate(1)->name = 'height';
+        $height->translate(2)->name = 'height';
+        $height->in_search = 1;
+        $height->data_type = Property::DATA_TYPE_INTEGER;
+        $height->storage_id = PropertyStorageHelper::storageIdByClass(TableInheritance::class);
+        $height->property_handler_id = PropertyHandlerHelper::getInstance()->handlerIdByClassName(
+            \DevGroup\DataStructure\propertyHandler\TextField::className()
+        );
+        $this->assertTrue($height->validate());
+        $saved = $height->save();
+
+        $this->assertTrue($saved, var_export($height->errors, true));
+
+
+        $productInDb = Product::findOne(['id'=>1]);
+
+
+        $propertyGroup->link(
+            'properties',
+            $power
+        );
+
+        $propertyGroup->link(
+            'properties',
+            $height
+        );
+        $this->assertTrue($productInDb->addPropertyGroup($propertyGroup));
+        $productInDb->power = 130;
+        $productInDb->height = 4;
+        $models = [ &$productInDb ];
+        $this->assertTrue(PropertiesHelper::storeValues($models));
+        $this->assertTrue($productInDb->save());
+
+
+        $res = $search->filterByPropertiesRange(
+            Product::class,
+            ['storage' => [TableInheritance::class]],
+            [
+                $power->id => [
+                  'min' => 100,
+                ],
+                $height->id => [
+                    'min' => 4,
+                    'max' => 5,
+                ],
+            ]
+        );
+
+        $this->assertCount(1, $res);
+
+        $res = $search->filterByPropertiesRange(
+            Product::class,
+            ['storage' => [TableInheritance::class]],
+            [
+                $power->id => [
+                    'max' => 120,
+                ],
+                $height->id => [
+                    'min' => 4,
+                    'max' => 5,
+                ],
+            ]
+        );
+
+        $this->assertCount(0, $res);
+    }
+
+
+    /**
      * @todo getModelIdsByRange method in StaticValues
      * @depends testFilterFormData
      * @group range
@@ -399,6 +606,97 @@ class CommonSearchTest extends DSTCommonTestCase
             true
         );
         $this->assertEmpty($res);
+    }
+
+    public function testFindContentInPropertiesTableInheritance()
+    {
+        $search = Yii::$app->getModule('properties')->getSearch();
+        $propertyGroup = new PropertyGroup(Product::className());
+        $propertyGroup->internal_name = 'Specification';
+        $propertyGroup->translate(1)->name = 'Specification';
+        $propertyGroup->translate(2)->name = 'Specification';
+        $this->assertTrue($propertyGroup->save());
+
+
+        $description = new Property();
+        $description->key = 'description_te';
+        $description->translate(1)->name = 'Description';
+        $description->translate(2)->name = 'Description';
+        $description->in_search = 1;
+        $description->data_type = Property::DATA_TYPE_INVARIANT_STRING;
+        $description->storage_id = PropertyStorageHelper::storageIdByClass(TableInheritance::class);
+        $description->property_handler_id = PropertyHandlerHelper::getInstance()->handlerIdByClassName(
+            \DevGroup\DataStructure\propertyHandler\TextField::className()
+        );
+        $this->assertTrue($description->save());
+
+
+        $announce = new Property();
+        $announce->key = 'announce_te';
+        $announce->translate(1)->name = 'Announce';
+        $announce->translate(2)->name = 'Announce';
+        $announce->in_search = 1;
+        $announce->data_type = Property::DATA_TYPE_INVARIANT_STRING;
+        $announce->storage_id = PropertyStorageHelper::storageIdByClass(TableInheritance::class);
+        $announce->property_handler_id = PropertyHandlerHelper::getInstance()->handlerIdByClassName(
+            \DevGroup\DataStructure\propertyHandler\TextField::className()
+        );
+        $this->assertTrue($announce->save());
+
+
+
+        $productInDb = Product::findOne(['id'=>1]);
+
+
+        $propertyGroup->link(
+            'properties',
+            $description
+        );
+        $propertyGroup->link(
+            'properties',
+            $announce
+        );
+        $this->assertTrue($productInDb->addPropertyGroup($propertyGroup));
+
+        $productInDb->description_te = 'one two three';
+        $productInDb->announce_te = 'three five';
+        $models = [ &$productInDb ];
+        $this->assertTrue(PropertiesHelper::storeValues($models));
+        $this->assertTrue($productInDb->save());
+
+
+        $res = $search->findInProperties(
+            Product::class,
+            ['storage' => [TableInheritance::class]],
+            [$description->id, $announce->id],
+            'two',
+            true
+        );
+
+        $this->assertCount(1, $res);
+
+        $res = $search->findInProperties(
+            Product::class,
+            ['storage' => [TableInheritance::class]],
+            [$description->id, $announce->id],
+            'two',
+            false
+        );
+
+        $this->assertEmpty($res);
+
+        $productInDb->announce_te = 'two three five';
+        $this->assertTrue(PropertiesHelper::storeValues($models));
+        $productInDb->save();
+
+        $res = $search->findInProperties(
+            Product::class,
+            ['storage' => [TableInheritance::class]],
+            [$description->id, $announce->id],
+            'two',
+            false
+        );
+        $this->assertCount(1, $res);
     }
 }
 

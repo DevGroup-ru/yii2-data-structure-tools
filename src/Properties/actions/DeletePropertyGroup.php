@@ -40,7 +40,7 @@ class DeletePropertyGroup extends BaseAdminAction
         );
 
         if ($hard === false) {
-            (boolval($model->delete()) === false && $model->isDeleted() === true) ?
+            ($model->delete() !== false && $model->isDeleted() === true) ?
                 Yii::$app->session->setFlash('info', Module::t('app', 'Property group has been hidden.')) :
                 Yii::$app->session->setFlash('warning', Module::t('app', 'Property group  has not been hidden.'));
         } elseif ((bool)$hard === true) {
