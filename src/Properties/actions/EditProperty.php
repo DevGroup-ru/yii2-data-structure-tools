@@ -9,7 +9,9 @@ use DevGroup\DataStructure\models\PropertyGroup;
 use DevGroup\DataStructure\Properties\Module;
 use Yii;
 use yii\helpers\ArrayHelper;
+use yii\helpers\Json;
 use yii\web\NotFoundHttpException;
+use yii\web\View;
 
 /**
  * EditProperty is a universal action that can be used to handle creating and editing properties.
@@ -60,7 +62,10 @@ class EditProperty extends BaseAdminAction
             86400,
             new NotFoundHttpException("PropertyGroup model with specified id not found")
         );
-
+        $wizardData = Module::getInstance()->prepareWizardData();
+        $wizardData['isNewRecord'] = $model->isNewRecord;
+        $wizardData = Json::encode($wizardData);
+        $this->controller->getView()->registerJs("window.WizardData = {$wizardData};", View::POS_HEAD);
         if ($model->isNewRecord === false) {
             // populate translations relation as we need to save all
             $model->translations;
@@ -107,7 +112,7 @@ class EditProperty extends BaseAdminAction
                 $this->controller->trigger($id === null ? self::EVENT_AFTER_INSERT : self::EVENT_AFTER_UPDATE, $event);
 
                 if ($event->isValid === true) {
-                    Yii::$app->session->setFlash('success', Module::t('app', 'PropertyGroup saved.'));
+                    Yii::$app->session->setFlash('success', Module::t('app', 'Property saved.'));
 
                     return $this->controller->redirect([
                         $this->listGroupPropertiesActionId,

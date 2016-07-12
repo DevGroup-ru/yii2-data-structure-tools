@@ -5,13 +5,32 @@ namespace DevGroup\DataStructure\propertyHandler;
 
 
 use DevGroup\DataStructure\models\Property;
+use DevGroup\DataStructure\propertyStorage\EAV;
+use DevGroup\DataStructure\propertyStorage\TableInheritance;
 use Yii;
 use yii\jui\JuiAsset;
 
 class DatePickerField extends AbstractPropertyHandler
 {
 
-    public static $multipleMode = Property::MODE_ALLOW_ALL;
+    /** @inheritdoc */
+    public static $multipleMode = Property::MODE_ALLOW_NOTHING;
+
+    /** @inheritdoc */
+    public static $allowedTypes = [
+        Property::DATA_TYPE_STRING,
+        Property::DATA_TYPE_INVARIANT_STRING,
+        Property::DATA_TYPE_INTEGER,
+    ];
+
+    /** @inheritdoc */
+    public static $allowInSearch = true;
+
+    /** @inheritdoc */
+    public static $allowedStorage = [
+        EAV::class,
+        TableInheritance::class,
+    ];
 
     /**
      * Get validation rules for a property.

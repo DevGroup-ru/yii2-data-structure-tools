@@ -6,6 +6,8 @@ namespace DevGroup\DataStructure\propertyHandler;
 
 use DevGroup\AdminUtils\events\ModelEditForm;
 use DevGroup\DataStructure\models\Property;
+use DevGroup\DataStructure\propertyStorage\EAV;
+use DevGroup\DataStructure\propertyStorage\TableInheritance;
 use Yii;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Json;
@@ -13,7 +15,23 @@ use yii\jui\JuiAsset;
 
 class MaskedInput extends AbstractPropertyHandler
 {
+    /** @inheritdoc */
     public static $multipleMode = Property::MODE_ALLOW_ALL;
+
+    /** @inheritdoc */
+    public static $allowInSearch = true;
+
+    /** @inheritdoc */
+    public static $allowedStorage = [
+        EAV::class,
+        TableInheritance::class,
+    ];
+
+    /** @inheritdoc */
+    public static $allowedTypes = [
+        Property::DATA_TYPE_STRING,
+        Property::DATA_TYPE_INVARIANT_STRING,
+    ];
 
     /**
      * Get validation rules for a property.

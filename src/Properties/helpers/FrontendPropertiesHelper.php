@@ -42,12 +42,16 @@ class FrontendPropertiesHelper
     public static function handlersSelectOptions()
     {
         return Yii::$app->cache->lazy(function () {
-            return (new Query)
+            $query = (new Query)
                 ->select(['name', 'id'])
                 ->from(PropertyHandlers::tableName())
                 ->orderBy(['sort_order' => SORT_ASC])
-                ->indexBy('id')
-                ->column();
+                ->indexBy('id');
+            $handlers = Module::getInstance()->handlersList;
+            if (count($handlers) > 0) {
+                $query->where(['class_name' => $handlers]);
+            }
+            return $query->column();
         }, 'PropertyHandlerId2Name', 86400, PropertyHandlers::commonTag());
     }
 

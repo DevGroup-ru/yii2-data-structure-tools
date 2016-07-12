@@ -41,13 +41,13 @@ if (true === $property->canTranslate()) {
         }
         ?>
         <div class="m-form__col multi-eav <?= $model->hasErrors($property->key) ? 'has-error' : '' ?>">
+            <label for="<?= $inputId ?>">
+                <?= $property->name ?>
+                <button class="btn btn-info btn-xs" data-action="add-new-eav-input">
+                    <i class="fa fa-plus"></i>
+                </button>
+            </label>
             <?php foreach ($values as $index => $value) : ?>
-                <label for="<?= $inputId . '-' . $index ?>">
-                    <?= $property->name ?>
-                    <button class="btn btn-info btn-xs" data-action="add-new-eav-input">
-                        <i class="fa fa-plus"></i>
-                    </button>
-                </label>
                 <div class="input-group">
                     <div class="input-group-addon arrows"><i class="fa fa-arrows"></i></div>
                     <?=

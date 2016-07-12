@@ -62,14 +62,18 @@ class Property extends ActiveRecord
     const DATA_TYPE_PACKED_JSON = 4;
     const DATA_TYPE_BOOLEAN = 5;
     const DATA_TYPE_INVARIANT_STRING = 6;
+
     // Handler type
     const TYPE_CUSTOM_VALUE = 1;
     const TYPE_VALUES_LIST = 2;
+
     // Multiple mode
-    const MODE_ALLOW_NOTHING = 0;
-    const MODE_ALLOW_SINGLE = 0b00000001;
-    const MODE_ALLOW_MULTIPLE = 0b00000010;
-    const MODE_ALLOW_ALL = 0b00000011;
+    const MODE_ALLOW_NOTHING = 10;
+    const MODE_ALLOW_SINGLE = 11;
+    const MODE_ALLOW_MULTIPLE = 12;
+    const MODE_ALLOW_ALL = 13;
+
+
     // Packed sub arrays
     const PACKED_HANDLER_PARAMS = 'handlerParams';
     const PACKED_ADDITIONAL_RULES = 'additionalRules';

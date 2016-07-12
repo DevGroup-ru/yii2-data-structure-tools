@@ -11,8 +11,27 @@ use yii\helpers\Html;
 
 class StaticValues extends AbstractPropertyHandler
 {
-    public static $type = Property::TYPE_VALUES_LIST;
+    /** @inheritdoc */
     public static $multipleMode = Property::MODE_ALLOW_ALL;
+
+    /** @inheritdoc */
+    public static $allowInSearch = true;
+
+    /** @inheritdoc */
+    public static $allowedStorage = [
+        \DevGroup\DataStructure\propertyStorage\StaticValues::class,
+    ];
+
+    /** @inheritdoc */
+    public static $allowedTypes = [
+        Property::DATA_TYPE_STRING,
+        Property::DATA_TYPE_INTEGER,
+        Property::DATA_TYPE_FLOAT,
+        Property::DATA_TYPE_TEXT,
+        Property::DATA_TYPE_PACKED_JSON,
+        Property::DATA_TYPE_BOOLEAN,
+        Property::DATA_TYPE_INVARIANT_STRING,
+    ];
 
     /**
      * Forces property to be of integer data type

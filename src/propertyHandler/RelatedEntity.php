@@ -6,6 +6,7 @@ namespace DevGroup\DataStructure\propertyHandler;
 
 use DevGroup\AdminUtils\events\ModelEditForm;
 use DevGroup\DataStructure\models\Property;
+use DevGroup\DataStructure\propertyStorage\EAV;
 use Yii;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Json;
@@ -13,7 +14,22 @@ use yii\jui\JuiAsset;
 
 class RelatedEntity extends AbstractPropertyHandler
 {
+    /** @inheritdoc */
     public static $multipleMode = Property::MODE_ALLOW_ALL;
+
+    /** @inheritdoc */
+    public static $allowedStorage = [
+        EAV::class,
+    ];
+
+    /** @inheritdoc */
+    public static $allowedTypes = [
+        Property::DATA_TYPE_INTEGER,
+    ];
+
+    /** @inheritdoc */
+    public static $allowInSearch = true;
+
     public static $aliases = [
         1 => 'date',
         2 => 'ip',

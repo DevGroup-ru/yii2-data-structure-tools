@@ -3,10 +3,27 @@
 namespace DevGroup\DataStructure\propertyHandler;
 
 use DevGroup\DataStructure\models\Property;
+use DevGroup\DataStructure\propertyStorage\EAV;
+use DevGroup\DataStructure\propertyStorage\TableInheritance;
 
 class MapField extends AbstractPropertyHandler
 {
+    /** @inheritdoc */
     public static $multipleMode = Property::MODE_ALLOW_SINGLE;
+
+    /** @inheritdoc */
+    public static $allowedTypes = [
+        Property::DATA_TYPE_INVARIANT_STRING,
+    ];
+
+    /** @inheritdoc */
+    public static $allowedStorage = [
+        EAV::class,
+        TableInheritance::class,
+    ];
+
+    /** @inheritdoc */
+    public static $allowInSearch = false;
 
     public $key;
 

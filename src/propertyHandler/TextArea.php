@@ -4,6 +4,8 @@ namespace DevGroup\DataStructure\propertyHandler;
 
 use DevGroup\DataStructure\models\Property;
 use DevGroup\DataStructure\Properties\validators\ValuesValidator;
+use DevGroup\DataStructure\propertyStorage\EAV;
+use DevGroup\DataStructure\propertyStorage\TableInheritance;
 
 /**
  * Class TextArea
@@ -12,7 +14,24 @@ use DevGroup\DataStructure\Properties\validators\ValuesValidator;
  */
 class TextArea extends AbstractPropertyHandler
 {
+    /** @inheritdoc */
     public static $multipleMode = Property::MODE_ALLOW_ALL;
+
+    /** @inheritdoc */
+    public static $allowInSearch = true;
+
+    /** @inheritdoc */
+    public static $allowedStorage = [
+        EAV::class,
+        TableInheritance::class,
+    ];
+
+    /** @inheritdoc */
+    public static $allowedTypes = [
+        Property::DATA_TYPE_STRING,
+        Property::DATA_TYPE_TEXT,
+        Property::DATA_TYPE_INVARIANT_STRING,
+    ];
 
     /**
      * @inheritdoc

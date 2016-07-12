@@ -23,19 +23,19 @@ if (empty($params['mask']) === false) {
 if ($property->allow_multiple_values == 1) :
     $inputName = Html::getInputName($model, $property->key) . '[]';
     $inputId = Html::getInputId($model, $property->key);
-    $values = isset($model->{$property->key}) ? (array) $model->{$property->key} : [];
+    $values = isset($model->{$property->key}) ? (array)$model->{$property->key} : [];
     if (count($values) === 0) {
         $values = [''];
     }
     ?>
     <div class="m-form__col multi-eav <?= $model->hasErrors($property->key) ? 'has-error' : '' ?>">
+        <label for="<?= $inputId ?>">
+            <?= $property->name ?>
+            <button class="btn btn-info btn-xs" data-action="add-new-eav-input">
+                <i class="fa fa-plus"></i>
+            </button>
+        </label>
         <?php foreach ($values as $index => $value) : ?>
-            <label for="<?= $inputId . '-' . $index ?>">
-                <?= $property->name ?>
-                <button class="btn btn-info btn-xs" data-action="add-new-eav-input">
-                    <i class="fa fa-plus"></i>
-                </button>
-            </label>
             <div class="input-group">
                 <div class="input-group-addon arrows"><i class="fa fa-arrows"></i></div>
                 <?= MaskedInput::widget(

@@ -7,12 +7,32 @@ namespace DevGroup\DataStructure\propertyHandler;
 use DevGroup\AdminUtils\events\ModelEditForm;
 use DevGroup\DataStructure\models\Property;
 use DevGroup\DataStructure\models\StaticValue;
+use DevGroup\DataStructure\propertyStorage\StaticValues as SVStorage;
 
 class Select extends AbstractPropertyHandler
 {
 
-    public static $type = Property::TYPE_VALUES_LIST;
+    /** @inheritdoc */
     public static $multipleMode = Property::MODE_ALLOW_ALL;
+
+    /** @inheritdoc */
+    public static $allowedStorage = [
+        SVStorage::class,
+    ];
+
+    /** @inheritdoc */
+    public static $allowedTypes = [
+        Property::DATA_TYPE_STRING,
+        Property::DATA_TYPE_INTEGER,
+        Property::DATA_TYPE_FLOAT,
+        Property::DATA_TYPE_TEXT,
+        Property::DATA_TYPE_PACKED_JSON,
+        Property::DATA_TYPE_BOOLEAN,
+        Property::DATA_TYPE_INVARIANT_STRING,
+    ];
+
+    /** @inheritdoc */
+    public static $allowInSearch = true;
 
     /**
      * Forces property to be of integer data type
@@ -78,9 +98,7 @@ class Select extends AbstractPropertyHandler
     public static function onPropertyEditForm(ModelEditForm $event)
     {
 
-        if (!$event->model->isNewRecord && $event->model->storage->class_name == \DevGroup\DataStructure\propertyStorage\StaticValues::className(
-            )
-        ) {
+        if (!$event->model->isNewRecord && $event->model->storage->class_name == SVStorage::class) {
             $view = $event->getView();
             $model = $event->model;
             $staticValue = new StaticValue($model);
