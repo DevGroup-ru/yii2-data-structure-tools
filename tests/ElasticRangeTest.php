@@ -10,7 +10,7 @@ use Yii;
 
 class ElasticRangeTest extends DSTCommonTestCase
 {
-    public function testCorrectRangeSearch()
+    public function testRangeSearch()
     {
         sleep(2);
         /** @var Search $search */
@@ -64,7 +64,6 @@ class ElasticRangeTest extends DSTCommonTestCase
         ]];
         $params4 = [
             5 => [
-                'min' => 4,
                 'mox' => 22,
             ],
         ];
@@ -103,5 +102,45 @@ class ElasticRangeTest extends DSTCommonTestCase
         ];
         $res6 = $search->filterByPropertiesRange(Product::class, $config6, $params6);
         $this->assertEmpty($res6);
+
+        //all is ok
+        //with only start param
+        $config7 = ['storage' => [
+            EAV::class
+        ]];
+        $params7 = [
+            5 => [
+                'min' => 4,
+            ],
+        ];
+        $res7 = $search->filterByPropertiesRange(Product::class, $config7, $params7);
+        $this->assertEquals([1, 2], $res7);
+
+        //all is ok
+        //with only end param
+        $config8 = ['storage' => [
+            EAV::class
+        ]];
+        $params8 = [
+            5 => [
+                'max' => 6,
+            ],
+        ];
+        $res8 = $search->filterByPropertiesRange(Product::class, $config8, $params8);
+        $this->assertEquals([1, 2], $res8);
+
+        //all is ok
+        //one param ok and one param bad
+        $config9 = ['storage' => [
+            EAV::class
+        ]];
+        $params9 = [
+            5 => [
+                'mon' => 4,
+                'max' => 6,
+            ],
+        ];
+        $res9 = $search->filterByPropertiesRange(Product::class, $config9, $params9);
+        $this->assertEquals([1, 2], $res9);
     }
 }

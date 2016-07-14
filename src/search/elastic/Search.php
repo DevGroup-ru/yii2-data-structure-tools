@@ -146,8 +146,21 @@ class Search extends AbstractSearch
             ->all();
         $currentLang = LanguageHelper::getCurrent();
         $match = [];
+        $condition = [];
+        $ranges = 0;
         foreach ($params as $propId => $values) {
-            if (false === isset($values[$fromKey], $values[$toKey], $propData[$propId])) {
+            if (false === isset($propData[$propId])) {
+                continue;
+            }
+            if (true === isset($values[$fromKey])) {
+                $fromValue = Property::castValueToDataType($values[$fromKey], $propData[$propId]['data_type']);
+                $condition['gte'] = $fromValue;
+            }
+            if (true === isset($values[$toKey])) {
+                $toValue = Property::castValueToDataType($values[$toKey], $propData[$propId]['data_type']);
+                $condition['lte'] = $toValue;
+            }
+            if (false === isset($values[$toKey]) && false === isset($values[$fromKey])) {
                 continue;
             }
             $isNumberColumn = in_array(
@@ -157,8 +170,6 @@ class Search extends AbstractSearch
             if (false === $isNumberColumn) {
                 continue;
             }
-            $fromValue = Property::castValueToDataType($values[$fromKey], $propData[$propId]['data_type']);
-            $toValue = Property::castValueToDataType($values[$toKey], $propData[$propId]['data_type']);
             $indexColumn = self::dataTypeToIndexField($propData[$propId]['data_type']);
             switch ($storageToId[$propData[$propId]['storage_id']]) {
                 case EAV::class :
@@ -166,28 +177,28 @@ class Search extends AbstractSearch
                         'bool' => [
                             'must' => [
                                 ['term' => [self::EAV_FIELD . '.prop_id' => $propId]],
-                                ['range' => [self::EAV_FIELD . '.' . $indexColumn => [
-                                    'gte' => $fromValue, 'lte' => $toValue
-                                ]]]
+                                ['range' => [self::EAV_FIELD . '.' . $indexColumn => $condition]]
                             ]
                         ]
                     ];
+                    $ranges++;
                     break;
                 case StaticValues::class :
                     $match[] = [
                         'bool' => [
                             'must' => [
                                 ['term' => [self::STATIC_VALUES_FILED . '.prop_id' => $propId]],
-                                ['range' => [self::STATIC_VALUES_FILED . '.value_' . $currentLang . '.raw' => [
-                                    'gte' => $fromValue, 'lte' => $toValue
-                                ]]]
+                                ['range' =>
+                                    [self::STATIC_VALUES_FILED . '.value_' . $currentLang . '.raw' => $condition]
+                                ]
                             ]
                         ]
                     ];
+                    $ranges++;
                     break;
             }
         }
-        if (true === empty($match)) {
+        if ($ranges == 0) {
             return [];
         }
         $query = ['bool' => ['should' => $match]];
