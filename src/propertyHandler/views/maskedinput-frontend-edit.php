@@ -11,14 +11,16 @@ use DevGroup\DataStructure\propertyHandler\RelatedEntity;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
-use yii\widgets\MaskedInput;
+use DevGroup\DataStructure\widgets\MaskedInput;
 
 $params = ArrayHelper::getValue($property, 'params.' . Property::PACKED_HANDLER_PARAMS, []);
 $maskedSettings = [];
 if (empty($params['mask']) === false) {
     $maskedSettings['mask'] = $params['mask'];
-} else {
+} elseif (empty($params['alias']) === false) {
     $maskedSettings = ['clientOptions' => ['alias' => RelatedEntity::$aliases[$params['alias']],],];
+} else {
+    $maskedSettings['mask'] = '*{0,*}';
 }
 if ($property->allow_multiple_values == 1) :
     $inputName = Html::getInputName($model, $property->key) . '[]';
