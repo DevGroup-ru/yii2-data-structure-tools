@@ -12,46 +12,46 @@
 
 
 	<property id="1" key="material" data_type="0" in_search="1" is_internal="0" allow_multiple_values="0" storage_id="1" packed_json_params="{}" property_handler_id="1" />
-		<static_value id="1" property_id="1" sort_order="1" />
+		<static_value id="1" property_id="1" sort_order="1" packed_json_params="{&quot;img&quot;:&quot;2&quot;,&quot;aliases&quot;:{&quot;0&quot;:&quot;metallic&quot;,&quot;4&quot;:&quot;iron&quot;,&quot;2&quot;:&quot;Металический&quot;}}" />
 			<static_value_translation model_id="1" language_id="1" name="metal" description="metal" slug="metal" />
 			<static_value_translation model_id="1" language_id="2" name="metal" description="металл" slug="metal" />
-		<static_value id="2" property_id="1" sort_order="1" />
+		<static_value id="2" property_id="1" sort_order="1"  packed_json_params="{}" />
 			<static_value_translation model_id="2" language_id="1" name="plastic" description="plastic" slug="plastic" />
 			<static_value_translation model_id="2" language_id="2" name="plastic" description="пластик" slug="plastic" />
-		<static_value id="3" property_id="1" sort_order="1" />
+		<static_value id="3" property_id="1" sort_order="1"  packed_json_params="{}" />
 			<static_value_translation model_id="3" language_id="1" name="glass" description="glass" slug="glass" />
 			<static_value_translation model_id="3" language_id="2" name="glass" description="стекло" slug="glass" />
 
     <property id="11" key="count" data_type="0" in_search="1" is_internal="0" allow_multiple_values="0" storage_id="1" packed_json_params="{}" property_handler_id="1" />
-        <static_value id="11" property_id="11" sort_order="1" />
+        <static_value id="11" property_id="11" sort_order="1"  packed_json_params="{}" />
             <static_value_translation model_id="11" language_id="1" name="15" description="" slug="15" />
             <static_value_translation model_id="11" language_id="2" name="15" description="" slug="15" />
-        <static_value id="12" property_id="11" sort_order="1" />
+        <static_value id="12" property_id="11" sort_order="1"  packed_json_params="{}" />
             <static_value_translation model_id="12" language_id="1" name="17" description="" slug="17" />
             <static_value_translation model_id="12" language_id="2" name="17" description="" slug="17" />
-        <static_value id="13" property_id="11" sort_order="1" />
+        <static_value id="13" property_id="11" sort_order="1"  packed_json_params="{}" />
             <static_value_translation model_id="13" language_id="1" name="19" description="" slug="19" />
             <static_value_translation model_id="13" language_id="2" name="19" description="" slug="19" />
 
 	<property id="2" key="color" data_type="0" is_internal="0" allow_multiple_values="1" storage_id="1" packed_json_params="{}" property_handler_id="1" />
-		<static_value id="4" property_id="2" sort_order="1" />
+		<static_value id="4" property_id="2" sort_order="1"  packed_json_params="{}" />
 			<static_value_translation model_id="4" language_id="1" name="white" description="white" slug="white" />
 			<static_value_translation model_id="4" language_id="2" name="white" description="белый" slug="white" />
-		<static_value id="5" property_id="2" sort_order="1" />
+		<static_value id="5" property_id="2" sort_order="1"  packed_json_params="{}" />
 			<static_value_translation model_id="5" language_id="1" name="black" description="black" slug="black" />
 			<static_value_translation model_id="5" language_id="2" name="black" description="черный" slug="black" />
-		<static_value id="6" property_id="2" sort_order="1" />
+		<static_value id="6" property_id="2" sort_order="1"  packed_json_params="{}" />
 			<static_value_translation model_id="6" language_id="1" name="silver" description="silver" slug="silver" />
 			<static_value_translation model_id="6" language_id="2" name="silver" description="серебряный" slug="silver" />
 
     <property id="9" key="some_integer" in_search="0" data_type="1" is_internal="0" allow_multiple_values="0" storage_id="1" packed_json_params="{}" property_handler_id="11" />
-        <static_value id="91" property_id="9" sort_order="1" />
+        <static_value id="91" property_id="9" sort_order="1"  packed_json_params="{}" />
             <static_value_translation model_id="91" language_id="1" name="91" description="91" slug="91" />
             <static_value_translation model_id="91" language_id="2" name="91" description="91" slug="91" />
-        <static_value id="92" property_id="9" sort_order="2" />
+        <static_value id="92" property_id="9" sort_order="2"  packed_json_params="{}" />
             <static_value_translation model_id="92" language_id="1" name="92" description="92" slug="92" />
             <static_value_translation model_id="92" language_id="2" name="92" description="92" slug="92" />
-        <static_value id="93" property_id="9" sort_order="3" />
+        <static_value id="93" property_id="9" sort_order="3"  packed_json_params="{}" />
             <static_value_translation model_id="93" language_id="1" name="93" description="93" slug="93" />
             <static_value_translation model_id="93" language_id="2" name="93" description="93" slug="93" />
 

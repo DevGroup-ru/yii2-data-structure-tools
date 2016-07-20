@@ -3,6 +3,7 @@
 namespace DevGroup\DataStructure\propertyHandler;
 
 use DevGroup\AdminUtils\events\ModelEditForm;
+use DevGroup\DataStructure\behaviors\PackedJsonAttributes;
 use DevGroup\DataStructure\models\Property;
 use DevGroup\DataStructure\models\StaticValue;
 use yii\bootstrap\ActiveForm;
@@ -33,6 +34,17 @@ class StaticValues extends AbstractPropertyHandler
         Property::DATA_TYPE_INVARIANT_STRING,
     ];
 
+    /**
+     * @inheritdoc
+     */
+    public function behaviors()
+    {
+        return [
+            'PackedJsonAttributes' => [
+                'class' => PackedJsonAttributes::className(),
+            ],
+        ];
+    }
     /**
      * Forces property to be of integer data type
      * @param \DevGroup\DataStructure\models\Property $property

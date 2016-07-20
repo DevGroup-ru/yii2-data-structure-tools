@@ -2,6 +2,7 @@
 namespace DevGroup\DataStructure\models;
 
 use arogachev\sortable\behaviors\numerical\ContinuousNumericalSortableBehavior;
+use DevGroup\DataStructure\behaviors\PackedJsonAttributes;
 use DevGroup\DataStructure\Properties\Module;
 use DevGroup\Entity\traits\EntityTrait;
 use DevGroup\Entity\traits\SoftDeleteTrait;
@@ -48,6 +49,7 @@ class StaticValue extends ActiveRecord
      */
     private $rules = [
         [['sort_order', 'property_id'], 'integer',],
+        [['params'], 'safe'],
         [['property_id'], 'required',],
         [['slug'], 'default', 'value' => ''],
         [['id'], 'integer', 'on' => 'search'],
@@ -76,16 +78,19 @@ class StaticValue extends ActiveRecord
     {
         return [
             'multilingual' => [
-                'class' => MultilingualActiveRecord::className(),
+                'class' => MultilingualActiveRecord::class,
                 'translationPublishedAttribute' => false,
             ],
             'CacheableActiveRecord' => [
-                'class' => CacheableActiveRecord::className(),
+                'class' => CacheableActiveRecord::class,
             ],
             'ContinuousNumericalSortableBehavior' => [
-                'class' => ContinuousNumericalSortableBehavior::className(),
+                'class' => ContinuousNumericalSortableBehavior::class,
                 'sortAttribute' => 'sort_order'
-            ]
+            ],
+            'PackedJsonAttributes' => [
+                'class' => PackedJsonAttributes::class,
+            ],
         ];
     }
 

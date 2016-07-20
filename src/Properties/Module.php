@@ -9,7 +9,9 @@ use DevGroup\DataStructure\commands\TranslateEavController;
 use DevGroup\DataStructure\models\PropertyHandlers;
 use DevGroup\DataStructure\models\PropertyStorage;
 use DevGroup\DataStructure\Properties\actions\EditProperty;
+use DevGroup\DataStructure\Properties\actions\EditStaticValue;
 use DevGroup\DataStructure\propertyHandler\AbstractPropertyHandler;
+use DevGroup\DataStructure\propertyHandler\ColorHandler;
 use DevGroup\DataStructure\propertyHandler\MaskedInput;
 use DevGroup\DataStructure\propertyHandler\RelatedEntity;
 use DevGroup\DataStructure\propertyHandler\StaticValues;
@@ -110,20 +112,27 @@ class Module extends BaseModule implements BootstrapInterface
         parent::init();
 
         ModelEditForm::on(
-            View::className(),
+            View::class,
             EditProperty::EVENT_AFTER_FORM,
             [StaticValues::class, 'onPropertyEditForm']
         );
         ModelEditForm::on(
-            View::className(),
+            View::class,
             EditProperty::EVENT_FORM_BEFORE_SUBMIT,
             [MaskedInput::class, 'onPropertyEditForm']
         );
         ModelEditForm::on(
-            View::className(),
+            View::class,
             EditProperty::EVENT_FORM_BEFORE_SUBMIT,
             [RelatedEntity::class, 'onPropertyEditForm']
         );
+
+        ModelEditForm::on(
+            View::class,
+            EditStaticValue::EVENT_FORM_BEFORE_SUBMIT,
+            [ColorHandler::class, 'onStaticValueEditForm']
+        );
+
     }
 
     /**

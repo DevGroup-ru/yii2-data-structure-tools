@@ -15,6 +15,17 @@ class EditStaticValue extends BaseAdminAction
 
     public $viewFile = 'edit-static-value';
 
+    const EVENT_BEFORE_INSERT = 'static-value-before-insert';
+    const EVENT_BEFORE_UPDATE = 'static-value-before-update';
+    const EVENT_AFTER_INSERT  = 'static-value-after-insert';
+    const EVENT_AFTER_UPDATE  = 'static-value-after-update';
+
+    const EVENT_FORM_BEFORE_SUBMIT = 'static-value-form-before-submit';
+    const EVENT_FORM_AFTER_SUBMIT  = 'static-value-form-after-submit';
+
+    const EVENT_BEFORE_FORM = 'static-value-before-form';
+    const EVENT_AFTER_FORM = 'static-value-after-form';
+
     public function run($property_id, $propertyGroupId, $id = null, $return_url = null)
     {
         /** @var StaticValue $model */
@@ -35,6 +46,7 @@ class EditStaticValue extends BaseAdminAction
 
         $model->loadDefaultValues();
 
+
         if (Yii::$app->request->isPost && $model->load(Yii::$app->request->post())) {
             foreach (Yii::$app->request->post('StaticValueTranslation', []) as $language => $data) {
                 foreach ($data as $attribute => $translation) {
@@ -43,7 +55,6 @@ class EditStaticValue extends BaseAdminAction
             }
 
             if ($model->save()) {
-
                 return $this->redirectUser(
                     $model->id,
                     true,

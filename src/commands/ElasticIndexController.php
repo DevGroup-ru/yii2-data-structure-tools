@@ -22,6 +22,7 @@ use Yii;
 use yii\db\Query;
 use yii\helpers\ArrayHelper;
 use Elasticsearch\ClientBuilder;
+use yii\helpers\Json;
 
 
 /**
@@ -385,18 +386,18 @@ class ElasticIndexController extends Controller
         $res = ['body' => []];
         $propIds = array_column($props, 'id');
         $propValues = (new Query())->from(StaticValue::tableName())
-            ->select(['id', 'property_id'])
+            ->select(['id', 'property_id', 'packed_json_params'])
+            ->indexBy('id')
             ->where(['property_id' => $propIds])
             ->distinct(true)
             ->all();
-        $valueIds = array_column($propValues, 'id');
+        $valueIds = array_keys($propValues);
         $assignedValues = (new Query())->from($bindingsTable)
             ->select(['model_id', 'static_value_id'])
             ->where(['static_value_id' => $valueIds])
             ->all();
         $assignedValueIds = array_column($assignedValues, 'static_value_id');
         $assignedValueIds = array_unique($assignedValueIds);
-        $propValuesMap = ArrayHelper::map($propValues, 'id', 'property_id');
         $props = ArrayHelper::map($props, 'id', 'key');
         $translations = StaticValueTranslation::find()
             ->select(['model_id', 'language_id', 'name', 'slug'])
@@ -417,7 +418,9 @@ class ElasticIndexController extends Controller
         }
         $data = [];
         foreach ($assignedValues as $i => $value) {
-            $propId = isset($propValuesMap[$value['static_value_id']]) ? $propValuesMap[$value['static_value_id']] : null;
+            $propId = isset($propValues[$value['static_value_id']]['property_id']) ?
+                $propValues[$value['static_value_id']]['property_id'] :
+                null;
             $propKey = isset($props[$propId]) ? $props[$propId] : null;
             $staticValueId = $value['static_value_id'];
             $propVals = [
@@ -425,6 +428,14 @@ class ElasticIndexController extends Controller
                 'prop_id' => $propId,
                 'prop_key' => $propKey,
             ];
+
+            if(isset($propValues[$value['static_value_id']]['packed_json_params'])) {
+                $params = Json::decode($propValues[$value['static_value_id']]['packed_json_params']);
+                if(empty($params['aliases']) === false) {
+                    $propVals['aliases'] = (array) array_values($params['aliases']);
+                }
+            }
+
             if (true === isset($mapped[$staticValueId])) {
                 $propVals = array_merge($propVals, $mapped[$staticValueId]);
             }

@@ -255,8 +255,13 @@ class Search extends AbstractSearch
                         'bool' => [
                             'must' => [
                                 ['term' => [self::STATIC_VALUES_FILED . '.prop_id' => $id]],
-                                ['term' => [self::STATIC_VALUES_FILED . '.value_' . $currentLang . '.raw' => $content]]
-                            ]
+                            ],
+                            'should' => [
+                                ['term' => [self::STATIC_VALUES_FILED . '.value_' . $currentLang . '.raw' => $content]],
+                                ['term' => [self::STATIC_VALUES_FILED . '.aliases' => $content]]
+                            ],
+                            "minimum_should_match" => 1,
+
                         ]
                     ];
                     break;
