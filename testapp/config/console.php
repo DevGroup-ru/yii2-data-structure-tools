@@ -9,6 +9,13 @@ return [
     'controllerNamespace' => 'app\commands',
     'controllerMap' => [
         'properties' => '\DevGroup\DataStructure\commands\PropertiesController',
+        'migrate' => [
+            'class' => 'dmstr\console\controllers\MigrateController',
+            'migrationLookup' => [
+                '@DevGroup/DataStructure/migrations/',
+                '@DevGroup/Measure/migrations/',
+            ]
+        ],
     ],
     'components' => [
         'cache' => [
@@ -44,5 +51,6 @@ return [
             'class' => 'yii\gii\Module',
         ],
     ],
+    'extensions' => require(__DIR__ . '/../../vendor/yiisoft/extensions.php'),
     'params' => $params,
 ];

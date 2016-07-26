@@ -64,8 +64,6 @@ class m151106_140536_initial extends Migration
             ]
         );
 
-        Yii::$app->runAction('migrate/up', ['interactive'=>0, 'migrationPath' => __DIR__ . '/../../src/migrations/']);
-
         \DevGroup\DataStructure\helpers\PropertiesTableGenerator::getInstance()->generate(app\models\Product::className());
 
     }

@@ -3,6 +3,7 @@
 namespace DevGroup\DataStructure\Properties;
 
 use arogachev\sortable\controllers\SortController;
+use DevGroup\AdminUtils\events\ModelEditAction;
 use DevGroup\AdminUtils\events\ModelEditForm;
 use DevGroup\DataStructure\commands\ElasticIndexController;
 use DevGroup\DataStructure\commands\TranslateEavController;
@@ -10,10 +11,12 @@ use DevGroup\DataStructure\models\PropertyHandlers;
 use DevGroup\DataStructure\models\PropertyStorage;
 use DevGroup\DataStructure\Properties\actions\EditProperty;
 use DevGroup\DataStructure\Properties\actions\EditStaticValue;
+use DevGroup\DataStructure\Properties\controllers\ManageController;
 use DevGroup\DataStructure\propertyHandler\AbstractPropertyHandler;
 use DevGroup\DataStructure\propertyHandler\ColorHandler;
 use DevGroup\DataStructure\propertyHandler\MaskedInput;
 use DevGroup\DataStructure\propertyHandler\RelatedEntity;
+use DevGroup\DataStructure\propertyHandler\MeasureInput;
 use DevGroup\DataStructure\propertyHandler\StaticValues;
 use DevGroup\DataStructure\search\base\AbstractSearch;
 use DevGroup\DataStructure\search\common\Search;
@@ -125,6 +128,18 @@ class Module extends BaseModule implements BootstrapInterface
             View::class,
             EditProperty::EVENT_FORM_BEFORE_SUBMIT,
             [RelatedEntity::class, 'onPropertyEditForm']
+        );
+
+        ModelEditForm::on(
+            View::class,
+            EditProperty::EVENT_FORM_BEFORE_SUBMIT,
+            [MeasureInput::class, 'onPropertyEditForm']
+        );
+
+        ModelEditAction::on(
+            ManageController::class,
+            EditProperty::EVENT_BEFORE_UPDATE,
+            [MeasureInput::class, 'onPropertyEditAction']
         );
 
         ModelEditForm::on(

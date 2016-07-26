@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "c68242585a9dea7b9f8e17d66357d7b5",
-    "content-hash": "c4bb5bf68b80dae60c369bf9b60a0fc7",
+    "hash": "b034461b365f39ee448a9367375d5d3d",
+    "content-hash": "e264f9921fb3c2ec507de66732e196b4",
     "packages": [
         {
             "name": "arogachev/yii2-sortable",
@@ -545,6 +545,58 @@
             "time": "2014-12-16 14:27:06"
         },
         {
+            "name": "devgroup/yii2-measure",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/DevGroup-ru/yii2-measure.git",
+                "reference": "aab58a2c53a99a0e776a92b7f7f0caf42b8684ae"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/DevGroup-ru/yii2-measure/zipball/aab58a2c53a99a0e776a92b7f7f0caf42b8684ae",
+                "reference": "aab58a2c53a99a0e776a92b7f7f0caf42b8684ae",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.4.0",
+                "yiisoft/yii2": "~2.0.0",
+                "yiister/yii2-mappable-ar": "^1.0"
+            },
+            "require-dev": {
+                "codeception/codeception": "^2.2",
+                "yiisoft/yii2-codeception": "~2.0.0"
+            },
+            "type": "yii2-extension",
+            "extra": {
+                "bootstrap": "DevGroup\\Measure\\Bootstrap"
+            },
+            "autoload": {
+                "psr-4": {
+                    "DevGroup\\Measure\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Pavel Fedotov",
+                    "email": "fps.06@mail.ru"
+                }
+            ],
+            "description": "This extension allows to work with different measure units, converts and formats it",
+            "keywords": [
+                "extension",
+                "measure",
+                "measures",
+                "units",
+                "yii2"
+            ],
+            "time": "2016-07-25 11:28:20"
+        },
+        {
             "name": "devgroup/yii2-multilingual",
             "version": "dev-master",
             "source": {
@@ -1049,12 +1101,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/kartik-v/yii2-widget-select2.git",
-                "reference": "5ca33a716188422e85560cdce0cb2110a998a618"
+                "reference": "a30c0519eaefe70ab0fbebe8cef88e393a207ed0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/kartik-v/yii2-widget-select2/zipball/5ca33a716188422e85560cdce0cb2110a998a618",
-                "reference": "5ca33a716188422e85560cdce0cb2110a998a618",
+                "url": "https://api.github.com/repos/kartik-v/yii2-widget-select2/zipball/a30c0519eaefe70ab0fbebe8cef88e393a207ed0",
+                "reference": "a30c0519eaefe70ab0fbebe8cef88e393a207ed0",
                 "shasum": ""
             },
             "require": {
@@ -1094,7 +1146,7 @@
                 "widget",
                 "yii2"
             ],
-            "time": "2016-06-14 13:48:39"
+            "time": "2016-07-25 07:22:15"
         },
         {
             "name": "psr/log",
@@ -1399,12 +1451,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/yiisoft/yii2-framework.git",
-                "reference": "95a5e80150bf158e1d114f5429051a267689e9ae"
+                "reference": "98629e415acde62ac91f41b170b12a7f2548b61e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/yiisoft/yii2-framework/zipball/95a5e80150bf158e1d114f5429051a267689e9ae",
-                "reference": "95a5e80150bf158e1d114f5429051a267689e9ae",
+                "url": "https://api.github.com/repos/yiisoft/yii2-framework/zipball/98629e415acde62ac91f41b170b12a7f2548b61e",
+                "reference": "98629e415acde62ac91f41b170b12a7f2548b61e",
                 "shasum": ""
             },
             "require": {
@@ -1485,7 +1537,7 @@
                 "framework",
                 "yii2"
             ],
-            "time": "2016-07-19 12:30:29"
+            "time": "2016-07-21 15:19:13"
         },
         {
             "name": "yiisoft/yii2-bootstrap",
@@ -1591,12 +1643,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/yiisoft/yii2-jui.git",
-                "reference": "1612593ac710975c235e75708b69fa9ee375ab46"
+                "reference": "47d384ebc035b59c554d9e270316970f9d60c336"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/yiisoft/yii2-jui/zipball/1612593ac710975c235e75708b69fa9ee375ab46",
-                "reference": "1612593ac710975c235e75708b69fa9ee375ab46",
+                "url": "https://api.github.com/repos/yiisoft/yii2-jui/zipball/47d384ebc035b59c554d9e270316970f9d60c336",
+                "reference": "47d384ebc035b59c554d9e270316970f9d60c336",
                 "shasum": ""
             },
             "require": {
@@ -1633,7 +1685,61 @@
                 "jQuery UI",
                 "yii2"
             ],
-            "time": "2016-06-11 22:54:20"
+            "time": "2016-07-22 22:27:25"
+        },
+        {
+            "name": "yiister/yii2-mappable-ar",
+            "version": "1.0.3",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/yiister/yii2-mappable-ar.git",
+                "reference": "28e264fd7bb5b58a970205ed072b8ad572e0a0fd"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/yiister/yii2-mappable-ar/zipball/28e264fd7bb5b58a970205ed072b8ad572e0a0fd",
+                "reference": "28e264fd7bb5b58a970205ed072b8ad572e0a0fd",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.4.0",
+                "yiisoft/yii2": "~2.0.0"
+            },
+            "require-dev": {
+                "codeception/codeception": "^2.2",
+                "yiisoft/yii2-codeception": "^2.0"
+            },
+            "type": "yii2-extension",
+            "autoload": {
+                "psr-4": {
+                    "yiister\\mappable\\": ""
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD-3-Clause"
+            ],
+            "authors": [
+                {
+                    "name": "Pavel Fedotov",
+                    "email": "fps.06@mail.ru",
+                    "homepage": "https://github.com/fps01",
+                    "role": "Creator"
+                }
+            ],
+            "description": "It is an extension for Yii framework 2 that gives an ability to use identity map for any ActiveRecord model.",
+            "homepage": "https://github.com/yiister/yii2-mappable-ar",
+            "keywords": [
+                "active-record",
+                "ar",
+                "backend",
+                "extension",
+                "identity-map",
+                "mappable",
+                "utils",
+                "yii2"
+            ],
+            "time": "2016-07-20 03:09:06"
         }
     ],
     "packages-dev": [
@@ -1911,6 +2017,46 @@
             "time": "2015-11-24 10:12:58"
         },
         {
+            "name": "dmstr/yii2-migrate-command",
+            "version": "0.3.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/dmstr/yii2-migrate-command.git",
+                "reference": "dcfe52c088b8039ce7e08e0b0fa5cff0002f2d79"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/dmstr/yii2-migrate-command/zipball/dcfe52c088b8039ce7e08e0b0fa5cff0002f2d79",
+                "reference": "dcfe52c088b8039ce7e08e0b0fa5cff0002f2d79",
+                "shasum": ""
+            },
+            "type": "yii2-extension",
+            "autoload": {
+                "psr-4": {
+                    "dmstr\\console\\controllers\\": ""
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD-3-Clause"
+            ],
+            "authors": [
+                {
+                    "name": "Tobias Munk",
+                    "email": "tobias@diemeisterei.de"
+                }
+            ],
+            "description": "Console Migration Command with multiple paths/aliases support",
+            "keywords": [
+                "command",
+                "console",
+                "extension",
+                "migration",
+                "yii2"
+            ],
+            "time": "2016-01-19 17:31:24"
+        },
+        {
             "name": "doctrine/instantiator",
             "version": "dev-master",
             "source": {
@@ -1970,12 +2116,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/fzaninotto/Faker.git",
-                "reference": "039eeba8a61788df89c7800eccb2c56723a0db34"
+                "reference": "5265f16ae0ae9b6acaf7c518063d80b2383a8086"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/fzaninotto/Faker/zipball/039eeba8a61788df89c7800eccb2c56723a0db34",
-                "reference": "039eeba8a61788df89c7800eccb2c56723a0db34",
+                "url": "https://api.github.com/repos/fzaninotto/Faker/zipball/5265f16ae0ae9b6acaf7c518063d80b2383a8086",
+                "reference": "5265f16ae0ae9b6acaf7c518063d80b2383a8086",
                 "shasum": ""
             },
             "require": {
@@ -2012,7 +2158,7 @@
                 "faker",
                 "fixtures"
             ],
-            "time": "2016-07-11 08:36:05"
+            "time": "2016-07-25 09:33:04"
         },
         {
             "name": "phpdocumentor/reflection-common",
@@ -2564,12 +2710,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/phpunit.git",
-                "reference": "b9cf8c5ff8bc658bebf8e9a5473fc513c38473de"
+                "reference": "c062dddcb68e44b563f66ee319ddae2b5a322a90"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/b9cf8c5ff8bc658bebf8e9a5473fc513c38473de",
-                "reference": "b9cf8c5ff8bc658bebf8e9a5473fc513c38473de",
+                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/c062dddcb68e44b563f66ee319ddae2b5a322a90",
+                "reference": "c062dddcb68e44b563f66ee319ddae2b5a322a90",
                 "shasum": ""
             },
             "require": {
@@ -2628,7 +2774,7 @@
                 "testing",
                 "xunit"
             ],
-            "time": "2016-06-17 15:17:43"
+            "time": "2016-07-21 06:48:14"
         },
         {
             "name": "phpunit/phpunit-mock-objects",
