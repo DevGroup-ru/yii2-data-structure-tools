@@ -17,6 +17,7 @@ use DevGroup\DataStructure\propertyHandler\ColorHandler;
 use DevGroup\DataStructure\propertyHandler\MaskedInput;
 use DevGroup\DataStructure\propertyHandler\RelatedEntity;
 use DevGroup\DataStructure\propertyHandler\MeasureInput;
+use DevGroup\DataStructure\propertyHandler\SizeGroupInput;
 use DevGroup\DataStructure\propertyHandler\StaticValues;
 use DevGroup\DataStructure\search\base\AbstractSearch;
 use DevGroup\DataStructure\search\common\Search;
@@ -140,6 +141,18 @@ class Module extends BaseModule implements BootstrapInterface
             ManageController::class,
             EditProperty::EVENT_BEFORE_UPDATE,
             [MeasureInput::class, 'onPropertyEditAction']
+        );
+
+        ModelEditForm::on(
+            View::class,
+            EditProperty::EVENT_FORM_BEFORE_SUBMIT,
+            [SizeGroupInput::class, 'onPropertyEditForm']
+        );
+
+        ModelEditAction::on(
+            ManageController::class,
+            EditProperty::EVENT_BEFORE_UPDATE,
+            [SizeGroupInput::class, 'onPropertyEditAction']
         );
 
         ModelEditForm::on(
