@@ -6,7 +6,7 @@ $config = [
     'vendorPath' => '@app/../vendor',
     'id' => 'minimal',
     'basePath' => dirname(__DIR__),
-    'bootstrap' => ['log', 'multilingual', 'debug', 'properties', 'adminUtils'],
+    'bootstrap' => ['log', 'multilingual', 'debug', 'properties', 'adminUtils', 'media'],
     'modules' => [
         'gii' => [
             'class' => 'yii\gii\Module',
@@ -19,6 +19,9 @@ $config = [
         ],
         'adminUtils' => [
             'class' => DevGroup\AdminUtils\AdminModule::class,
+        ],
+        'media' => [
+            'class' => 'DevGroup\MediaStorage\MediaModule',
         ],
     ],
     'components' => [

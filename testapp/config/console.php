@@ -14,6 +14,7 @@ return [
             'migrationLookup' => [
                 '@DevGroup/DataStructure/migrations/',
                 '@DevGroup/Measure/migrations/',
+                '@DevGroup/MediaStorage/migrations/',
             ]
         ],
     ],
