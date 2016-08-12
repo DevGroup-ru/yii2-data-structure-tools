@@ -6,7 +6,6 @@ use DevGroup\DataStructure\helpers\PropertiesHelper;
 use DevGroup\DataStructure\models\Property;
 use DevGroup\DataStructure\models\PropertyGroup;
 use yii\helpers\ArrayHelper;
-use yii\web\Application;
 use yii\web\ServerErrorHttpException;
 
 /**
@@ -45,11 +44,16 @@ trait PropertiesTrait
      */
     protected static function buildTableName($suffix = '')
     {
-        if (strpos(static::tableName(), '}}') !== false) {
-            return str_replace('}}', $suffix . '}}', static::tableName());
+        if (true === empty(static::$tablePrefix)) {
+            if (strpos(static::tableName(), '}}') !== false) {
+                $name = str_replace('}}', $suffix . '}}', static::tableName());
+            } else {
+                $name = static::tableName() . $suffix;
+            }
         } else {
-            return static::tableName() . $suffix;
+            $name = static::$tablePrefix . $suffix;
         }
+        return $name;
     }
 
     /**

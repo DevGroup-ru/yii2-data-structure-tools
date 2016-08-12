@@ -8,7 +8,7 @@ use yii\web\JqueryAsset;
 
 class PropertiesAsset extends AssetBundle
 {
-    public $sourcePath = __DIR__ . DIRECTORY_SEPARATOR;
+    public $sourcePath = '@DevGroup/DataStructure/assets';
 
     public $js = [
         'js/property-wizard.js',
