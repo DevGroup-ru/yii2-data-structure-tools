@@ -6,7 +6,7 @@ use DevGroup\DataStructure\Properties\actions\EditProperty;
 use DevGroup\DataStructure\Properties\helpers\FrontendPropertiesHelper;
 use DevGroup\DataStructure\Properties\Module;
 use \DevGroup\DataStructure\assets\PropertiesAsset;
-use yii\helpers\ArrayHelper;
+use DevGroup\Multilingual\widgets\MultilingualFormTabs;
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 
@@ -17,10 +17,17 @@ use yii\widgets\ActiveForm;
  * @var integer $applicablePropertyModelId
  * @var string $listPropertyGroupsActionId
  * @var string $listGroupPropertiesActionId
+ * @var bool $canSave
  */
 
-$this->params['breadcrumbs'][] = ['label' => Module::t('app', 'Property groups'), 'url' => [$listPropertyGroupsActionId]];
-$this->params['breadcrumbs'][] = ['label' => Module::t('app', 'Group properties') . ": $propertyGroup->internal_name", 'url' => [$listGroupPropertiesActionId, 'id' => $propertyGroup->id]];
+$this->params['breadcrumbs'][] = [
+    'label' => Module::t('app', 'Property groups'),
+    'url' => [$listPropertyGroupsActionId]
+];
+$this->params['breadcrumbs'][] = [
+    'label' => Module::t('app', 'Group properties') . ": $propertyGroup->internal_name",
+    'url' => [$listGroupPropertiesActionId, 'id' => $propertyGroup->id]
+];
 if ($model->isNewRecord) {
     $this->title = Module::t('app', 'New property');
 } else {
@@ -54,13 +61,11 @@ PropertiesAsset::register($this);
                     )
                 ?>
                 <?= $form->field($model, 'key') ?>
-                <?=
-                DevGroup\Multilingual\widgets\MultilingualFormTabs::widget([
+                <?= MultilingualFormTabs::widget([
                     'model' => $model,
                     'childView' => __DIR__ . DIRECTORY_SEPARATOR . '_property-multilingual.php',
                     'form' => $form,
-                ])
-                ?>
+                ]) ?>
             </div>
             <div class="col-xs-12 col-md-4">
                 <?= $form->field($model, 'data_type')->dropDownList(FrontendPropertiesHelper::dataTypeSelectOptions(), [
@@ -68,16 +73,14 @@ PropertiesAsset::register($this);
                     'data-wizard' => 'data-type',
                     'prompt' => Module::t('app', 'Select') . ' ' . Module::t('app', 'Data Type')
                 ]) ?>
-                <?=
-                $form
+                <?= $form
                     ->field($model, 'storage_id')
                     ->dropDownList(
                         FrontendPropertiesHelper::storagesSelectOptions(), [
                             'data-wizard' => 'storage',
                             'prompt' => Module::t('app', 'Select') . ' ' . Module::t('app', 'Storage')
                         ]
-                    )
-                ?>
+                    ) ?>
                 <?= $form->field($model, 'is_internal')->checkbox() ?>
                 <?= $form->field($model, 'in_search')->checkbox(['data-wizard' => 'init']) ?>
                 <?= $form->field($model, 'allow_multiple_values')->checkbox(['data-wizard' => 'init']) ?>
@@ -87,9 +90,7 @@ PropertiesAsset::register($this);
                     [
                         'label' => Module::t('app', 'Required'),
                     ]
-                );
-                ?>
-
+                ) ?>
             </div>
             <div class="col-xs-12">
                 <?php
@@ -97,10 +98,15 @@ PropertiesAsset::register($this);
                 $this->trigger(EditProperty::EVENT_FORM_BEFORE_SUBMIT, $event);
                 ?>
 
-
-                <div class="form-group">
-                    <?= Html::submitButton($model->isNewRecord ? Module::t('app', 'Create') : Module::t('app', 'Save'), ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>
-                </div>
+                <?php if (true === $canSave) : ?>
+                    <div class="form-group">
+                        <?= Html::submitButton($model->isNewRecord
+                            ? Module::t('app', 'Create')
+                            : Module::t('app', 'Save'),
+                            ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']
+                        ) ?>
+                    </div>
+                <?php endif; ?>
 
                 <?php
                 $event = new ModelEditForm($form, $model);

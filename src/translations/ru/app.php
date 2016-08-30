@@ -12,7 +12,7 @@ return [
     'Properties' => 'Свойства',
     'Delete' => 'Удалить',
     'Create property group' => 'Создать группу свойств',
-    'Edit property group {id}' => 'Редактирование группы свойст {id}',
+    'Edit property group {id}' => 'Редактирование группы свойств #{id}',
     'Name' => 'Название',
     'Description' => 'Описание',
     'Internal Name' => 'Внутреннее название',

@@ -46,6 +46,10 @@ return [
                 ],
             ],
         ],
+        'authManager' => [
+            'class' => 'yii\rbac\PhpManager',
+            'defaultRoles' => ['DataStructureAdministrator'],
+        ],
     ],
     'modules' => [
         'gii' => [

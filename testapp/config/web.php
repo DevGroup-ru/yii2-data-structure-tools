@@ -77,6 +77,10 @@ $config = [
             'excludeRoutes' => false,
 
         ],
+        'authManager' => [
+            'class' => 'yii\rbac\PhpManager',
+            'defaultRoles' => ['DataStructureAdministrator'],
+        ],
     ],
     'extensions' => require(__DIR__ . '/../../vendor/yiisoft/extensions.php'),
     'params' => $params,

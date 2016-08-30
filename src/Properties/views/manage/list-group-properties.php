@@ -59,7 +59,7 @@ $this->params['breadcrumbs'][] = $this->title;
             [
                 'class' => ActionColumn::className(),
                 'buttons' => function ($model, $key, $index, $column) use ($propertyGroup) {
-                    $result  = [
+                    $result = [
                         'edit' => [
                             'url' => 'edit-property',
                             'icon' => 'pencil',
@@ -107,18 +107,18 @@ $this->params['breadcrumbs'][] = $this->title;
         ],
     ]); ?>
 
-    <p>
-        <?=
-        Html::a(
-            Icon::show('plus') . '&nbsp;' .
-            Module::t('app', 'Create property'),
-            [
-                $editPropertyActionId,
-                'propertyGroupId' => $propertyGroup->id,
-            ],
-            ['class' => 'btn btn-success']
-        )
-        ?>
-    </p>
+    <?php if (true === Yii::$app->user->can('dst-property-edit')) : ?>
+        <p>
+            <?= Html::a(
+                Icon::show('plus') . '&nbsp;' .
+                Module::t('app', 'Create property'),
+                [
+                    $editPropertyActionId,
+                    'propertyGroupId' => $propertyGroup->id,
+                ],
+                ['class' => 'btn btn-success']
+            ) ?>
+        </p>
+    <?php endif; ?>
 
 </div>

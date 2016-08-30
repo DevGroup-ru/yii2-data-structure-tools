@@ -43,5 +43,9 @@ return [
             'class' => 'yii2tech\filedb\Connection',
             'path' =>  dirname(dirname(__DIR__)) . '/testapp/config/data',
         ],
+        'authManager' => [
+            'class' => 'yii\rbac\PhpManager',
+            'defaultRoles' => ['DataStructureAdministrator'],
+        ],
     ],
 ];

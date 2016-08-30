@@ -128,25 +128,25 @@ $this->params['breadcrumbs'][] = $this->title;
         ],
     ]); ?>
 
-    <p>
-        <?=
-        Html::a(
-            Icon::show('plus') . '&nbsp;' .
-            Module::t('app', 'Create property group'),
-            [
-                $editPropertyGroupActionId,
-                'applicablePropertyModelId' => $currentApplicablePropertyModel['id'],
-            ],
-            [
-                'class' => 'btn btn-success',
-                'data-admin-url' => \yii\helpers\Url::to([
+    <?php if (true === Yii::$app->user->can('dst-property-group-edit')) : ?>
+        <p>
+            <?= Html::a(
+                Icon::show('plus') . '&nbsp;' .
+                Module::t('app', 'Create property group'),
+                [
                     $editPropertyGroupActionId,
                     'applicablePropertyModelId' => $currentApplicablePropertyModel['id'],
-                ])
+                ],
+                [
+                    'class' => 'btn btn-success',
+                    'data-admin-url' => \yii\helpers\Url::to([
+                        $editPropertyGroupActionId,
+                        'applicablePropertyModelId' => $currentApplicablePropertyModel['id'],
+                    ])
 
-            ]
-        )
-        ?>
-    </p>
+                ]
+            ) ?>
+        </p>
+    <?php endif; ?>
 
 </div>

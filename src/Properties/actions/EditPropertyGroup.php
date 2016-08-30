@@ -6,13 +6,27 @@ use DevGroup\AdminUtils\actions\BaseAdminAction;
 use DevGroup\DataStructure\models\PropertyGroup;
 use DevGroup\DataStructure\Properties\Module;
 use Yii;
+use yii\web\ForbiddenHttpException;
 use yii\web\NotFoundHttpException;
 
+/**
+ * Class EditPropertyGroup
+ *
+ * @package DevGroup\DataStructure\Properties\actions
+ */
 class EditPropertyGroup extends BaseAdminAction
 {
     public $listPropertyGroupsActionId = 'list-property-groups';
     public $viewFile = 'edit-property-group';
 
+    /**
+     * @param $applicablePropertyModelId
+     * @param null $id
+     * @return string|\yii\web\Response
+     * @throws ForbiddenHttpException
+     * @throws \Exception
+     * @throws bool
+     */
     public function run($applicablePropertyModelId, $id = null)
     {
         /** @var PropertyGroup $model */
@@ -29,9 +43,14 @@ class EditPropertyGroup extends BaseAdminAction
             // populate translations relation as we need to save all
             $model->translations;
         }
-
-
-        if (Yii::$app->request->isPost && $model->load(Yii::$app->request->post())) {
+        $post = Yii::$app->request->post();
+        $canSave = Yii::$app->user->can('dst-property-group-edit');
+        if (false === empty($post) && false === $canSave) {
+            throw new ForbiddenHttpException(
+                Yii::t('yii', 'You are not allowed to perform this action.')
+            );
+        }
+        if (Yii::$app->request->isPost && $model->load($post)) {
             foreach (Yii::$app->request->post('PropertyGroupTranslation', []) as $language => $data) {
                 foreach ($data as $attribute => $translation) {
                     $model->translate($language)->$attribute = $translation;
@@ -53,6 +72,7 @@ class EditPropertyGroup extends BaseAdminAction
             'model' => $model,
             'applicablePropertyModelId' => $model->applicable_property_model_id,
             'listPropertyGroupsActionId' => $this->listPropertyGroupsActionId,
+            'canSave' => $canSave,
         ]);
     }
 }

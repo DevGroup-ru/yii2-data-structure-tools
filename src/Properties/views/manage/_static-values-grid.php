@@ -23,18 +23,20 @@ $propertyGroupId = Yii::$app->request->get('propertyGroupId');
 <h2><?= Html::encode(Module::t('app', 'Static values')) ?></h2>
 
 <div class="form-group">
-    <?= Html::a(
-        Module::t('app', 'New Static value'),
-        [
-            'edit-static-value',
-            'property_id' => $property->id,
-            'propertyGroupId' => $propertyGroupId,
-            'return_url' => Helper::returnUrl()
-        ],
-        [
-            'class' => 'btn btn-primary'
-        ]
-    ) ?>
+    <?php if (true === Yii::$app->user->can('dst-static-values-edit')) : ?>
+        <?= Html::a(
+            Module::t('app', 'New Static value'),
+            [
+                'edit-static-value',
+                'property_id' => $property->id,
+                'propertyGroupId' => $propertyGroupId,
+                'return_url' => Helper::returnUrl()
+            ],
+            [
+                'class' => 'btn btn-primary'
+            ]
+        ) ?>
+    <?php endif; ?>
 
     <?php $pjax = Pjax::begin([
         'options' => [

@@ -14,6 +14,7 @@ use yii\widgets\ActiveForm;
 
 /***
  * @var StaticValue $model
+ * @var bool $canSave
  */
 
 $this->params['breadcrumbs'][] = [
@@ -82,16 +83,18 @@ $this->params['breadcrumbs'][] = $this->title;
         $this->trigger(EditStaticValue::EVENT_FORM_BEFORE_SUBMIT, $event);
         ?>
 
-        <?= FrontendHelper::formSaveButtons(
-            $model,
-            Url::to(
-                [
-                    'edit-property',
-                    'id' => $model->property_id,
-                    'propertyGroupId' => $model->property->defaultPropertyGroup->id
-                ]
-            )
-        ); ?>
+        <?php if (true === $canSave) : ?>
+            <?= FrontendHelper::formSaveButtons(
+                $model,
+                Url::to(
+                    [
+                        'edit-property',
+                        'id' => $model->property_id,
+                        'propertyGroupId' => $model->property->defaultPropertyGroup->id
+                    ]
+                )
+            ) ?>
+        <?php endif; ?>
 
         <?php
         $event = new ModelEditForm($form, $model);

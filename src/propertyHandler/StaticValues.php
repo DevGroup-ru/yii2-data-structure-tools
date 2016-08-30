@@ -45,6 +45,7 @@ class StaticValues extends AbstractPropertyHandler
             ],
         ];
     }
+
     /**
      * Forces property to be of integer data type
      * @param \DevGroup\DataStructure\models\Property $property
@@ -106,7 +107,9 @@ class StaticValues extends AbstractPropertyHandler
     public static function onPropertyEditForm(ModelEditForm $event)
     {
 
-        if (!$event->model->isNewRecord && $event->model->storage->class_name == \DevGroup\DataStructure\propertyStorage\StaticValues::className()) {
+        if (!$event->model->isNewRecord
+            && $event->model->storage->class_name == \DevGroup\DataStructure\propertyStorage\StaticValues::class
+        ) {
             $view = $event->getView();
             $model = $event->model;
             $staticValue = new StaticValue($model);

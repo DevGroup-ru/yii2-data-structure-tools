@@ -7,6 +7,7 @@ use DevGroup\AdminUtils\traits\BackendRedirect;
 use DevGroup\DataStructure\models\StaticValue;
 use DevGroup\DataStructure\Properties\Module;
 use Yii;
+use yii\web\ForbiddenHttpException;
 use yii\web\NotFoundHttpException;
 
 class EditStaticValue extends BaseAdminAction
@@ -17,11 +18,11 @@ class EditStaticValue extends BaseAdminAction
 
     const EVENT_BEFORE_INSERT = 'static-value-before-insert';
     const EVENT_BEFORE_UPDATE = 'static-value-before-update';
-    const EVENT_AFTER_INSERT  = 'static-value-after-insert';
-    const EVENT_AFTER_UPDATE  = 'static-value-after-update';
+    const EVENT_AFTER_INSERT = 'static-value-after-insert';
+    const EVENT_AFTER_UPDATE = 'static-value-after-update';
 
     const EVENT_FORM_BEFORE_SUBMIT = 'static-value-form-before-submit';
-    const EVENT_FORM_AFTER_SUBMIT  = 'static-value-form-after-submit';
+    const EVENT_FORM_AFTER_SUBMIT = 'static-value-form-after-submit';
 
     const EVENT_BEFORE_FORM = 'static-value-before-form';
     const EVENT_AFTER_FORM = 'static-value-after-form';
@@ -46,8 +47,14 @@ class EditStaticValue extends BaseAdminAction
 
         $model->loadDefaultValues();
 
-
-        if (Yii::$app->request->isPost && $model->load(Yii::$app->request->post())) {
+        $post = Yii::$app->request->post();
+        $canSave = Yii::$app->user->can('dst-property-group-edit');
+        if (false === empty($post) && false === $canSave) {
+            throw new ForbiddenHttpException(
+                Yii::t('yii', 'You are not allowed to perform this action.')
+            );
+        }
+        if (Yii::$app->request->isPost && $model->load($post)) {
             foreach (Yii::$app->request->post('StaticValueTranslation', []) as $language => $data) {
                 foreach ($data as $attribute => $translation) {
                     $model->translate($language)->$attribute = $translation;
@@ -74,6 +81,7 @@ class EditStaticValue extends BaseAdminAction
 
         return $this->render([
             'model' => $model,
+            'canSave' => $canSave,
         ]);
     }
 
