@@ -18,14 +18,14 @@ use yii\web\ServerErrorHttpException;
 trait PropertiesTrait
 {
     /**
-     * @var null|integer[] Array of property_group_ids
+     * @var integer[] Array of property_group_ids
      */
     public $propertyGroupIds = null;
 
-    /** @var null|integer[] Array of properties ids */
+    /** @var integer[] Array of properties ids */
     public $propertiesIds = null;
 
-    /** @var null|string[] Array of properties attributes names indexed by property ids */
+    /** @var string[] Array of properties attributes names indexed by property ids */
     public $propertiesAttributes = null;
 
     /** @var array Array of properties values indexed by property id */
