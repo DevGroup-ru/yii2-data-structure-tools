@@ -233,7 +233,7 @@ class HasProperties extends Behavior
         // check for auto added property groups
         $owner->ensurePropertyGroupIds();
         $autoAddedGroups = PropertyGroup::getAutoAddedGroupsIds(
-            PropertiesHelper::applicablePropertyModelId($owner->className())
+            PropertiesHelper::applicablePropertyModelId($owner)
         );
 
         foreach ($autoAddedGroups as $id) {

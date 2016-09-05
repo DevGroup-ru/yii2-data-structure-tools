@@ -63,20 +63,26 @@ class PropertiesHelper
     /**
      * Returns id of property_group_models record for requested classname
      *
-     * @param string $className
+     * @param ActiveRecord | string $class
      * @param bool|false $forceRefresh
      *
      * @return integer
      * @throws \yii\base\Exception
      */
-    public static function applicablePropertyModelId($className, $forceRefresh = false)
+    public static function applicablePropertyModelId($class, $forceRefresh = false)
     {
+        //ability to store properties of all model heirs in the one set of tables
+        if (true === method_exists($class, 'getApplicableClass')) {
+            $modelClass = $class::getApplicableClass();
+        } else {
+            $modelClass = is_string($class) ? $class : get_class($class);
+        }
         self::retrieveApplicablePropertyModels($forceRefresh);
 
-        if (isset(self::$applicablePropertyModels[$className])) {
-            return self::$applicablePropertyModels[$className];
+        if (isset(self::$applicablePropertyModels[$modelClass])) {
+            return self::$applicablePropertyModels[$modelClass];
         } else {
-            throw new Exception('Property group model record not found for class: ' . $className);
+            throw new Exception('Property group model record not found for class: ' . $modelClass);
         }
     }
 
@@ -442,7 +448,8 @@ class PropertiesHelper
         $customDependency = null,
         $customKey = '',
         $cacheLifetime = 86400
-    ) {
+    )
+    {
         $storageClass = $property->storage->class_name;
         return $storageClass::getPropertyValuesByParams(
             $property->id,
@@ -457,7 +464,8 @@ class PropertiesHelper
         Property $property,
         $values = [],
         $returnType = AbstractPropertyStorage::RETURN_ALL
-    ) {
+    )
+    {
         $storageClass = $property->storage->class_name;
         return $storageClass::getModelsByPropertyValues($property->id, $values, $returnType);
     }

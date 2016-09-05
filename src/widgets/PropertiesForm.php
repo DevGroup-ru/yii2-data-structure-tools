@@ -142,7 +142,8 @@ class PropertiesForm extends Widget
             throw new InvalidParamException('Field "form" must be an ActiveForm');
         }
         PropertiesFormAsset::register($this->getView());
-        $availableGroups = PropertiesHelper::getAvailablePropertyGroupsList(get_class($this->model));
+
+        $availableGroups = PropertiesHelper::getAvailablePropertyGroupsList($this->model);
         $models = [$this->model];
         PropertiesHelper::fillProperties($models);
         $attachedGroups = $this->getAttachedGroups();
