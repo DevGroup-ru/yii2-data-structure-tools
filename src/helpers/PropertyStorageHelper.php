@@ -53,10 +53,7 @@ class PropertyStorageHelper
     {
         $className = get_class($model);
         if (isset(self::$applicablePropertyModelStorageIds[$className]) === false) {
-            $apmId = ApplicablePropertyModels::find()
-                ->select('id')
-                ->where(['class_name' => $className])
-                ->scalar();
+            $apmId = PropertiesHelper::applicablePropertyModelId($model);
             if ($apmId === false) {
                 return [];
             }
