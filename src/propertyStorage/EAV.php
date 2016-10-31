@@ -276,7 +276,7 @@ class EAV extends AbstractPropertyStorage
             return [];
         }
         $rows = [];
-        foreach ($values as $index => $value) {
+        foreach ((array) $values as $index => $value) {
             if ($value !== 0 && true === empty($value)) {
                 continue;
             }

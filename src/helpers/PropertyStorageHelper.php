@@ -8,6 +8,7 @@ use DevGroup\DataStructure\models\PropertyGroup;
 use DevGroup\DataStructure\models\PropertyPropertyGroup;
 use DevGroup\DataStructure\models\PropertyStorage;
 use Yii;
+use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
 use yii\helpers\ArrayHelper;
 use yii\web\ServerErrorHttpException;
@@ -51,23 +52,25 @@ class PropertyStorageHelper
      */
     public static function getHandlersForModel(ActiveRecord $model)
     {
-        $className = get_class($model);
+        $className = $model->hasMethod('getApplicableClass')
+            ? call_user_func([$model, 'getApplicableClass'])
+            : get_class($model);
         if (isset(self::$applicablePropertyModelStorageIds[$className]) === false) {
             $apmId = PropertiesHelper::applicablePropertyModelId($model);
             if ($apmId === false) {
                 return [];
             }
-            $pgIds = PropertyGroup::find()
+            $pgIds = (new ActiveQuery(PropertyGroup::class))
                 ->select('id')
                 ->where(['applicable_property_model_id' => $apmId])
                 ->column();
             if (empty($pgIds) === true) {
                 return [];
             }
-            self::$applicablePropertyModelStorageIds[$className] = Property::find()
+            self::$applicablePropertyModelStorageIds[$className] = (new ActiveQuery(Property::class))
                 ->from(Property::tableName() . ' p')
-                ->distinct(true)
                 ->select('storage_id')
+                ->distinct(true)
                 ->join('JOIN', PropertyPropertyGroup::tableName() . ' pg', 'p.id = pg.property_id AND pg.property_group_id IN (' . implode(',', $pgIds) . ')')
                 ->column();
         }
