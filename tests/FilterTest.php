@@ -72,6 +72,7 @@ class FilterTest extends \PHPUnit_Extensions_Database_TestCase
 
     private function importDump($filename)
     {
+        Yii::$app->cache->flush();
         $lines = explode(';', file_get_contents(__DIR__ . "/migrations/$filename"));
 
         foreach ($lines as $line) {
@@ -120,12 +121,14 @@ class FilterTest extends \PHPUnit_Extensions_Database_TestCase
 
     public function testFiltering()
     {
+//        sleep(10);
         //single selections
         //  static values
         $this->assertFilter(['1' => ['metal'],], 1, [1]);
         $this->assertFilter(['1' => ['plastic'],], 3, [2, 4, 5]);
         $this->assertFilter(['1' => ['glass']]);
         $this->assertFilter(['1' => ['stone']]);
+
 
         //  eav
         $this->assertFilter(['3' => ['138*67*7'],], 1, [1]);
@@ -264,13 +267,31 @@ class FilterTest extends \PHPUnit_Extensions_Database_TestCase
 
     private function assertFilter($selections, $expectedCount = 0, $expectedIds = [])
     {
-        $this->assertEquals(
-            [Product::className() => $expectedCount],
-            PropertiesFilterHelper::filterObjects($selections, AbstractPropertyStorage::RETURN_COUNT)
-        );
         $result = PropertiesFilterHelper::filterObjects($selections);
-        foreach ($result[Product::className()] as $item) {
-            $this->assertNotFalse(array_search($item->id, $expectedIds));
-        }
+        $this->assertSame([Product::className()], array_keys($result));
+
+        $resultedIds = $this->sortAndCast($result[Product::className()]);
+
+        $expectedIds = $this->sortAndCast($expectedIds);
+
+        $this->assertSame($expectedCount, count($resultedIds));
+
+        $this->assertSame(count($expectedIds), count($resultedIds));
+        $this->assertSame($expectedIds, $resultedIds);
+
+    }
+
+    private function sortAndCast($result)
+    {
+        $result = array_reduce($result, function($carry, $item) {
+            if (is_object($item)) {
+                $carry[] = (int) $item->id;
+            } else {
+                $carry[] = (int) $item;
+            }
+            return $carry;
+        }, []);
+        sort($result);
+        return $result;
     }
 }
