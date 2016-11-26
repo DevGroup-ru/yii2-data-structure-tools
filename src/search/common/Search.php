@@ -11,6 +11,7 @@ use DevGroup\DataStructure\search\base\AbstractSearch;
 use DevGroup\DataStructure\traits\PropertiesTrait;
 use DevGroup\TagDependencyHelper\TagDependencyTrait;
 use Yii;
+use yii\caching\TagDependency;
 use yii\db\ActiveRecord;
 use yii\helpers\ArrayHelper;
 
@@ -111,7 +112,7 @@ class Search extends AbstractSearch
         }
         return $data;
     }
-    
+
     /**
      * @inheritdoc
      */
@@ -163,7 +164,16 @@ class Search extends AbstractSearch
         }
         $storage = [];
         foreach ($list as $storageClass) {
-            if (false === $storageId = $query->params([':className' => $storageClass])->scalar()) {
+            $storageId = PropertyStorage::getDb()->cache(
+                function ($db) use ($storageClass, $query) {
+                    return $query
+                        ->params([':className' => $storageClass])
+                        ->scalar($db);
+                },
+                86400,
+                new TagDependency(['tags' => [PropertyStorage::commonTag()]])
+            );
+            if (false === $storageId) {
                 continue;
             }
             $storage[$storageId] = $storageClass;

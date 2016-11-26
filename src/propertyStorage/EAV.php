@@ -56,7 +56,14 @@ class EAV extends AbstractPropertyStorage
             },
             'model_id'
         );
-        $textAreaHandlerId = PropertyHandlers::find()->select('id')->where(['class_name' => TextArea::class])->scalar();
+
+        $textAreaHandlerId = PropertyHandlers::getDb()->cache(
+            function ($db) {
+                return PropertyHandlers::find()->select('id')->where(['class_name' => TextArea::class])->scalar($db);
+            },
+            86400,
+            new TagDependency(['tags' => [PropertyHandlers::commonTag()]])
+        );
         foreach ($models as &$model) {
             if (isset($values[$model->id])) {
                 $groupedByProperty = ArrayHelper::map(
@@ -697,7 +704,7 @@ class EAV extends AbstractPropertyStorage
         }
         return $result;
     }
-    
+
     /**
      * @param HasProperties|PropertiesTrait|\DevGroup\TagDependencyHelper\TagDependencyTrait|string|ActiveRecord $modelClass
      * @param array $selections
