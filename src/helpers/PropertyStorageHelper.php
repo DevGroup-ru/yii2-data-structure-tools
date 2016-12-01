@@ -60,6 +60,7 @@ class PropertyStorageHelper
             if ($apmId === false) {
                 return [];
             }
+            //! @todo Add cache here
             $pgIds = (new ActiveQuery(PropertyGroup::class))
                 ->select('id')
                 ->where(['applicable_property_model_id' => $apmId])

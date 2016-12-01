@@ -59,6 +59,7 @@ class HasProperties extends Behavior
     public function afterFind()
     {
         if ($this->autoFetchProperties === true) {
+
             /** @var \yii\db\ActiveRecord|\DevGroup\DataStructure\traits\PropertiesTrait $owner */
             $owner = $this->owner;
             $owner->ensurePropertyGroupIds();
@@ -110,6 +111,9 @@ class HasProperties extends Behavior
      */
     public function canGetProperty($name, $checkVars = true)
     {
+        if (property_exists($this, $name)) {
+            return true;
+        }
         if ($this->hasPropertyKey($name)) {
             return true;
         }
@@ -125,6 +129,9 @@ class HasProperties extends Behavior
      */
     public function canSetProperty($name, $checkVars = true)
     {
+        if (property_exists($this, $name)) {
+            return true;
+        }
         if ($this->hasPropertyKey($name)) {
             return true;
         }
