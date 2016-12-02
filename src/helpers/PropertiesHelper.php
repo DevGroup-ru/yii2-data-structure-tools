@@ -129,6 +129,7 @@ class PropertiesHelper
         if (count($models) === 0) {
             return [];
         }
+        //! @todo Add check for not retrieving properties twice
         static::fillPropertyGroups($models);
         static::ensurePropertiesAttributes($models);
 
@@ -139,7 +140,7 @@ class PropertiesHelper
 
         foreach ($storageHandlers as $storage) {
             Yii::beginProfile('Fill properties: ' . $storage::className());
-            if (true === $frontend && get_class($storage) == EAV::class) {
+            if (true === $frontend && get_class($storage) === EAV::class) {
                 /** @var EAV $storage */
                 $storage->fillProperties($models, Yii::$app->multilingual->language_id);
             } else {

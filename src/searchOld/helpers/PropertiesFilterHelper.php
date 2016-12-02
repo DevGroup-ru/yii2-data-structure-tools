@@ -100,6 +100,8 @@ class PropertiesFilterHelper extends Object
                     );
                 }
                 break;
+            case Filter::RETURN_QUERY:
+                // do nothing, as we already have prepared query there
         }
 
         return $prepareState;

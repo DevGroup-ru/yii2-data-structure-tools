@@ -75,6 +75,7 @@ class PropertyStorageHelper
                 ->join('JOIN', PropertyPropertyGroup::tableName() . ' pg', 'p.id = pg.property_id AND pg.property_group_id IN (' . implode(',', $pgIds) . ')')
                 ->column();
         }
+
         $storageHandlers = static::storageHandlers();
         $result = [];
         foreach (self::$applicablePropertyModelStorageIds[$className] as $id) {
@@ -82,6 +83,7 @@ class PropertyStorageHelper
                 $result[] = $storageHandlers[$id];
             }
         }
+
         return $result;
     }
 

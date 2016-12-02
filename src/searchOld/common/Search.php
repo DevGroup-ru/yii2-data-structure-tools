@@ -48,6 +48,7 @@ class Search extends AbstractSearch
         $data = false;
         ksort($params);
         /** @var AbstractPropertyStorage $one */
+
         foreach ($storage as $one) {
             $modelIds = $one::getModelIdsByValues($modelClass, $params);
             if ($modelIds === false) {
