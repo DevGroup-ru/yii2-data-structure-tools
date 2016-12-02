@@ -18,7 +18,7 @@
     "require": {
         "php": ">=5.5.0",
         "yiisoft/yii2": "^2.0.6",
-        "devgroup/yii2-tag-dependency-helper": "~1.5.0",
+        "devgroup/yii2-tag-dependency-helper": "~1.5",
         "unclead/yii2-multiple-input": "~1.2.3",
         "devgroup/yii2-multilingual": "*",
         "devgroup/yii2-entity": "*",
