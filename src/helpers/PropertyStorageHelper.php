@@ -7,6 +7,7 @@ use DevGroup\DataStructure\models\Property;
 use DevGroup\DataStructure\models\PropertyGroup;
 use DevGroup\DataStructure\models\PropertyPropertyGroup;
 use DevGroup\DataStructure\models\PropertyStorage;
+use DevGroup\TagDependencyHelper\LazyCache;
 use Yii;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
@@ -60,11 +61,16 @@ class PropertyStorageHelper
             if ($apmId === false) {
                 return [];
             }
-            //! @todo Add cache here
-            $pgIds = (new ActiveQuery(PropertyGroup::class))
-                ->select('id')
-                ->where(['applicable_property_model_id' => $apmId])
-                ->column();
+            /** @var LazyCache $cache */
+            $cache = Yii::$app->cache;
+
+            $pgIds = $cache->lazy(function() use ($apmId) {
+                return (new ActiveQuery(PropertyGroup::class))
+                    ->select('id')
+                    ->where(['applicable_property_model_id' => $apmId])
+                    ->column();
+            }, "pgIds:$apmId", 86400, PropertyGroup::commonTag());
+
             if (empty($pgIds) === true) {
                 return [];
             }

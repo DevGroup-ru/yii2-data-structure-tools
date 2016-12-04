@@ -11,5 +11,6 @@ class ResultResponse extends QueryResponse
      * @var yii\db\ActiveRecord[]|SearchableEntity[] Entities
      */
     public $entities = [];
-
+    /** @var  yii\data\Pagination */
+    public $pages;
 }

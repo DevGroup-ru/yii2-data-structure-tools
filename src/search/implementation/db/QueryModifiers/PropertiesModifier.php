@@ -22,10 +22,12 @@ class PropertiesModifier
 
         /** @var yii\db\ActiveQuery $activeQuery */
         $activeQuery = &$e->params['activeQuery'];
+        $mainEntityClassName = $searchQuery->mainEntityClassName;
+        $column = $mainEntityClassName::tableName() . '.id';
         foreach ($searchQuery->properties as $className => $selections) {
             $queries = static::filterObjects($className, $selections);
             foreach ($queries as $c => $q) {
-                $activeQuery->andWhere(['in', 'id', $q]);
+                $activeQuery->andWhere(['in', $column, $q]);
             }
         }
     }

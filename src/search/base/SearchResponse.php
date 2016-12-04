@@ -24,6 +24,9 @@ abstract class SearchResponse extends yii\base\Component
      */
     public $success = false;
 
+    /** @var SearchQuery */
+    public $searchQuery;
+
     public function __construct(array $config = [])
     {
         parent::__construct($config);

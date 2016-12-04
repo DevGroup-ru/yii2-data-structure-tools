@@ -13,6 +13,7 @@ use DevGroup\DataStructure\search\implementation\db\QueryModifiers\DefaultWith;
 use DevGroup\DataStructure\search\implementation\db\QueryModifiers\LimitOffset;
 use DevGroup\DataStructure\search\implementation\db\QueryModifiers\MainEntityAttributes;
 use DevGroup\DataStructure\search\implementation\db\QueryModifiers\PropertiesModifier;
+use DevGroup\DataStructure\search\implementation\db\QueryModifiers\RelationAttributes;
 use DevGroup\DataStructure\search\response\CountResponse;
 use DevGroup\DataStructure\search\response\ResultResponse;
 use DevGroup\DataStructure\search\response\QueryResponse;
@@ -26,8 +27,11 @@ class DbSearcher extends AbstractSearcher
         $this->on(self::EVENT_BEFORE_PAGINATION, [DefaultAttributesScope::class, 'modify']);
         $this->on(self::EVENT_BEFORE_PAGINATION, [DefaultWith::class, 'modify']);
         $this->on(self::EVENT_BEFORE_PAGINATION, [MainEntityAttributes::class, 'modify']);
-        $this->on(self::EVENT_BEFORE_PAGINATION, [LimitOffset::class, 'modify']);
+        $this->on(self::EVENT_BEFORE_PAGINATION, [RelationAttributes::class, 'modify']);
         $this->on(self::EVENT_BEFORE_PAGINATION, [PropertiesModifier::class, 'modify']);
+
+        $this->on(self::EVENT_AFTER_PAGINATION, [LimitOffset::class, 'modify']);
+
     }
 
     /**
@@ -64,14 +68,27 @@ class DbSearcher extends AbstractSearcher
         $pages = $searchQuery->getPagination();
         if ($returnType !== BaseSearch::SEARCH_COUNT && $pages !== null) {
             if ($pages->totalCount === 0) {
-                $pages->totalCount = $activeQuery->count('id');
+                $column = $mainEntityClassName::tableName() . '.id';
+                $pages->totalCount = (int) $activeQuery->count($column);
             }
             $searchQuery->limit = $pages->limit;
             $searchQuery->offset = $pages->offset;
         }
 
+        $e = new SearchEvent(
+            $searchQuery,
+            $returnType,
+            $response,
+            [
+                'params' => [
+                    'activeQuery' => &$activeQuery,
+                    'pages' => $pages,
+                ],
+            ]
+        );
+        $this->trigger(self::EVENT_AFTER_PAGINATION, $e);
 
-
+        $response->searchQuery = $searchQuery;
 
         switch ($returnType) {
             case BaseSearch::SEARCH_COUNT:
@@ -88,6 +105,7 @@ class DbSearcher extends AbstractSearcher
                 /** @var ResultResponse $response */
                 // query for debug
                 $response->query = $activeQuery;
+                $response->pages = $pages;
                 $response->entities = $activeQuery->all();
                 $e = new SearchEvent(
                     $searchQuery,

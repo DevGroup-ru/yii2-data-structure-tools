@@ -11,7 +11,8 @@ use yii;
 
 abstract class AbstractSearcher extends yii\base\Component
 {
-    const EVENT_BEFORE_PAGINATION = 'after-pagination';
+    const EVENT_BEFORE_PAGINATION = 'before-pagination';
+    const EVENT_AFTER_PAGINATION = 'after-pagination';
     const EVENT_AFTER_FIND = 'after-find';
 
 

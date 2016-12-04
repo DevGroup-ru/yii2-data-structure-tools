@@ -38,6 +38,25 @@ class BaseSearch extends yii\base\Component
     }
 
     /**
+     * @param string|array $json
+     *
+     * @return \DevGroup\DataStructure\search\base\SearchQuery
+     */
+    public function searchFromJson($json)
+    {
+        if (is_string($json)) {
+            $json = yii\helpers\Json::decode($json);
+        }
+        if (isset($json['mainEntityClassName'], $json['searchQuery']) === false) {
+            throw new \RuntimeException("mainEntityClassName and searchQuery needed to be in json for search");
+        }
+        $mainEntityClassName = $json['mainEntityClassName'];
+        $q = new SearchQuery($mainEntityClassName, $this, $json['searchQuery']);
+        $q->pagination($q->pagination);
+        return $q;
+    }
+
+    /**
      * @param \DevGroup\DataStructure\search\base\SearchQuery $searchQuery
      * @param int $returnType Return type(count, query, result, ids)
      * @return SearchResponse

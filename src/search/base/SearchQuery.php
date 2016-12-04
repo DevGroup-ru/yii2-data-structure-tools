@@ -5,6 +5,13 @@ namespace DevGroup\DataStructure\search\base;
 use yii;
 use yii\data\Pagination;
 
+/**
+ * Class SearchQuery
+ *
+ * Example usage: https://gist.github.com/bethrezen/abbf1c6ff7d93aa70e8e3e8eae695ce7
+ *
+ * @package DevGroup\DataStructure\search\base
+ */
 class SearchQuery extends yii\base\Component
 {
     /**
@@ -20,7 +27,7 @@ class SearchQuery extends yii\base\Component
     /**
      * @var yii\data\Pagination
      */
-    protected $pagination;
+    public $pagination;
 
     /**
      * @var bool Whether to fill properties in all models if they are supported
@@ -55,6 +62,11 @@ class SearchQuery extends yii\base\Component
     /**
      * @var array
      */
+    public $relationAttributes = [];
+
+    /**
+     * @var array
+     */
     public $properties = [];
 
     /**
@@ -81,13 +93,50 @@ class SearchQuery extends yii\base\Component
     }
 
     /**
-     * @param array|Pagination|string $config Array of component configuration, component instance or classname.
+     * Fills properties filtration and return searchQuery
+     * @param array $properties
+     *
+     * @return $this
+     */
+    public function properties($properties)
+    {
+        $this->properties = $properties;
+        return $this;
+    }
+
+    /**
+     * Fills mainEntityAttributes filtration and return searchQuery
+     * @param array $mainEntityAttributes
+     *
+     * @return $this
+     */
+    public function mainEntityAttributes($mainEntityAttributes)
+    {
+        $this->mainEntityAttributes= $mainEntityAttributes;
+        return $this;
+    }
+
+    /**
+     * Fills relationAttributes filtration and return searchQuery
+     * @param array $relationAttributes
+     *
+     * @return $this
+     */
+    public function relationAttributes($relationAttributes)
+    {
+        $this->relationAttributes= $relationAttributes;
+        return $this;
+    }
+
+    /**
+     * @param array|Pagination|string|bool $config Array of component configuration, component instance or classname.
      *
      * @return $this
      */
     public function pagination($config)
     {
-        if (is_array($config)) {
+        if (is_array($config) || $config === true) {
+            $config = $config === true ? ['class' => Pagination::class] : $config;
             $this->pagination = Yii::createObject($config);
         } elseif (is_object($config)) {
             $this->pagination = &$config;
@@ -106,7 +155,7 @@ class SearchQuery extends yii\base\Component
      */
     public function getPagination()
     {
-        if ($this->pagination !== null && $this->limit) {
+        if (is_object($this->pagination) && $this->limit) {
             $this->pagination->defaultPageSize = $this->limit;
         }
         return $this->pagination;
