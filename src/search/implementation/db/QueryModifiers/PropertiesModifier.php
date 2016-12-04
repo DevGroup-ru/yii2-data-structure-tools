@@ -53,8 +53,8 @@ class PropertiesModifier
             $storageClass = $storage->class_name;
             if ($storageClass === TableInheritance::class) {
                 $tiSelections[$propertyId] = $values;
+                unset($selections[$propertyId]);
             }
-            unset($selections[$propertyId]);
         }
         // go through other properties
         foreach ($selections as $propertyId => $values) {
