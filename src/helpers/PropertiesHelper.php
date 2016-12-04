@@ -476,6 +476,7 @@ class PropertiesHelper
         $returnType = AbstractPropertyStorage::RETURN_ALL
     )
     {
+        /** @var AbstractPropertyStorage $storageClass */
         $storageClass = $property->storage->class_name;
         return $storageClass::getModelsByPropertyValues($property->id, $values, $returnType);
     }

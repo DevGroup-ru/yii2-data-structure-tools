@@ -10,6 +10,7 @@ use yii\caching\TagDependency;
 use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
 use yii\db\Expression;
+use yii\db\Query;
 use yii\helpers\ArrayHelper;
 
 /**
@@ -34,6 +35,13 @@ class PropertiesFilterHelper extends Object
             return [];
         }
         $tags = [];
+        /**
+         * Что тут плохо:
+         * 1. Не понятно, к чему тут такой цикл
+         * 2. Из EAV можно сразу выбирать model_id без JOIN - это быстрее будет.
+         * ID потом пересекаются с основной таблицей и за счёт других условий убираются ненужные.
+         *
+         */
         foreach ($propertySelections as $propertyId => $propertySelection) {
             $property = Property::findById($propertyId);
             $tags[] = $property->objectTag();
@@ -45,6 +53,8 @@ class PropertiesFilterHelper extends Object
         }
 
         $firstElement = array_shift($selections);
+
+
         $prepareState = array_reduce(
             $selections,
             function ($result, $item) {
@@ -65,7 +75,7 @@ class PropertiesFilterHelper extends Object
              * Now we gather ids and ask for models using subquery
              */
             /** @var ActiveRecord $className */
-            $prepareState[$className] = $className::find()
+            $prepareState[$className] = (new Query())
                 ->select('`t`.`id`')
                 ->from(['t' => $query])
                 ->addGroupBy('t.id')
@@ -101,7 +111,10 @@ class PropertiesFilterHelper extends Object
                 }
                 break;
             case Filter::RETURN_QUERY:
-                // do nothing, as we already have prepared query there
+                foreach ($prepareState as $className => $item) {
+                    $prepareState[$className] =  $item;
+                }
+                break;
         }
 
         return $prepareState;

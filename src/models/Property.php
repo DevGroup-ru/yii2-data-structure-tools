@@ -333,12 +333,13 @@ class Property extends ActiveRecord
     {
         parent::afterFind();
         static::$propertyIdToKey[$this->id] = $this->key;
+        static::$identityMap[$this->id] = $this;
 
         // cast scalar values
-        $this->allow_multiple_values = boolval($this->allow_multiple_values);
-        $this->is_internal = boolval($this->is_internal);
-        $this->data_type = intval($this->data_type);
-        $this->property_handler_id = intval($this->property_handler_id);
+        $this->allow_multiple_values = (bool) $this->allow_multiple_values;
+        $this->is_internal = (bool) $this->is_internal;
+        $this->data_type = (int) $this->data_type;
+        $this->property_handler_id = (int) $this->property_handler_id;
     }
 
     /**
@@ -406,15 +407,15 @@ class Property extends ActiveRecord
     {
         switch ($type) {
             case Property::DATA_TYPE_FLOAT:
-                return empty($value) ? null : floatval($value);
+                return empty($value) ? null : (float) $value;
                 break;
 
             case Property::DATA_TYPE_BOOLEAN:
-                return empty($value) ? null : boolval($value);
+                return empty($value) ? null : (bool) $value;
                 break;
 
             case Property::DATA_TYPE_INTEGER:
-                return empty($value) ? null : intval($value);
+                return empty($value) ? null : (int) $value;
                 break;
 
             default:
@@ -506,6 +507,37 @@ class Property extends ActiveRecord
     }
 
     /**
+     * Returns properties by ids
+     * @param int[] $ids
+     * @param bool  $throwException
+     * @todo  Add SMART cache here
+     *
+     * @return mixed
+     */
+    public static function findByIds($ids, $throwException = true)
+    {
+        $ids = array_unique($ids);
+        $ids = array_map('intval', $ids);
+        $ids2find = array_diff($ids, array_keys(static::$identityMap));
+        if (count($ids2find) > 0) {
+            Property::find()->where(['in', 'id', $ids2find])->all();
+        }
+
+        return array_reduce(
+            $ids,
+            function ($carry, $id) use ($throwException) {
+                if (isset(static::$identityMap[$id])) {
+                    $carry[$id] = static::$identityMap[$id];
+                } elseif ($throwException) {
+                    throw new \RuntimeException("Property $id not found");
+                }
+                return $carry;
+            },
+            []
+        );
+    }
+
+    /**
      * @return array of all data types
      */
     public static function getDataTypes()
@@ -563,7 +595,16 @@ class Property extends ActiveRecord
      */
     public function getStorage()
     {
+        // please don't use relation if not needed, use storage() otherwise
         return $this->hasOne(PropertyStorage::className(), ['id' => 'storage_id']);
+    }
+
+    /**
+     * @return PropertyStorage
+     */
+    public function storage()
+    {
+        return PropertyStorage::loadModel($this->storage_id, false, true, 86400, true, true);
     }
 
     public function afterBind($propertyGroup)

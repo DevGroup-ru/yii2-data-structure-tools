@@ -37,7 +37,7 @@
         "yiisoft/yii2-bootstrap": "^2.0@dev",
         "devgroup/yii2-admin-utils": "dev-master",
         "devgroup/dotplant-dev": "~1.0.0",
-        "elasticsearch/elasticsearch": "^2.1",
+        "elasticsearch/elasticsearch": "~5.0",
         "dmstr/yii2-migrate-command": "^0.3.1"
     },
     "autoload": {

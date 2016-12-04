@@ -50,8 +50,22 @@ class SearchQuery extends yii\base\Component
     /**
      * @var array
      */
-    public $conditions = [];
+    public $mainEntityAttributes = [];
 
+    /**
+     * @var array
+     */
+    public $properties = [];
+
+    /**
+     * @var int
+     */
+    public $limit = 10;
+
+    /**
+     * @var int
+     */
+    public $offset = 0;
     /**
      * SearchQuery constructor.
      *
@@ -92,6 +106,9 @@ class SearchQuery extends yii\base\Component
      */
     public function getPagination()
     {
+        if ($this->pagination !== null && $this->limit) {
+            $this->pagination->defaultPageSize = $this->limit;
+        }
         return $this->pagination;
     }
 

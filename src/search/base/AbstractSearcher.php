@@ -11,7 +11,7 @@ use yii;
 
 abstract class AbstractSearcher extends yii\base\Component
 {
-    const EVENT_AFTER_PAGINATION = 'after-pagination';
+    const EVENT_BEFORE_PAGINATION = 'after-pagination';
     const EVENT_AFTER_FIND = 'after-find';
 
 
@@ -27,7 +27,7 @@ abstract class AbstractSearcher extends yii\base\Component
 
     public function init()
     {
-        $this->on(self::EVENT_AFTER_PAGINATION, [DisablePropertiesAutoFetch::class, 'modify']);
+        $this->on(self::EVENT_BEFORE_PAGINATION, [DisablePropertiesAutoFetch::class, 'modify']);
         $this->on(self::EVENT_AFTER_FIND, [FetchProperties::class, 'modify']);
     }
 

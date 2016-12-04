@@ -219,14 +219,14 @@ class EAV extends AbstractPropertyStorage
                     $condition = ['model_id' => $modelId, 'property_id' => $propertyIds];
                 }
             }
-            $firstModel->getDb()->createCommand()->delete($firstModel->eavTable(), $condition)->execute();
+            $firstModel::getDb()->createCommand()->delete($firstModel::eavTable(), $condition)->execute();
         }
         if (count($insertRows) === 0) {
             return true;
         }
-        $cmd = $firstModel->getDb()->createCommand();
+        $cmd = $firstModel::getDb()->createCommand();
         return $cmd->batchInsert(
-                $firstModel->eavTable(),
+                $firstModel::eavTable(),
                 [
                     'model_id',
                     'property_id',
@@ -339,8 +339,8 @@ class EAV extends AbstractPropertyStorage
     public function deleteProperties($models, $propertyIds)
     {
         foreach ($models as $model) {
-            $model->getDb()->createCommand()->delete(
-                    $model->eavTable(),
+            $model::getDb()->createCommand()->delete(
+                    $model::eavTable(),
                     ['model_id' => $model->id, 'property_id' => (array) $propertyIds]
                 )->execute();
         }
@@ -533,15 +533,18 @@ class EAV extends AbstractPropertyStorage
         $column = static::dataTypeToEavColumn($property->data_type);
         foreach ($classNames as $className) {
             $eavTable = $className::eavTable();
-            $tmpQuery = $className::find()->innerJoin(
-                "$eavTable  EAV",
-                $className::tableName() . '.id= EAV.model_id'
-            )->andWhere(
-                [
-                    'EAV.property_id' => $propertyId,
-                    'EAV.' . $column => $values,
-                ]
-            )->addGroupBy($className::primaryKey());
+            $tmpQuery = (new Query())
+                ->select($className::tableName() . '.`id` id')
+                ->from($className::tableName())
+                ->innerJoin(
+                    "$eavTable  EAV",
+                    $className::tableName() . '.id= EAV.model_id'
+                )->andWhere(
+                    [
+                        'EAV.property_id' => $propertyId,
+                        'EAV.' . $column => $values,
+                    ]
+                )->addGroupBy($className::primaryKey());
             $dependency = static::dependencyHelper(
                 $customDependency,
                 ArrayHelper::merge($tags, (array) $className::commonTag())
@@ -781,5 +784,31 @@ class EAV extends AbstractPropertyStorage
             Yii::$app->cache->set($cacheKey, $result, $cacheLifetime, $dependency);
         }
         return $result;
+    }
+
+
+    /**
+     * @inheritdoc
+     */
+    public static function modelIdsQuery($modelClass, $propertyId, $values)
+    {
+        $property = Property::findById($propertyId);
+        $column = static::dataTypeToEavColumn($property->data_type);
+
+        $values = array_map(
+            function ($val) use ($property) {
+                return Property::castValueToDataType($val, $property->data_type);
+            },
+            $values
+        );
+
+        return (new Query())
+            ->select('model_id')
+            ->from($modelClass::eavTable())
+            ->where([
+                'property_id' => $propertyId,
+                $column => $values,
+            ])
+            ->groupBy('model_id');
     }
 }

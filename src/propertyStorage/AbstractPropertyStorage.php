@@ -71,7 +71,7 @@ abstract class AbstractPropertyStorage implements Filter
      */
     public function __construct($storageId)
     {
-        $this->storageId = intval($storageId);
+        $this->storageId = (int) $storageId;
     }
 
     /**
@@ -437,5 +437,17 @@ abstract class AbstractPropertyStorage implements Filter
     )
     {
         return false;
+    }
+
+    /**
+     * @param PropertiesTrait $modelClass
+     * @param int $propertyId
+     * @param array $values
+     *
+     * @return ActiveQuery
+     */
+    public static function modelIdsQuery($modelClass, $propertyId, $values)
+    {
+        return null;
     }
 }
