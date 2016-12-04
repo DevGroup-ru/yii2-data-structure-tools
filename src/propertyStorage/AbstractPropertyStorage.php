@@ -10,6 +10,7 @@ use DevGroup\DataStructure\models\PropertyPropertyGroup;
 use DevGroup\DataStructure\Properties\Module;
 use DevGroup\DataStructure\search\interfaces\Filter;
 use DevGroup\DataStructure\traits\PropertiesTrait;
+use DevGroup\TagDependencyHelper\TagDependencyTrait;
 use Yii;
 use yii\base\Exception;
 use yii\caching\ChainedDependency;
@@ -440,14 +441,25 @@ abstract class AbstractPropertyStorage implements Filter
     }
 
     /**
-     * @param PropertiesTrait $modelClass
+     * @param PropertiesTrait|TagDependencyTrait $modelClass
      * @param int $propertyId
      * @param array $values
      *
-     * @return ActiveQuery
+     * @return Query
      */
     public static function modelIdsQuery($modelClass, $propertyId, $values)
     {
         return null;
+    }
+
+    /**
+     * @param int $propertyId
+     * @param array $values
+     *
+     * @return string
+     */
+    public static function hashPropertyValues($propertyId, $values)
+    {
+        return md5($propertyId . ':' . implode(0xdeadbeef, $values));
     }
 }

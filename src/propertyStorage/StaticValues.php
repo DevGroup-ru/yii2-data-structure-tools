@@ -292,6 +292,41 @@ class StaticValues extends AbstractPropertyStorage
         return $result;
     }
 
+    public static function modelIdsQuery($modelClass, $propertyId, $values)
+    {
+        $cacheKey = __CLASS__ . ':' . __FUNCTION__ . ':' . static::hashPropertyValues($propertyId, $values);
+        $cached = Yii::$app->cache->get($cacheKey);
+        if ($cached !== false) {
+            return $cached;
+        }
+        $property = Property::findById($propertyId);
+
+        $values = array_map(
+            function ($val) use ($property) {
+                return Property::castValueToDataType($val, $property->data_type);
+            },
+            $values
+        );
+
+        $q = (new Query())
+            ->select('model_id')
+            ->from($modelClass::staticValuesBindingsTable())
+            ->where(['in', 'static_value_id', $values,])
+            ->groupBy('model_id');
+        Yii::$app->cache->set(
+            $cacheKey,
+            $q,
+            86400,
+            new TagDependency([
+                'tags' => [
+                    $modelClass::commonTag(),
+                    Property::commonTag(),
+                ]
+            ])
+        );
+        return $q;
+    }
+
     /**
      * @inheritdoc
      */

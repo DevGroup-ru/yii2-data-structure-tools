@@ -792,6 +792,11 @@ class EAV extends AbstractPropertyStorage
      */
     public static function modelIdsQuery($modelClass, $propertyId, $values)
     {
+        $cacheKey = __CLASS__ . ':' . __FUNCTION__ . ':' . static::hashPropertyValues($propertyId, $values);
+        $cached = Yii::$app->cache->get($cacheKey);
+        if ($cached !== false) {
+            return $cached;
+        }
         $property = Property::findById($propertyId);
         $column = static::dataTypeToEavColumn($property->data_type);
 
@@ -802,7 +807,7 @@ class EAV extends AbstractPropertyStorage
             $values
         );
 
-        return (new Query())
+        $q = (new Query())
             ->select('model_id')
             ->from($modelClass::eavTable())
             ->where([
@@ -810,5 +815,17 @@ class EAV extends AbstractPropertyStorage
                 $column => $values,
             ])
             ->groupBy('model_id');
+        Yii::$app->cache->set(
+            $cacheKey,
+            $q,
+            86400,
+            new TagDependency([
+                'tags' => [
+                    $modelClass::commonTag(),
+                    Property::commonTag(),
+                ]
+            ])
+        );
+        return $q;
     }
 }

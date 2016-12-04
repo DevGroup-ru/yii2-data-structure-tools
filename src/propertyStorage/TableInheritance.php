@@ -11,6 +11,7 @@ use DevGroup\DataStructure\models\PropertyGroup;
 use DevGroup\DataStructure\Properties\Module;
 use DevGroup\DataStructure\traits\PropertiesTrait;
 use DevGroup\TagDependencyHelper\NamingHelper;
+use DevGroup\TagDependencyHelper\TagDependencyTrait;
 use Yii;
 use yii\caching\ChainedDependency;
 use yii\caching\TagDependency;
@@ -446,6 +447,26 @@ class TableInheritance extends AbstractPropertyStorage
             Yii::$app->cache->set($cacheKey, $result, $cacheLifetime, $dependency);
         }
         return $result;
+    }
+    /**
+     * @param PropertiesTrait|TagDependencyTrait $modelClass
+     * @param array $values
+     * @todo  Add SMART cache here(hash values somehow)
+     *
+     * @return Query
+     */
+    public static function modelIdsQueryAtOnce($modelClass, $values)
+    {
+        $q = (new Query())
+            ->select('model_id')
+            ->from($modelClass::tableInheritanceTable());
+
+        foreach ($values as $key => $vals) {
+            $q->andWhere(['or', $key, $vals]);
+        };
+
+            $q->groupBy('model_id');
+        return $q;
     }
 
     /**
