@@ -30,11 +30,13 @@ class BaseSearch extends yii\base\Component
     /**
      * @param string $mainEntityClassname
      *
-     * @return \DevGroup\DataStructure\search\base\SearchQuery
+     * @param array $config array to pass to SearchQuery constructor
+     *
+     * @return SearchQuery
      */
-    public function search($mainEntityClassname)
+    public function search($mainEntityClassname, $config = [])
     {
-        return new SearchQuery($mainEntityClassname, $this);
+        return Yii::$container->get(SearchQuery::class, [$mainEntityClassname, $this, $config]);
     }
 
     /**

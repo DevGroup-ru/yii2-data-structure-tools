@@ -79,6 +79,10 @@ class SearchQuery extends yii\base\Component
      */
     public $offset = 0;
     /**
+     *
+     */
+    public $order = null;
+    /**
      * SearchQuery constructor.
      *
      * @param string $mainEntityClassName Class name of main entity we want to retrieve.
