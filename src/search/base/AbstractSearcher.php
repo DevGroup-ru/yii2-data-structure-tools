@@ -5,6 +5,7 @@ namespace DevGroup\DataStructure\search\base;
 use DevGroup\DataStructure\search\eventHandlers\QueryModifiers\DisablePropertiesAutoFetch;
 use DevGroup\DataStructure\search\eventHandlers\QueryModifiers\FetchProperties;
 use DevGroup\DataStructure\search\response\CountResponse;
+use DevGroup\DataStructure\search\response\IdsResponse;
 use DevGroup\DataStructure\search\response\ResultResponse;
 use DevGroup\DataStructure\search\response\QueryResponse;
 use yii;
@@ -45,6 +46,9 @@ abstract class AbstractSearcher extends yii\base\Component
                 break;
             case BaseSearch::SEARCH_RESULT:
                 return new ResultResponse();
+                break;
+            case BaseSearch::SEARCH_IDS:
+                return new IdsResponse();
                 break;
             case BaseSearch::SEARCH_QUERY:
             default:

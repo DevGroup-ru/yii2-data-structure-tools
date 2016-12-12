@@ -16,6 +16,7 @@ use DevGroup\DataStructure\search\implementation\db\QueryModifiers\OrderBy;
 use DevGroup\DataStructure\search\implementation\db\QueryModifiers\PropertiesModifier;
 use DevGroup\DataStructure\search\implementation\db\QueryModifiers\RelationAttributes;
 use DevGroup\DataStructure\search\response\CountResponse;
+use DevGroup\DataStructure\search\response\IdsResponse;
 use DevGroup\DataStructure\search\response\ResultResponse;
 use DevGroup\DataStructure\search\response\QueryResponse;
 use yii;
@@ -120,6 +121,20 @@ class DbSearcher extends AbstractSearcher
                     ]
                 );
                 $this->trigger(self::EVENT_AFTER_FIND, $e);
+                $success = true;
+                break;
+            case BaseSearch::SEARCH_IDS:
+                /** @var IdsResponse $response */
+                $activeQuery->select(
+                    array_map(
+                        function ($item) use ($mainEntityClassName) {
+                            return $mainEntityClassName::tableName() . '.' . $item;
+                        },
+                        $mainEntityClassName::primaryKey()
+                    )
+                );
+                $response->ids = $activeQuery->all();
+                $response->query = $activeQuery;
                 $success = true;
                 break;
         }
