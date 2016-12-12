@@ -12,6 +12,7 @@ use DevGroup\DataStructure\search\implementation\db\QueryModifiers\DefaultAttrib
 use DevGroup\DataStructure\search\implementation\db\QueryModifiers\DefaultWith;
 use DevGroup\DataStructure\search\implementation\db\QueryModifiers\LimitOffset;
 use DevGroup\DataStructure\search\implementation\db\QueryModifiers\MainEntityAttributes;
+use DevGroup\DataStructure\search\implementation\db\QueryModifiers\OrderBy;
 use DevGroup\DataStructure\search\implementation\db\QueryModifiers\PropertiesModifier;
 use DevGroup\DataStructure\search\implementation\db\QueryModifiers\RelationAttributes;
 use DevGroup\DataStructure\search\response\CountResponse;
@@ -29,6 +30,7 @@ class DbSearcher extends AbstractSearcher
         $this->on(self::EVENT_BEFORE_PAGINATION, [MainEntityAttributes::class, 'modify']);
         $this->on(self::EVENT_BEFORE_PAGINATION, [RelationAttributes::class, 'modify']);
         $this->on(self::EVENT_BEFORE_PAGINATION, [PropertiesModifier::class, 'modify']);
+        $this->on(self::EVENT_BEFORE_PAGINATION, [OrderBy::class, 'modify']);
 
         $this->on(self::EVENT_AFTER_PAGINATION, [LimitOffset::class, 'modify']);
 
