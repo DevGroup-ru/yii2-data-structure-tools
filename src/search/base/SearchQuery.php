@@ -81,7 +81,7 @@ class SearchQuery extends yii\base\Component
     /**
      *
      */
-    public $order = null;
+    public $order;
     /**
      * SearchQuery constructor.
      *
