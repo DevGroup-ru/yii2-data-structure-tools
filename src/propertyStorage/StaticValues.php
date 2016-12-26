@@ -10,6 +10,7 @@ use DevGroup\DataStructure\models\StaticValue;
 use DevGroup\DataStructure\models\StaticValueTranslation;
 use DevGroup\DataStructure\traits\PropertiesTrait;
 use DevGroup\TagDependencyHelper\NamingHelper;
+use DevGroup\TagDependencyHelper\TagDependencyTrait;
 use Yii;
 use yii\caching\ChainedDependency;
 use yii\caching\TagDependency;
@@ -45,47 +46,7 @@ class StaticValues extends AbstractPropertyStorage
     {
         /** @var \yii\db\ActiveRecord|\DevGroup\DataStructure\traits\PropertiesTrait|\DevGroup\TagDependencyHelper\TagDependencyTrait $firstModel */
         $firstModel = reset($models);
-        $tags = [];
-        foreach ($models as $model) {
-            $tags[] = $model->objectTag();
-        }
-        $static_values_rows = Yii::$app->cache->lazy(function () use ($firstModel, $models) {
-            $query = new \yii\db\Query();
-            $staticValuesBindingTable = $firstModel->staticValuesBindingsTable();
-            $rows = $query
-                ->select([
-                    "$staticValuesBindingTable.model_id",
-                    "$staticValuesBindingTable.static_value_id",
-                    "$staticValuesBindingTable.sort_order",
-                    "{{static_value}}.property_id",
-                ])
-                ->from($firstModel->staticValuesBindingsTable())
-                ->innerJoin(StaticValue::tableName(), "$staticValuesBindingTable.static_value_id = {{static_value}}.id")
-                ->where(PropertiesHelper::getInCondition($models))
-                ->orderBy([
-                    "$staticValuesBindingTable.model_id" => SORT_ASC,
-                    "{{static_value}}.property_id" => SORT_ASC,
-                    "$staticValuesBindingTable.sort_order" => SORT_ASC
-                ])
-                ->all($firstModel->getDb());
-
-            $result = [];
-
-            foreach ($rows as $row) {
-                $modelId = $row['model_id'];
-
-                if (isset($result[$modelId]) === false) {
-                    $result[$modelId] = [];
-                }
-                $propertyId = $row['property_id'];
-                if (isset($result[$modelId][$propertyId]) === false) {
-                    $result[$modelId][$propertyId] = [];
-                }
-                $result[$modelId][$propertyId][] = $row['static_value_id'];
-            }
-
-            return $result;
-        }, PropertiesHelper::generateCacheKey($models, 'static_values'), 86400, $tags);
+        $static_values_rows = static::getValues($firstModel::className(), ArrayHelper::getColumn($models, 'id'));
 
         // fill models with static values
         $modelIdToArrayIndex = PropertiesHelper::idToArrayIndex($models);
@@ -493,5 +454,72 @@ class StaticValues extends AbstractPropertyStorage
             $dependency
         );
         return $data;
+    }
+
+    public static function getFrontendValues($className, $ids, $languageId = null) {
+        $svt = [];
+        $values = static::getValues($className, $ids);
+        foreach ($values as $modelId => $properties) {
+            foreach ($properties as $propertyId => $staticValues) {
+                foreach ($staticValues as $index => $staticValueId) {
+                    if (!isset($svt[$staticValueId])) {
+                        $svt[$staticValueId] = StaticValueTranslation::find()
+                            ->select(['name'])
+                            ->where(['model_id' => $staticValueId])
+                            ->scalar();
+                    }
+                    $values[$modelId][$propertyId][$index] = $svt[$staticValueId];
+                }
+            }
+        }
+        return $values;
+    }
+
+    protected static function getValues($className, $ids, $languageId = null)
+    {
+        sort($ids);
+        $cacheKey = $className::tableName() . ':' . implode(',', $ids) . "-static_values";
+        $tags = [];
+        foreach ($ids as $id) {
+            $tags[] = NamingHelper::getObjectTag($className, $id);
+        }
+        $static_values_rows = Yii::$app->cache->lazy(function () use ($className, $ids) {
+            $query = new \yii\db\Query();
+            $staticValuesBindingTable = $className::staticValuesBindingsTable();
+            $rows = $query
+                ->select(
+                    [
+                        "$staticValuesBindingTable.model_id",
+                        "$staticValuesBindingTable.static_value_id",
+                        "$staticValuesBindingTable.sort_order",
+                        "{{static_value}}.property_id",
+                    ]
+                )
+                ->from($staticValuesBindingTable)
+                ->innerJoin(StaticValue::tableName(), "$staticValuesBindingTable.static_value_id = {{static_value}}.id")
+                ->where(['model_id' => $ids])
+                ->orderBy(
+                    [
+                        "$staticValuesBindingTable.model_id" => SORT_ASC,
+                        "{{static_value}}.property_id" => SORT_ASC,
+                        "$staticValuesBindingTable.sort_order" => SORT_ASC
+                    ]
+                )
+                ->all($className::getDb());
+            $result = [];
+            foreach ($rows as $row) {
+                $modelId = $row['model_id'];
+                if (isset($result[$modelId]) === false) {
+                    $result[$modelId] = [];
+                }
+                $propertyId = $row['property_id'];
+                if (isset($result[$modelId][$propertyId]) === false) {
+                    $result[$modelId][$propertyId] = [];
+                }
+                $result[$modelId][$propertyId][] = $row['static_value_id'];
+            }
+            return $result;
+        }, $cacheKey, 86400, $tags);
+        return $static_values_rows;
     }
 }

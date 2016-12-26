@@ -35,19 +35,8 @@ class EAV extends AbstractPropertyStorage
         /** @var \yii\db\ActiveRecord|\DevGroup\DataStructure\traits\PropertiesTrait $firstModel */
         $firstModel = reset($models);
 
-        /** @var \yii\db\Command $command */
-        $query = new Query();
-        $query->select('*')->from($firstModel->eavTable())->where(PropertiesHelper::getInCondition($models))->orderBy(
-                [
-                    'model_id' => SORT_ASC,
-                    'sort_order' => SORT_ASC,
-                ]
-            );
-        if (null !== $languageId) {
-            $query->andWhere(['language_id' => [(int) $languageId, 0]]);
-        }
+        $values = static::getValues($firstModel::className(), ArrayHelper::getColumn($models, 'id'), $languageId);
 
-        $values = $query->createCommand($firstModel->getDb())->queryAll();
         $values = ArrayHelper::map(
             $values,
             'id',
@@ -827,5 +816,40 @@ class EAV extends AbstractPropertyStorage
             ])
         );
         return $q;
+    }
+
+    public static function getFrontendValues($className, $ids, $languageId = null)
+    {
+        $values = static::getValues($className, $ids, $languageId);
+        $values = ArrayHelper::map(
+            $values,
+            'property_id',
+            function ($item) {
+                $property = Property::findById($item['property_id']);
+                return $item[static::dataTypeToEavColumn($property->data_type)];
+            },
+            'model_id'
+        );
+        return $values;
+    }
+
+    protected static function getValues($className, $ids, $languageId = null)
+    {
+        /** @var \yii\db\Command $command */
+        $query = new Query();
+        $query->select('*')
+            ->from($className::eavTable())
+            ->where(['model_id' => $ids])
+            ->orderBy(
+                [
+                    'model_id' => SORT_ASC,
+                    'sort_order' => SORT_ASC,
+                ]
+            );
+        if (null !== $languageId) {
+            $query->andWhere(['language_id' => [(int) $languageId, 0]]);
+        }
+        $values = $query->createCommand($className::getDb())->queryAll();
+        return $values;
     }
 }
