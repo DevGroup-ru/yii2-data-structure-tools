@@ -71,7 +71,7 @@ class DbSearcher extends AbstractSearcher
         $pages = $searchQuery->getPagination();
         if ($returnType !== BaseSearch::SEARCH_COUNT && $pages !== null) {
             if ($pages->totalCount === 0) {
-                $column = $mainEntityClassName::tableName() . '.id';
+                $column = '`c`.id';
                 $pages->totalCount = (int) $activeQuery->count($column);
             }
             $searchQuery->limit = $pages->limit;
