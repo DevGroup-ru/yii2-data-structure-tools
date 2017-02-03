@@ -38,7 +38,7 @@ class PackedJsonAttributes extends Behavior
         if ($this->_packedAttributes === null) {
             /** @var ActiveRecord $owner */
             $owner = $this->owner;
-            $allAttributes = array_keys($owner->getAttributes());
+            $allAttributes = method_exists($owner, 'getAttributes') ? array_keys($owner->getAttributes()) : [];
             $this->_packedAttributes = array_reduce(
                 $allAttributes,
                 function ($carry, $item) {
