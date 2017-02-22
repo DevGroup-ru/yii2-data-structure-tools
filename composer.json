@@ -30,7 +30,6 @@
         "devgroup/yii2-jsoneditor": "*",
         "vova07/yii2-imperavi-widget": "*",
         "devgroup/yii2-measure": "*",
-        "devgroup/yii2-media-storage": "*",
         "kartik-v/yii2-widget-colorinput": "*"
     },
     "require-dev": {

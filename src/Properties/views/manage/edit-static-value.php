@@ -4,8 +4,6 @@ use DevGroup\AdminUtils\FrontendHelper;
 use DevGroup\DataStructure\models\StaticValue;
 use DevGroup\DataStructure\Properties\actions\EditStaticValue;
 use DevGroup\DataStructure\Properties\Module;
-use DevGroup\MediaStorage\widgets\MediaInput;
-use mihaildev\elfinder\InputFile;
 use unclead\widgets\MultipleInput;
 use unclead\widgets\MultipleInputColumn;
 use yii\helpers\Html;
@@ -50,8 +48,8 @@ $this->params['breadcrumbs'][] = $this->title;
             'form' => $form,
         ])
         ?>
-
-        <?= MediaInput::widget([
+        <?php if (class_exists('DevGroup\MediaStorage\widgets\MediaInput')): ?>
+        <?= DevGroup\MediaStorage\widgets\MediaInput::widget([
             'name' => Html::getInputName($model, 'params[img]'),
             'value' => empty($model->params['img']) === false ? $model->params['img'] : '',
             'controller' => 'media/elfinder',
@@ -61,6 +59,7 @@ $this->params['breadcrumbs'][] = $this->title;
             'buttonName' => '<i class="fa fa-plus"></i> ' . Yii::t('app', 'Open gallery'),
             'multiple' => false,
         ]) ?>
+        <?php endif;?>
 
         <?= $form->field($model, 'params')
             ->label(false)
