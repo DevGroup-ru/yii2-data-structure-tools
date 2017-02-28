@@ -86,7 +86,7 @@ class m150923_140300_properties extends Migration
             'class_name' => $this->string()->notNull(),
             'sort_order' => $this->integer()->notNull()->defaultValue(0),
             'packed_json_default_config' => $this->text()->notNull(),
-        ]);
+        ], $tableOptions);
 
         // translations
         $this->createTable('{{%property_translation}}', [
