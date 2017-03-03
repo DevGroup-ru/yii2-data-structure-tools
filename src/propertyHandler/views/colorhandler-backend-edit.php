@@ -15,7 +15,7 @@ use yii\helpers\ArrayHelper;
 
 $dataQuery = $property->getStaticValues();
 
-if ((int)$property->allow_multiple_values === 1 && !empty($model->{$property->key})) {
+if ((int)$property->allow_multiple_values === 1 && !empty($model->{$property->key}) && is_array($model->{$property->key})) {
     $dataQuery->orderBy([
         new \yii\db\Expression('FIELD(id, ' . implode(',', $model->{$property->key}) . '), sort_order')
     ]);
