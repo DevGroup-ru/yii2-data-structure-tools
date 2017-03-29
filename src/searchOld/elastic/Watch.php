@@ -1,6 +1,6 @@
 <?php
 
-namespace DevGroup\DataStructure\search\elastic;
+namespace DevGroup\DataStructure\searchOld\elastic;
 
 use DevGroup\DataStructure\behaviors\HasProperties;
 use DevGroup\DataStructure\models\Property;
@@ -8,9 +8,9 @@ use DevGroup\DataStructure\models\PropertyStorage;
 use DevGroup\DataStructure\models\StaticValueTranslation;
 use DevGroup\DataStructure\propertyStorage\EAV;
 use DevGroup\DataStructure\propertyStorage\StaticValues;
-use DevGroup\DataStructure\search\base\AbstractWatch;
-use DevGroup\DataStructure\search\elastic\helpers\IndexHelper;
-use DevGroup\DataStructure\search\helpers\LanguageHelper;
+use DevGroup\DataStructure\searchOld\base\AbstractWatch;
+use DevGroup\DataStructure\searchOld\elastic\helpers\IndexHelper;
+use DevGroup\DataStructure\searchOld\helpers\LanguageHelper;
 use DevGroup\DataStructure\traits\PropertiesTrait;
 use Elasticsearch\Client;
 use yii\db\ActiveRecord;
@@ -29,7 +29,7 @@ use Yii;
  * - index structure: @see ElasticIndexController::$staticIndexConfig
  *
  *
- * @package DevGroup\DataStructure\search\elastic
+ * @package DevGroup\DataStructure\searchOld\elastic
  */
 class Watch extends AbstractWatch
 {

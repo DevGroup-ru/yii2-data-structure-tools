@@ -2,7 +2,7 @@
 
 namespace DevGroup\DataStructure\tests;
 
-use DevGroup\DataStructure\search\elastic\helpers\IndexHelper;
+use DevGroup\DataStructure\searchOld\elastic\helpers\IndexHelper;
 use DevGroup\DataStructure\tests\models\Product;
 use Elasticsearch\ClientBuilder;
 use Yii;

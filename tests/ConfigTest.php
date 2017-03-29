@@ -3,9 +3,9 @@
 namespace DevGroup\DataStructure\tests;
 
 
-use DevGroup\DataStructure\search\common\Search as Common;
-use DevGroup\DataStructure\search\elastic\Search as Elastic;
-use DevGroup\DataStructure\search\elastic\Watch;
+use DevGroup\DataStructure\searchOld\common\Search as Common;
+use DevGroup\DataStructure\searchOld\elastic\Search as Elastic;
+use DevGroup\DataStructure\searchOld\elastic\Watch;
 use yii\web\Application;
 use Yii;
 

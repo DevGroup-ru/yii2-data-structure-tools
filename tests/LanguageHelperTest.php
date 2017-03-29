@@ -2,7 +2,7 @@
 
 namespace DevGroup\DataStructure\tests;
 
-use DevGroup\DataStructure\search\helpers\LanguageHelper;
+use DevGroup\DataStructure\searchOld\helpers\LanguageHelper;
 use yii\helpers\ArrayHelper;
 use yii\web\Application;
 use Yii;

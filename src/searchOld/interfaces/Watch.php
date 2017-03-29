@@ -1,13 +1,13 @@
 <?php
 
-namespace DevGroup\DataStructure\search\interfaces;
+namespace DevGroup\DataStructure\searchOld\interfaces;
 
 use DevGroup\DataStructure\events\HasPropertiesEvent;
 
 /**
  * Interface Watch
  *
- * @package DevGroup\DataStructure\search\interfaces
+ * @package DevGroup\DataStructure\searchOld\interfaces
  */
 interface Watch
 {

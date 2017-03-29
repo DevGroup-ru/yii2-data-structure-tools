@@ -4,7 +4,7 @@ namespace DevGroup\DataStructure\tests;
 
 
 use DevGroup\DataStructure\propertyStorage\StaticValues;
-use DevGroup\DataStructure\search\elastic\helpers\IndexHelper;
+use DevGroup\DataStructure\searchOld\elastic\helpers\IndexHelper;
 use DevGroup\DataStructure\tests\models\Product;
 
 class IndexHelperNoDbTest  extends \PHPUnit_Framework_TestCase

@@ -1,8 +1,8 @@
 <?php
 
-namespace DevGroup\DataStructure\search\widgets;
+namespace DevGroup\DataStructure\searchOld\widgets;
 
-use DevGroup\DataStructure\search\base\AbstractSearch;
+use DevGroup\DataStructure\searchOld\base\AbstractSearch;
 use yii\base\InvalidParamException;
 use yii\base\Widget;
 use Yii;
@@ -10,7 +10,7 @@ use Yii;
 /**
  * Class FilterFormWidget
  * @codeCoverageIgnore
- * @package DevGroup\DataStructure\search\elastic\widgets
+ * @package DevGroup\DataStructure\searchOld\elastic\widgets
  */
 class FilterFormWidget extends Widget
 {

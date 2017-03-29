@@ -1,13 +1,13 @@
 <?php
 
-namespace DevGroup\DataStructure\search\common;
+namespace DevGroup\DataStructure\searchOld\common;
 
 use DevGroup\DataStructure\behaviors\HasProperties;
 use DevGroup\DataStructure\models\Property;
 use DevGroup\DataStructure\models\PropertyStorage;
 use DevGroup\DataStructure\propertyStorage\AbstractPropertyStorage;
 use DevGroup\DataStructure\propertyStorage\StaticValues;
-use DevGroup\DataStructure\search\base\AbstractSearch;
+use DevGroup\DataStructure\searchOld\base\AbstractSearch;
 use DevGroup\DataStructure\traits\PropertiesTrait;
 use DevGroup\TagDependencyHelper\TagDependencyTrait;
 use Yii;
@@ -18,7 +18,7 @@ use yii\helpers\ArrayHelper;
 /**
  * Class Search proceeds search against persistent database e.g.: mysql
  *
- * @package DevGroup\DataStructure\search\common
+ * @package DevGroup\DataStructure\searchOld\common
  */
 class Search extends AbstractSearch
 {

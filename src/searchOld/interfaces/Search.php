@@ -1,6 +1,6 @@
 <?php
 
-namespace DevGroup\DataStructure\search\interfaces;
+namespace DevGroup\DataStructure\searchOld\interfaces;
 
 use yii\db\ActiveRecord;
 use DevGroup\DataStructure\traits\PropertiesTrait;
@@ -10,7 +10,7 @@ use DevGroup\TagDependencyHelper\TagDependencyTrait;
 /**
  * Interface Search
  *
- * @package DevGroup\DataStructure\search\interfaces
+ * @package DevGroup\DataStructure\searchOld\interfaces
  */
 interface Search
 {

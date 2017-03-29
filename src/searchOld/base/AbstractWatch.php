@@ -1,16 +1,16 @@
 <?php
 
-namespace DevGroup\DataStructure\search\base;
+namespace DevGroup\DataStructure\searchOld\base;
 
 
 use DevGroup\DataStructure\behaviors\HasProperties;
 use DevGroup\DataStructure\events\HasPropertiesEvent;
-use DevGroup\DataStructure\search\interfaces\Watch;
+use DevGroup\DataStructure\searchOld\interfaces\Watch;
 
 /**
  * Class AbstractWatch
  *
- * @package DevGroup\DataStructure\search\base
+ * @package DevGroup\DataStructure\searchOld\base
  */
 abstract class AbstractWatch implements Watch
 {

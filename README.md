@@ -60,7 +60,7 @@ Preferred search mechanism you can define in the application configuration files
     ...
          'properties' => [
              'class' => 'DevGroup\DataStructure\Properties\Module',
-             'searchClass' => \DevGroup\DataStructure\search\elastic\Search::class,
+             'searchClass' => \DevGroup\DataStructure\searchOld\elastic\Search::class,
              'searchConfig' => [
                  'hosts' => ['host1:9200', 'https://host2:9200'],
                  'watcherClass' => MyWatch::class,

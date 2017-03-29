@@ -4,7 +4,7 @@ namespace DevGroup\DataStructure\tests;
 
 use DevGroup\DataStructure\propertyHandler\StaticValues;
 use DevGroup\DataStructure\propertyStorage\EAV;
-use DevGroup\DataStructure\search\elastic\Search;
+use DevGroup\DataStructure\searchOld\elastic\Search;
 use DevGroup\DataStructure\tests\models\Product;
 use Yii;
 
@@ -18,7 +18,7 @@ use Yii;
 class SearchTest extends DSTCommonTestCase
 {
     /**
-     * this must be the same to \DevGroup\DataStructure\search\common\Search::testFilterFormData()
+     * this must be the same to \DevGroup\DataStructure\searchOld\common\Search::testFilterFormData()
      * @return Search
      */
     public function testFilterFormData()

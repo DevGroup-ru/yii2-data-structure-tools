@@ -12,7 +12,7 @@ use DevGroup\DataStructure\models\StaticValue;
 use DevGroup\DataStructure\propertyStorage\EAV;
 use DevGroup\DataStructure\propertyStorage\StaticValues;
 use DevGroup\DataStructure\propertyStorage\TableInheritance;
-use DevGroup\DataStructure\search\common\Search;
+use DevGroup\DataStructure\searchOld\common\Search;
 use DevGroup\DataStructure\tests\models\Product;
 use DevGroup\DataStructure\tests\models\Category;
 use Yii;
@@ -20,7 +20,7 @@ use Yii;
 class CommonSearchTest extends DSTCommonTestCase
 {
 
-    public $searchClass = \DevGroup\DataStructure\search\common\Search::class;
+    public $searchClass = \DevGroup\DataStructure\searchOld\common\Search::class;
 
     public $prepareIndex = false;
 

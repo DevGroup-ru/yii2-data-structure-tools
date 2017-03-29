@@ -1,6 +1,6 @@
 <?php
 
-namespace DevGroup\DataStructure\search\elastic\helpers;
+namespace DevGroup\DataStructure\searchOld\elastic\helpers;
 
 use Elasticsearch\Client;
 use yii\base\Object;
@@ -10,7 +10,7 @@ use yii\helpers\StringHelper;
 /**
  * Class IndexHelper
  *
- * @package DevGroup\DataStructure\search\elastic\helpers
+ * @package DevGroup\DataStructure\searchOld\elastic\helpers
  */
 class IndexHelper extends Object
 {

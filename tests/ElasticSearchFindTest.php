@@ -4,7 +4,7 @@ namespace DevGroup\DataStructure\tests;
 
 use DevGroup\DataStructure\propertyStorage\StaticValues;
 use DevGroup\DataStructure\propertyStorage\EAV;
-use DevGroup\DataStructure\search\elastic\Search;
+use DevGroup\DataStructure\searchOld\elastic\Search;
 use DevGroup\DataStructure\tests\models\Product;
 use Yii;
 

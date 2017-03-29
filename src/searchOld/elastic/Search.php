@@ -1,6 +1,6 @@
 <?php
 
-namespace DevGroup\DataStructure\search\elastic;
+namespace DevGroup\DataStructure\searchOld\elastic;
 
 use DevGroup\DataStructure\behaviors\HasProperties;
 use DevGroup\DataStructure\models\Property;
@@ -8,9 +8,9 @@ use DevGroup\DataStructure\models\PropertyStorage;
 use DevGroup\DataStructure\models\PropertyTranslation;
 use DevGroup\DataStructure\propertyStorage\EAV;
 use DevGroup\DataStructure\propertyStorage\StaticValues;
-use DevGroup\DataStructure\search\base\AbstractSearch;
-use DevGroup\DataStructure\search\elastic\helpers\IndexHelper;
-use DevGroup\DataStructure\search\helpers\LanguageHelper;
+use DevGroup\DataStructure\searchOld\base\AbstractSearch;
+use DevGroup\DataStructure\searchOld\elastic\helpers\IndexHelper;
+use DevGroup\DataStructure\searchOld\helpers\LanguageHelper;
 use DevGroup\DataStructure\traits\PropertiesTrait;
 use DevGroup\TagDependencyHelper\TagDependencyTrait;
 use Elasticsearch\Client;
@@ -23,7 +23,7 @@ use yii\helpers\ArrayHelper;
 
 /**
  * Class Search
- * @package DevGroup\DataStructure\search\elastic
+ * @package DevGroup\DataStructure\searchOld\elastic
  * @property Watch $watcher
  */
 class Search extends AbstractSearch

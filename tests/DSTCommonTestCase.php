@@ -22,7 +22,7 @@ use Yii;
  */
 class DSTCommonTestCase extends \PHPUnit_Extensions_Database_TestCase
 {
-    public $searchClass = \DevGroup\DataStructure\search\elastic\Search::class;
+    public $searchClass = \DevGroup\DataStructure\searchOld\elastic\Search::class;
 
     public $prepareIndex = true;
 

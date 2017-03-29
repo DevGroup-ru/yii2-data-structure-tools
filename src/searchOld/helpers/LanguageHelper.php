@@ -1,6 +1,6 @@
 <?php
 
-namespace DevGroup\DataStructure\search\helpers;
+namespace DevGroup\DataStructure\searchOld\helpers;
 
 use yii\base\Component;
 use Yii;
@@ -9,7 +9,7 @@ use yii\helpers\ArrayHelper;
 /**
  * Class LanguageHelper
  *
- * @package DevGroup\DataStructure\search\helpers
+ * @package DevGroup\DataStructure\searchOld\helpers
  */
 class LanguageHelper extends Component
 {

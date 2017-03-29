@@ -3,7 +3,7 @@
 namespace DevGroup\DataStructure\tests;
 
 use DevGroup\DataStructure\models\StaticValue;
-use DevGroup\DataStructure\search\elastic\Search;
+use DevGroup\DataStructure\searchOld\elastic\Search;
 use Yii;
 
 /**

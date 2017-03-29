@@ -2,7 +2,7 @@
 
 namespace DevGroup\DataStructure\tests;
 
-use DevGroup\DataStructure\search\elastic\Search;
+use DevGroup\DataStructure\searchOld\elastic\Search;
 use Elasticsearch\Client;
 use Elasticsearch\ClientBuilder;
 use Yii;

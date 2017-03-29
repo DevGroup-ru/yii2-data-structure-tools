@@ -1,14 +1,14 @@
 <?php
 
-namespace DevGroup\DataStructure\search\base;
+namespace DevGroup\DataStructure\searchOld\base;
 
-use DevGroup\DataStructure\search\interfaces\Search;
+use DevGroup\DataStructure\searchOld\interfaces\Search;
 use yii\base\Component;
 
 /**
  * Class AbstractSearch
  *
- * @package DevGroup\DataStructure\search\base
+ * @package DevGroup\DataStructure\searchOld\base
  */
 abstract class AbstractSearch extends Component implements Search
 {
