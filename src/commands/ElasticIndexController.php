@@ -19,11 +19,11 @@ use Elasticsearch\Client;
 use Elasticsearch\Common\Exceptions\NoNodesAvailableException;
 use yii\console\Controller;
 use Yii;
+use yii\db\Expression;
 use yii\db\Query;
 use yii\helpers\ArrayHelper;
 use Elasticsearch\ClientBuilder;
 use yii\helpers\Json;
-
 
 /**
  * Class ElasticIndexController
@@ -392,10 +392,14 @@ class ElasticIndexController extends Controller
             ->distinct(true)
             ->all();
         $valueIds = array_keys($propValues);
-        $assignedValues = (new Query())->from($bindingsTable)
-            ->select(['model_id', 'static_value_id'])
-            ->where(['static_value_id' => $valueIds])
-            ->all();
+        if (count($valueIds) > 0) {
+            $assignedValues = (new Query())->from($bindingsTable)
+                ->select(['model_id', 'static_value_id'])
+                ->where(new Expression('`static_value_id` IN (' . implode(',', $valueIds) . ')'))
+                ->all();
+        } else {
+            $assignedValues = [];
+        }
         $assignedValueIds = array_column($assignedValues, 'static_value_id');
         $assignedValueIds = array_unique($assignedValueIds);
         $props = ArrayHelper::map($props, 'id', 'key');
