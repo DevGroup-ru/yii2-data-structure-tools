@@ -12,7 +12,6 @@ use DevGroup\DataStructure\searchOld\base\AbstractSearch;
 use DevGroup\DataStructure\searchOld\elastic\helpers\IndexHelper;
 use DevGroup\DataStructure\searchOld\helpers\LanguageHelper;
 use DevGroup\DataStructure\traits\PropertiesTrait;
-use DevGroup\TagDependencyHelper\TagDependencyTrait;
 use Elasticsearch\Client;
 use Elasticsearch\ClientBuilder;
 use Elasticsearch\Common\Exceptions\NoNodesAvailableException;
@@ -484,17 +483,46 @@ class Search extends AbstractSearch
      * @param string $index
      * @return array
      */
-    public static function buildFilterQuery($params, $index)
+    public static function buildFilterQuery($params, $index, $types)
     {
+        self::filterInput($params);
+        $storageToId = (new Query())
+            ->from(PropertyStorage::tableName())
+            ->select('class_name')
+            ->where(['class_name' => array_keys($types)])
+            ->indexBy('id')
+            ->column();
+        $propData = (new Query())
+            ->from(Property::tableName())
+            ->select(['id', 'data_type', 'storage_id'])
+            ->where([
+                'id' => array_keys($params),
+                'storage_id' => array_keys($storageToId),
+                'in_search' => 1
+            ])
+            ->indexBy('id')
+            ->all();
         $query = ['bool' => ['must' => []]];
         $currentLang = LanguageHelper::getCurrent();
         foreach ($params as $propId => $values) {
             $q = ['bool' => ['should' => []]];
-            foreach ($values as $val) {
-                $q['bool']['should'][] = [
-                    'bool' => ['must' => [['term' => [self::STATIC_VALUES_FILED . '.prop_id' => $propId]],
-                        ['term' => [self::STATIC_VALUES_FILED . '.value_' . $currentLang . '.raw' => $val]]]]
-                ];
+            switch ($storageToId[$propData[$propId]['storage_id']]) {
+                case EAV::class :
+                    foreach ($values as $val) {
+                        $q['bool']['should'][] = [
+                            'bool' => ['must' => [['term' => [self::STATIC_VALUES_FILED . '.prop_id' => $propId]],
+                                ['term' => [self::STATIC_VALUES_FILED . '.value_' . $currentLang . '.raw' => $val]]]]
+                        ];
+                    }
+                    break;
+                case StaticValues::class :
+                    foreach ($values as $val) {
+                        $q['bool']['should'][] = [
+                            'bool' => ['must' => [['term' => [self::STATIC_VALUES_FILED . '.prop_id' => $propId]],
+                                ['term' => [self::STATIC_VALUES_FILED . '.static_value_id' => $val]]]]
+                        ];
+                    }
+                    break;
             }
             $query['bool']['must'][] = $q;
         }
