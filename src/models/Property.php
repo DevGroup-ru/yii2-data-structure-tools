@@ -114,6 +114,7 @@ class Property extends ActiveRecord
             ['key', 'unique'],
             ['key', 'required'],
             ['key', 'string', 'max' => 80],
+            ['key', 'match', 'pattern' => '#^[\w\d\_]+$#is'],
             [['is_internal', 'allow_multiple_values'], 'filter', 'filter' => 'boolval'],
             [['data_type', 'in_search'], 'integer',],
             [['data_type'], 'required',],
